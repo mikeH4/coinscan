@@ -1,6 +1,6 @@
-from db import CreateSQLTables
+from modules.db import CreateSQLTables
 
-a = CreateSQLTables("db.db")
+a = CreateSQLTables("data/db.db")
 
 a += """
 CREATE TABLE posts (
@@ -16,6 +16,15 @@ CREATE TABLE posts (
     upvote_ratio FLOAT NOT NULL ,
     is_original_content TEXT NOT NULL ,
     is_self TEXT NOT NULL 
+)
+"""
+
+a += """
+CREATE TABLE latest (
+    address TEXT PRIMARY KEY NOT NULL ,
+    name TEXT NOT NULL ,
+    symbol TEXT NOT NULL ,
+    added INTEGER NOT NULL
 )
 """
 

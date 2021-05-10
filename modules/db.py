@@ -37,10 +37,14 @@ class DB:
         
         self.close()
       
-    def insert(self,table,data, commit: bool = True):
+    def insert(self,table,data, commit: bool = True, ignore_insert=False):
         cols = ",".join(data.keys())
         placeholder = self.placeholder(len(data))
-        sql = f"INSERT OR IGNORE INTO {table} ({cols}) VALUES ({placeholder})"
+        
+        or_ignore = ""
+        if ignore_insert:
+            or_ignore = "OR IGNORE"
+        sql = f"INSERT {or_ignore} INTO {table} ({cols}) VALUES ({placeholder})"
                 
         self.query(sql,data.values())
         
