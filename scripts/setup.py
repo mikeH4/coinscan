@@ -24,6 +24,9 @@ CREATE TABLE latest (
     address TEXT PRIMARY KEY NOT NULL ,
     name TEXT NOT NULL ,
     symbol TEXT NOT NULL ,
+    chain TEXT NOT NULL ,
+    defunct INTEGER NOT NULL ,
+    source_md5 STRING NOT NULL ,
     added INTEGER NOT NULL
 )
 """

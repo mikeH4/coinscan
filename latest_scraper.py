@@ -1,36 +1,44 @@
 from bs4 import BeautifulSoup
 from datetime import datetime,timedelta
+import json
 
 from modules.requests import get
 from modules.db import DB
-
-db = DB("data/db.db")
 
 interval_map = dict(
     m="minutes",
     h="hours",
     d="days",
 )
+chain_map = dict(
+    bscTokens="bsc",
+    ethTokens="eth"
+)
 while True:
+    db = DB("data/db.db")
+    
     res = get("https://tokensniffer.com/tokens/new",wait=10*60)
     soup = BeautifulSoup(res.text,"lxml")
-    for token in soup.select("table > tbody > tr"):
-        cells = token.select("th,td")
-        added_str = cells[3].get_text()[:-4]
-
-        kwargs = {}
-        kwargs[interval_map[added_str[-1]]] = int(added_str[:-1])
-        delta = timedelta(**kwargs)
-
-        added = (datetime.now() - delta).timestamp()
-
-        obj = dict(
-            name=cells[0].get_text(),
-            symbol=cells[1].get_text().upper(),
-            address=cells[2].get_text(),
-            added=added
-        )
-        db.insert("latest",obj,commit=False,ignore_insert=True)
-    db.conn.commit()
-
-db.close()
+    script_content = soup.select("script#__NEXT_DATA__")[0].string
+    data = json.loads(script_content)["props"]["pageProps"]
+    
+    for chain in ["bscTokens","ethTokens"]:
+        tokens = data[chain]
+        for token in tokens:
+            added = datetime.strptime(token["created_at"],"%Y-%m-%dT%H:%M:%S.%fZ")
+            obj = dict(
+                address=token["addr"],
+                name=token["name"],
+                symbol=token["symbol"].upper(),
+                chain=chain_map[chain],
+                defunct=int(token["defunct"]),
+                source_md5=token.get("source_md5",""),
+                added=added.timestamp()
+            )
+            if obj["source_md5"] is None:
+                obj["source_md5"] = ""
+            
+            print(obj["source_md5"])
+            db.insert("latest",obj,commit=False,ignore_insert=False)
+    print("Updated")    
+    db.close()
