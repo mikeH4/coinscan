@@ -13,7 +13,6 @@ const Router = ({Header,Sidebar}) => {
         <ReactRouter>
             <Header/>
             <Container dir="row">
-                <Sidebar/>
                 <Switch>
                     {routes.map(({Path,Render}) => (
                         <Route

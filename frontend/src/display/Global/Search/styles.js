@@ -13,14 +13,11 @@ const searchStyles = makeStyles((theme) => ({
       '&:hover': {
          backgroundColor: fade(theme.palette.common.white, 0.25),
       },
-      marginRight: theme.spacing(2),
-      marginLeft: 0,
+      marginRight: theme.spacing(1),
+      marginLeft: "auto",
       width: '100%',
-      [theme.breakpoints.up('sm')]: {
-         marginLeft: theme.spacing(3),
-         width: 'auto',
-      },
-      flexGrow: 1
+      flexGrow: 1,
+      maxWidth: "600px",
    },
    searchIcon: {
       padding: theme.spacing(0, 2),
@@ -40,9 +37,6 @@ const searchStyles = makeStyles((theme) => ({
       paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
       transition: theme.transitions.create('width'),
       width: '100%',
-      [theme.breakpoints.up('md')]: {
-         width: '20ch',
-      },
    },
 }));
 
