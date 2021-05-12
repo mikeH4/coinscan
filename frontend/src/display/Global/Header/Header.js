@@ -6,6 +6,8 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
 
+import { Link } from 'react-router-dom';
+
 import Search from "../Search/Search";
 import styles from "./styles";
 
@@ -19,6 +21,8 @@ function Header() {
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
                     <IconButton
+                    component={Link}
+                    to="/"
                     className={classes.menuButton}
                     color="inherit"
                     aria-label="menu"
@@ -32,7 +36,7 @@ function Header() {
                     setItems={setItems}
                     setLoading={setLoading}
                     />
-                    </Toolbar>
+                </Toolbar>
             </AppBar>
         </div>
     );

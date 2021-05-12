@@ -6,7 +6,10 @@ const searchStyles = makeStyles((theme) => ({
       flex: 1,
       height: "100%"
    },
-
+   searchWrapper: {
+      width: "100%",
+      flexDirection: "column"
+   },
    search: {
       position: 'relative',
       backgroundColor: fade(theme.palette.common.white, 0.15),
@@ -15,7 +18,6 @@ const searchStyles = makeStyles((theme) => ({
       },
       marginRight: theme.spacing(1),
       marginLeft: "auto",
-      width: '100%',
       flexGrow: 1,
       maxWidth: "600px",
    },
