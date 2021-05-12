@@ -8,7 +8,7 @@ import {
   
 import routes from "../routes";
 
-const Router = ({Header,Sidebar}) => {
+const Router = ({Header}) => {
     return (
         <ReactRouter>
             <Header/>

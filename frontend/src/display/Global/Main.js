@@ -8,7 +8,6 @@ import Router from "./Router";
 import { lightTheme, darkTheme } from './pallete';
 import appStyles from './styles';
 import Header from "./Header/Header";
-import Sidebar from "./Sidebar/Sidebar";
 
 
 const Main =  () => {
@@ -19,7 +18,7 @@ const Main =  () => {
       <ThemeProvider theme={prefersDarkMode ? darkTheme : lightTheme}>
          <CssBaseline />
          <div className={classes.main}>
-               <Router Header={Header} Sidebar={Sidebar}/>
+               <Router Header={Header}/>
          </div>
       </ThemeProvider>
    );

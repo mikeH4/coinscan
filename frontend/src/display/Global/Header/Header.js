@@ -13,8 +13,6 @@ import styles from "./styles";
 
 function Header() {
     const classes = styles();
-    const [items,setItems] = useState([]);
-    const [loading,setLoading] = useState(false);
 
     return (
         <div className={classes.root}>
@@ -30,12 +28,9 @@ function Header() {
                         <HomeIcon/>
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                        Coin    Scan
+                        Coin Scan
                     </Typography>
-                    <Search
-                    setItems={setItems}
-                    setLoading={setLoading}
-                    />
+                    <Search/>
                 </Toolbar>
             </AppBar>
         </div>

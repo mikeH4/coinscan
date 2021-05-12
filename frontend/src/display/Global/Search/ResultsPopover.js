@@ -6,7 +6,7 @@ import TokenCard from "../../components/Card/Card";
 
 import styles from "./resultsStyles";
 
-function ResultsPopover ({open,anchorEl,width = "fit-content"}) {
+function ResultsPopover ({open,anchorEl,width = "fit-content", results, loading}) {
     const classes = styles();
     return (
         <Popper
@@ -18,24 +18,12 @@ function ResultsPopover ({open,anchorEl,width = "fit-content"}) {
             {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={350}>
                 <Paper className={classes.container} style={{width}}>
-                    <TokenCard
-                    token={{
-                        address: "0xb7d053ba590a61100dfba0951182a6a50cd168cc",
-                        symbol: "SAFEMOON",
-                        name: "SafeMoon",
-                        bscheck: "safe"
-                    }}
-                    flat={true}
-                    />
-                    <TokenCard
-                    token={{
-                        address: "0x68758923ca801f1c5b54ef78e0e16767a46a6131",
-                        symbol: "CUMMIES",
-                        name: "CumRocket",
-                        bscheck: "risky"
-                    }}
-                    flat={true}
-                    />
+                    {results.map(token => (
+                        <TokenCard
+                        token={token}
+                        flat={true}
+                        />
+                    ))}
                 </Paper>
             </Fade>
             )}

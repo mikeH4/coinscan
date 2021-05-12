@@ -1,4 +1,3 @@
-import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { createRef, useState } from "react";
 
 import InputBase from '@material-ui/core/InputBase'
@@ -8,22 +7,14 @@ import SearchIcon from '@material-ui/icons/Search';
 import ResultsPopover from './ResultsPopover';
 import searchStyles from './styles';
 
-const searchAPI = async text => await (await fetch('/search',{
-    method: "post",
-    body: JSON.stringify({
-        search: text,
-        nonce: document.querySelector("input[name='nonce']").value,
-        apikey: process.env.REACT_APP_SEARCH_API_KEY || ""
-    }),
-    headers: {
-        "Content-Type": "application/json"
-    },
-})).json();
-const debouncedSearch = AwesomeDebouncePromise(searchAPI,300);
+import * as api from "../../Global/api";
 
-const Search = ({setItems,setLoading}) => {
+const Search = () => {
     const searchRef = createRef();
     const classes = searchStyles();
+
+    const [items,setItems] = useState([]);
+    const [loading,setLoading] = useState(false);
 
     const [resultsOpen,setResultsOpen] = useState(false);
     const [resultsWidth,setResultsWidth] = useState(null);
@@ -54,12 +45,9 @@ const Search = ({setItems,setLoading}) => {
                     }
                     setLoading(true);
                     try {
-                        const result = await debouncedSearch(target.value);
-                        if (!result.status) {
-                            window.location.reload();
-                        }
+                        const result = await api.search(target.value);
                         setLoading(false);
-                        setItems(result.result);
+                        setItems(result.found || []);
                     } catch (error) {
                     }
                 }}
@@ -77,6 +65,8 @@ const Search = ({setItems,setLoading}) => {
             open={resultsOpen}
             anchorEl={anchorEl}
             width={resultsWidth}
+            results={items}
+            loading={loading}
             />
         </div>
     )
