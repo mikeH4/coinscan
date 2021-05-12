@@ -7,7 +7,6 @@ import SearchIcon from '@material-ui/icons/Search';
 import ResultsPopover from './ResultsPopover';
 import searchStyles from './styles';
 
-import * as api from "../../Global/api";
 
 const Search = () => {
     const searchRef = createRef();
@@ -44,8 +43,8 @@ const Search = () => {
                         return;
                     }
                     setLoading(true);
+                    const result = {};
                     try {
-                        const result = await api.search(target.value);
                         setLoading(false);
                         setItems(result.found || []);
                     } catch (error) {

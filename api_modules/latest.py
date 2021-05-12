@@ -11,7 +11,6 @@ def read_items():
         "actions": [route.path for route in router.routes]
     }
 
-
 @router.get("/all")
 def all():
     return {"results": store}
