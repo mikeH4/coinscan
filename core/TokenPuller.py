@@ -1,12 +1,44 @@
+from os import stat
 from bs4 import BeautifulSoup
 import json
 from datetime import datetime
+from ratelimit import limits, sleep_and_retry
 
 from library.requests import get
 from library.db import DB
 
 from core.Token import Token
 from core.Address import Address
+
+class Request:
+    @staticmethod
+    def join(host,path):
+        return host.rtrim("/") + "/" + path.ltrim("/")
+
+    @staticmethod
+    @sleep_and_retry
+    @limits(calls=1, period=10)
+    def tokenfomo(path = "/"):
+        return get(Request.join("https://tokenfomo.io/",path))
+
+    @staticmethod
+    @sleep_and_retry
+    @limits(calls=2, period=2)
+    def bscscan(path = "/"):
+        return get(Request.join("https://bscscan.com/",path))
+
+    @staticmethod
+    @sleep_and_retry
+    @limits(calls=2, period=3)
+    def tokensniffer(path = "/"):
+        return get(Request.join("https://tokensniffer.com/",path))
+
+    @staticmethod
+    @sleep_and_retry
+    @limits(calls=1, period=2)
+    def bscheck(path = "/"):
+        return get(Request.join("http://www.bscheck.eu/",path))
+
 
 class TokenPuller:
     @staticmethod
@@ -17,7 +49,7 @@ class TokenPuller:
     def __init__(self, address) -> None:
         self.db = DB("data/tokens.db")
 
-        res = get("https://tokenfomo.io/")
+        res = Request.tokenfomo()
         data = self.parse_soup_json(
             BeautifulSoup(res.text),
             "script#__NEXT_DATA__"
@@ -33,7 +65,7 @@ class TokenPuller:
                 address=address,
                 block_time=int(record["blockTime"])
             )
-            res = get(f"https://bscscan.com/token/{address}#readContract")
+            res = Request.bscscan(f"/token/{address}#readContract")
             soup = BeautifulSoup(res.text)
             
             # Total Supply
@@ -47,14 +79,14 @@ class TokenPuller:
                 "#ContentPlaceHolder1_trDecimals > div:first-child > div:nth-child(2)"
             )[0].get_text())
 
-            res = get(f"https://bscscan.com/address/{address}")
+            res = Request.bscscan(f"/address/{address}")
             soup = BeautifulSoup(res.text)
 
             init_args["source_verified"] = bool(soup.select("#ContentPlaceHolder1_contractCodeDiv"))
 
             # BscCheck
 
-            res = soup.get("http://www.bscheck.eu/check_contract.php?contract={address}")
+            res = Request.bscheck(f"/check_contract.php?contract={address}")
             if str(res.text) == "BSCscan error":
                 # Rating "" will tell us that it hasn't been scanned
                 init_args["rating"] = ""
@@ -74,7 +106,7 @@ class TokenPuller:
 
             
             # Token Sniffer
-            res = get(f"https://tokensniffer.com/token/{address}")
+            res = Request.tokensniffer(f"/token/{address}")
             if res.status_code == 500:
                 # deployed 0 will tell us it hasn't been scanned
                 init_args["deployed"] = 0
