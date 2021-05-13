@@ -1,15 +1,8 @@
 from fastapi import APIRouter,HTTPException
-from api_modules.store import store
 
 router = APIRouter(
     prefix="/token"
 )
-
-@router.get("/")
-def read_items():
-    return {
-        "actions": [route.path for route in router.routes]
-    }
 
 @router.get("/search/{search}")
 def token(search):
