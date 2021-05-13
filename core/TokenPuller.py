@@ -50,7 +50,6 @@ class TokenPuller:
             res = get(f"https://bscscan.com/address/{address}")
             soup = BeautifulSoup(res.text)
 
-
             init_args["source_verified"] = bool(soup.select("#ContentPlaceHolder1_contractCodeDiv"))
 
             # BscCheck
@@ -102,4 +101,6 @@ class TokenPuller:
                 init_args["not_pausable"] = data["auditReport"]["testForPausable"] == False
                 init_args["not_proxy"] = data["auditReport"]["testForProxy"] == False
 
-            Token(init_args)
+            Token(init_args).insert_or_update(db=self.db)
+
+        self.db.close()
