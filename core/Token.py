@@ -1,27 +1,48 @@
-from datetime import datetime
-from core.Address import Address
 from core.CoreToken import CoreToken
 from library.db import DB
 
 class Token(CoreToken):
+    @staticmethod
+    def _get_latest_in_rows(limit=100):
+        limit_cond = ""
+        if limit is not None:
+            limit_cond = f"LIMIT {int(limit)}"
+
+        with DB("data/tokens.db") as db:
+            return db.get_all(f"SELECT * FROM tokens ORDER BY block_time DESC {limit_cond}")
+
     @classmethod
-    def from_row(cls,row):
-        token = cls()
-        token = do_some_crap(row)
+    def _from_row(cls,row):
+        token = cls({key:row[i] for i,key in enumerate(cls.keys)})
         return token
 
-    @staticmethod
-    def to_row(cls, row):
-        return {}
+    @classmethod
+    def get_latest(cls,limit=100):
+        rows = cls._get_latest_in_rows(limit=limit)
+        return [cls._from_row(row) for row in rows]
 
+    @classmethod
+    def search(cls,keyword):
+        with DB("data/tokens.db") as db:
+            placeholder = db.placeholder(1)
+            sql = f"""
+            SELECT * FROM tokens
+            WHERE
+            address = {placeholder}
+            OR symbol LIKE {placeholder}
+            OR name LIKE {placeholder}"""
+            rows = db.get_all(sql,[keyword,*["%" + keyword + "%"] * 2])
+            return [cls._from_row(row) for row in rows]
 
     @classmethod
     def get(cls, address):
-        token = db.get(address)
-        if token is None:
-            return None
-        return cls.from_row(token)
-    
+        with DB("data/tokens.db") as db:
+            placeholder = db.placeholder(1)
+            token = db.get(f"SELECT * FROM tokens WHERE address = {placeholder}",[address])
+            if token is None:
+                return None
+            return cls._from_row(token)
+        
     def insert_or_update(self,db:DB = None):
         _db = db if db is not None else DB("data/tokens.db")
 

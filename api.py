@@ -16,9 +16,6 @@ routers = [
 ]
 
 for router in routers:
-    router.get("/")(lambda: {
-        "actions": [route.path for route in router.routes]
-    })
     app.include_router(router)
 
 @app.get("/")

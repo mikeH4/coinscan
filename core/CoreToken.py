@@ -62,28 +62,29 @@ class CoreToken:
         self.not_proxy = not_proxy
         self.not_pausable = not_pausable
 
+    keys = [
+        "address",
+        "name",
+        "symbol",
+        "block_time",
+        "total_supply",
+        "decimals",
+        "source_verified",
+        "rating",
+        "honeypot_check",
+        "owner_renounced",
+        "dev_liquidity_check",
+        "lp_check",
+        "top_holders_check",
+        "deployed",
+        "first_seen",
+        "source_md5",
+        "similar_count",
+        "similar_viewable",
+        "no_older_tokens",
+        "not_proxy",
+        "not_pausable"
+    ]
+
     def dict(self):
-        keys = [
-            "name",
-            "symbol",
-            "address",
-            "block_time",
-            "total_supply",
-            "decimals",
-            "source_verified",
-            "rating",
-            "honeypot_check",
-            "owner_renounced",
-            "dev_liquidity_check",
-            "lp_check",
-            "top_holders_check",
-            "deployed",
-            "first_seen",
-            "source_md5",
-            "similar_count",
-            "similar_viewable",
-            "no_older_tokens",
-            "not_proxy",
-            "not_pausable",
-        ]
-        return {key:getattr(self,key) for key in keys}
+        return {key:getattr(self,key) for key in self.keys}

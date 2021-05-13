@@ -2,7 +2,7 @@ import sqlite3
 
 class DB:
     @staticmethod
-    def placeholder(l: list):
+    def placeholder(l: int):
         return ",".join(['?'] * l )
 
     def __init__(self, name=None):
