@@ -1,6 +1,6 @@
 from library.db import CreateSQLTables
 
-a = CreateSQLTables("data/db.db")
+a = CreateSQLTables("data/tokens.db")
 
 a += """
 CREATE TABLE tokens (
@@ -9,7 +9,7 @@ CREATE TABLE tokens (
     symbol TEXT NOT NULL,
     block_time INTEGER NOT NULL,
 
-    total_supply INTEGER NOT NULL,
+    total_supply FLOAT NOT NULL,
     decimals INTEGER NOT NULL,
     source_verified BOOLEAN NOT NULL,
 
