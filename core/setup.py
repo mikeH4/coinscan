@@ -1,4 +1,4 @@
-from modules.db import CreateSQLTables
+from library.db import CreateSQLTables
 
 a = CreateSQLTables("data/db.db")
 

@@ -10,14 +10,6 @@ from core.Address import Address
 
 class TokenPuller:
     @staticmethod
-    def get_existing_addresses(of=[]):
-        of = map(str,of)
-        placeholder = db.placeholder(len(of))
-        sql = f"SELECT address FROM tokens WHERE address IN ({placeholder})"
-        addrs = [row[0] for row in db.get_all(sql,of)]
-        return addrs
-
-    @staticmethod
     def parse_soup_json(soup,selector):
         script_content = soup.select(selector)[0].string
         return json.loads(script_content)
