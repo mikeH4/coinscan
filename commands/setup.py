@@ -4,9 +4,9 @@ a = CreateSQLTables("data/db.db")
 
 a += """
 CREATE TABLE tokens (
+    address VARCHAR(42) NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     symbol TEXT NOT NULL,
-    address VARCHAR(42) NOT NULL,
     block_time INTEGER NOT NULL,
 
     total_supply INTEGER NOT NULL,
@@ -27,6 +27,7 @@ CREATE TABLE tokens (
     similar_viewable INTEGER NOT NULL,
     no_older_tokens BOOLEAN NOT NULL,
     not_proxy BOOLEAN NOT NULL,
-    not_pausable BOOLEAN NOT NULL,
+    not_pausable BOOLEAN NOT NULL
 )
 """
+a.execute()

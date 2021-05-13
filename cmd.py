@@ -4,7 +4,7 @@ if __name__ == "__main__":
     from importlib import import_module
 
     available = []
-    for fn in listdir("scripts"):
+    for fn in listdir("commands"):
         if fn[-3:] == ".py" and fn != ".py":
             available.append(fn[:-3])
     if len(available) < 1:
@@ -15,4 +15,4 @@ if __name__ == "__main__":
     while opt not in available:
         opt = input("Script? ")
 
-    module = import_module("scripts." + opt)
+    module = import_module("commands." + opt)
