@@ -22,7 +22,10 @@ class Token(CoreToken):
         return [cls._from_row(row) for row in rows]
 
     @classmethod
-    def search(cls,keyword):
+    def search(cls,keyword,limit=10):
+        limit_cond = ""
+        if limit is not None:
+            limit_cond = f"LIMIT {int(limit)}"
         with DB("data/tokens.db") as db:
             placeholder = db.placeholder(1)
             sql = f"""
@@ -30,7 +33,9 @@ class Token(CoreToken):
             WHERE
             address = {placeholder}
             OR symbol LIKE {placeholder}
-            OR name LIKE {placeholder}"""
+            OR name LIKE {placeholder}
+            {limit_cond}
+            """
             rows = db.get_all(sql,[keyword,*["%" + keyword + "%"] * 2])
             return [cls._from_row(row) for row in rows]
 
