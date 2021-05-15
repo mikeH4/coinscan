@@ -3,7 +3,7 @@ from library.db import CreateSQLTables
 a = CreateSQLTables("data/tokens.db")
 
 a += """
-CREATE TABLE tokens (
+CREATE TABLE tokens_temp (
     address VARCHAR(42) NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     symbol TEXT NOT NULL,
