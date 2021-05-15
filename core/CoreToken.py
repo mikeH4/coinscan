@@ -7,6 +7,7 @@ class CoreToken:
         symbol:str,
         address:Address,
         block_time:int,
+        updated:int,
 
         # BscScan
         total_supply:int,
@@ -37,6 +38,7 @@ class CoreToken:
         self.symbol = symbol
         self.address = address
         self.block_time = block_time
+        self.updated = updated
 
         # BscScan
         self.total_supply = total_supply
@@ -67,6 +69,7 @@ class CoreToken:
         "name",
         "symbol",
         "block_time",
+        "updated",
         "total_supply",
         "decimals",
         "source_verified",

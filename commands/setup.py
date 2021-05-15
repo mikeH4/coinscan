@@ -8,6 +8,7 @@ CREATE TABLE tokens (
     name TEXT NOT NULL,
     symbol TEXT NOT NULL,
     block_time INTEGER NOT NULL,
+    updated INTEGER NOT NULL,
 
     total_supply FLOAT NOT NULL,
     decimals INTEGER NOT NULL,

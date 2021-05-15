@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import json
-from datetime import datetime
+from datetime import date, datetime
 from ratelimit import limits, sleep_and_retry
 
 from library.requests import get
@@ -45,10 +45,13 @@ class TokenPuller:
         script_content = soup.select(selector)[0].string
         return json.loads(script_content)
 
-    def get_existing_addresses(self,of=[]):
+    def get_existing_addresses(self,of=[],updated_after=None):
         of = list(map(str,of))
         placeholder = self.db.placeholder(len(of))
         sql = f"SELECT address FROM tokens WHERE address IN ({placeholder})"
+        if updated_after is not None:
+            sql += " AND updated > ?"
+            of += [updated_after]
         addrs = [row[0] for row in self.db.get_all(sql,of)]
         return addrs
 
@@ -122,7 +125,7 @@ class TokenPuller:
             )
 
 
-    def __init__(self, ignore_existing = False) -> None:
+    def __init__(self, ignore_existing = "last30min") -> None:
         self.db = DB("data/tokens.db")
 
         res = Request.tokenfomo()
@@ -132,7 +135,13 @@ class TokenPuller:
         )["props"]["pageProps"]["tokens"]
 
         existing_addrs = [] if not ignore_existing else self.get_existing_addresses(
-            [row["addr"] for row in data]
+            [row["addr"] for row in data],
+            # In last 30 min
+            updated_after=(
+                int(datetime.now().timestamp()-(60*30))
+                if ignore_existing == "last30min"
+                else None
+            )
         )
 
         for record in data:
@@ -147,7 +156,8 @@ class TokenPuller:
                 name=record["name"],
                 symbol=record["symbol"],
                 address=address,
-                block_time=int(record["blockTime"])
+                block_time=int(record["blockTime"]),
+                updated=int(datetime.now().timestamp())
             )
             res = Request.bscscan(f"/token/{address}#readContract")
             soup = BeautifulSoup(res.text,"html.parser")
