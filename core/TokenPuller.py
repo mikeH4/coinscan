@@ -125,7 +125,7 @@ class TokenPuller:
             )
 
 
-    def __init__(self, ignore_existing = "last30min") -> None:
+    def __init__(self, ignore_existing = "recent") -> None:
         self.db = DB("data/tokens.db")
 
         res = Request.tokenfomo()
@@ -138,8 +138,8 @@ class TokenPuller:
             [row["addr"] for row in data],
             # In last 30 min
             updated_after=(
-                int(datetime.now().timestamp()-(60*30))
-                if ignore_existing == "last30min"
+                int(datetime.now().timestamp()-(60*60*2))
+                if ignore_existing == "recent"
                 else None
             )
         )
