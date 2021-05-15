@@ -14,7 +14,7 @@ class ViewableToken(Token):
         ],
         total_supply=[None,human_format],
         source_verified=[None,bool],
-        rating=["bscheck_rating",lambda rating : "unknown" if not rating else rating],
+        rating=["bscheck_rating",lambda rating : "unrated" if not rating else rating],
         honeypot_check=["bscheck_honeypot",bool],
         owner_renounced=["bscheck_renounced",bool],
         lp_check=["bscheck_lp_check",bool],

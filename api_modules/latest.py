@@ -13,4 +13,4 @@ def read_items():
 
 @router.get("/get")
 def all():
-    return ViewableToken.get_latest(10)
+    return ViewableToken.get_latest(100)
