@@ -193,7 +193,6 @@ class TokenPuller:
             )
             
             updt = backoff(self.bscscan,address)
-            print(updt)
             if updt is None:
                 continue
             init_args.update(updt)
