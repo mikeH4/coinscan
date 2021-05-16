@@ -1,18 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api_modules import latest
-from api_modules import token
+from api_modules import v1
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"]
+    allow_origins=["*"],
 )
 
 routers = [
-    latest.router,
-    token.router,
+    v1.app,
 ]
 
 for router in routers:

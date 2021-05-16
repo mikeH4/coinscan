@@ -12,12 +12,12 @@ def read_items():
     }
 
 @router.get("/search/{search}")
-def token(search):
+def token(search: str):
     tokens = ViewableToken.search(search)
     return tokens
 
 @router.get("/{address}")
-def token(address):
+def token(address: str):
     token = ViewableToken.get(address)
     if token is None:
         raise HTTPException(status_code=404, detail="Not found")
