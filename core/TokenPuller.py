@@ -1,3 +1,6 @@
+from library.backoff import backoff
+from os import stat
+from re import A
 from bs4 import BeautifulSoup
 import json
 from datetime import date, datetime
@@ -124,6 +127,35 @@ class TokenPuller:
                 not_proxy=data["auditReport"].get("testForProxy",True) == False,
             )
 
+    @staticmethod
+    def bscscan(address):
+        res = Request.bscscan(f"/token/{address}#readContract")
+        soup = BeautifulSoup(res.text,"html.parser")
+        token_type = soup.select(
+            "#ContentPlaceHolder1_divSummary .card-header-title [data-original-title]"
+        )[0].get_text()
+        if token_type != "BEP-20":
+            return None
+        
+        args = {}
+
+        # Total Supply
+        total_supply = soup.select(
+            "#ContentPlaceHolder1_tr_valuepertoken + div > div:nth-child(2)"
+        )[0].get_text().strip().split(" ")[0]
+        args["total_supply"] = float(total_supply.replace(",",""))
+        
+        # Decimals
+        args["decimals"] = int(soup.select(
+            "#ContentPlaceHolder1_trDecimals > div:first-child > div:nth-child(2)"
+        )[0].get_text())
+
+        res = Request.bscscan(f"/address/{address}")
+        soup = BeautifulSoup(res.text,"html.parser")
+
+        args["source_verified"] = bool(soup.select("#ContentPlaceHolder1_contractCodeDiv"))
+        
+        return args
 
     def __init__(self, ignore_existing = "recent") -> None:
         self.db = DB("data/tokens.db")
@@ -159,30 +191,12 @@ class TokenPuller:
                 block_time=int(record["blockTime"]),
                 updated=int(datetime.now().timestamp())
             )
-            res = Request.bscscan(f"/token/{address}#readContract")
-            soup = BeautifulSoup(res.text,"html.parser")
             
-            token_type = soup.select(
-                "#ContentPlaceHolder1_divSummary .card-header-title [data-original-title]"
-            )[0].get_text()
-            if token_type != "BEP-20":
+            updt = backoff(self.bscscan,address)
+            print(updt)
+            if updt is None:
                 continue
-            
-            # Total Supply
-            total_supply = soup.select(
-                "#ContentPlaceHolder1_tr_valuepertoken + div > div:nth-child(2)"
-            )[0].get_text().strip().split(" ")[0]
-            init_args["total_supply"] = float(total_supply.replace(",",""))
-            
-            # Decimals
-            init_args["decimals"] = int(soup.select(
-                "#ContentPlaceHolder1_trDecimals > div:first-child > div:nth-child(2)"
-            )[0].get_text())
-
-            res = Request.bscscan(f"/address/{address}")
-            soup = BeautifulSoup(res.text,"html.parser")
-
-            init_args["source_verified"] = bool(soup.select("#ContentPlaceHolder1_contractCodeDiv"))
+            init_args.update(updt)
 
             # BscCheck
             init_args.update(self.bscheck(address))

@@ -8,7 +8,6 @@ routers = [
     v1.app,
 ]
 
-
 @app.get("/")
 async def root():
     return {
