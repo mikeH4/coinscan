@@ -25,7 +25,7 @@ class Request:
 
     @staticmethod
     @sleep_and_retry
-    @limits(calls=2, period=2)
+    @limits(calls=2, period=6)
     def bscscan(path = "/"):
         return get(Request.join("https://bscscan.com/",path))
 

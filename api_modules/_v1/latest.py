@@ -13,4 +13,5 @@ def read_items():
 
 @router.get("/get")
 def all():
+    print("HIT")
     return ViewableToken.get_latest(100)
