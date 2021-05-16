@@ -1,3 +1,4 @@
+from requests.sessions import default_headers
 from library.backoff import backoff
 from os import stat
 from re import A
@@ -97,24 +98,29 @@ class TokenPuller:
     @staticmethod
     def tokensniffer(address):
         res = Request.tokensniffer(f"/token/{address}")
+        default = dict(
+            deployed=0,
+            first_seen=0,
+            source_md5="",
+            similar_count=0,
+            similar_viewable=0,
+            no_older_tokens=False,
+            not_proxy=False,
+            not_pausable=False
+        )
         if res.status_code == 500:
             # deployed 0 will tell us it hasn't been scanned
-            return dict(
-                deployed=0,
-                first_seen=0,
-                source_md5="",
-                similar_count=0,
-                similar_viewable=0,
-                no_older_tokens=False,
-                not_proxy=False,
-                not_pausable=False
-            )
+            return default
         else:
-            data = TokenPuller.parse_soup_json(
-                BeautifulSoup(res.text,"html.parser"),
-                "script#__NEXT_DATA__"
-            )["props"]["pageProps"]
-            token_data = data["token"]
+            try:
+                data = TokenPuller.parse_soup_json(
+                    BeautifulSoup(res.text,"html.parser"),
+                    "script#__NEXT_DATA__"
+                )["props"]["pageProps"]
+                token_data = data["token"]
+            except Exception as e:
+                print(e)
+                return default
 
             return dict(
                 deployed=datetime.strptime(token_data["created_at"],"%Y-%m-%dT%H:%M:%S.%fZ").timestamp(),
