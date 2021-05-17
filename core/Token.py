@@ -8,7 +8,7 @@ class Token(CoreToken):
         if limit is not None:
             limit_cond = f"LIMIT {int(limit)}"
 
-        with DB("data/tokens.db") as db:
+        with DB("tokens") as db:
             return db.get_all(f"SELECT * FROM tokens ORDER BY block_time DESC {limit_cond}")
 
     @classmethod
@@ -26,7 +26,7 @@ class Token(CoreToken):
         limit_cond = ""
         if limit is not None:
             limit_cond = f"LIMIT {int(limit)}"
-        with DB("data/tokens.db") as db:
+        with DB("tokens") as db:
             placeholder = db.placeholder(1)
             sql = f"""
             SELECT * FROM tokens
@@ -41,7 +41,7 @@ class Token(CoreToken):
 
     @classmethod
     def get(cls, address):
-        with DB("data/tokens.db") as db:
+        with DB("tokens") as db:
             placeholder = db.placeholder(1)
             token = db.get(f"SELECT * FROM tokens WHERE address = {placeholder}",[address])
             if token is None:
@@ -49,7 +49,7 @@ class Token(CoreToken):
             return cls._from_row(token)
         
     def insert_or_update(self,db:DB = None):
-        _db = db if db is not None else DB("data/tokens.db")
+        _db = db if db is not None else DB("tokens")
 
         _dict = self.dict()
         address = _dict["address"]

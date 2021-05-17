@@ -164,7 +164,7 @@ class TokenPuller:
         return args
 
     def __init__(self, ignore_existing = "recent") -> None:
-        self.db = DB("data/tokens.db")
+        self.db = DB("tokens")
 
         res = Request.tokenfomo()
         data = self.parse_soup_json(
