@@ -8,7 +8,7 @@ from datetime import date, datetime
 from ratelimit import limits, sleep_and_retry
 
 from library.requests import get
-from library.sqlite import DB
+from library.postgres import DB
 
 from core.Token import Token
 from core.Address import Address

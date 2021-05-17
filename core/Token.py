@@ -1,5 +1,5 @@
 from core.CoreToken import CoreToken
-from library.sqlite import DB
+from library.postgres import DB
 
 class Token(CoreToken):
     @staticmethod
@@ -57,7 +57,7 @@ class Token(CoreToken):
         _db.insert(
             "tokens",
             _dict,
-            replace_insert="address",
+            replace_insert_on="address",
             commit=False
         )
         print("Inserted:", address)

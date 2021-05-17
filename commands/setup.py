@@ -1,4 +1,4 @@
-from library.sqlite import CreateSQLTables
+from library.postgres import CreateSQLTables
 
 a = CreateSQLTables("data/tokens.db")
 
@@ -29,6 +29,6 @@ CREATE TABLE tokens (
     no_older_tokens BOOLEAN NOT NULL,
     not_proxy BOOLEAN NOT NULL,
     not_pausable BOOLEAN NOT NULL
-)
+);
 """
 a.execute()
