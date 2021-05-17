@@ -20,8 +20,6 @@ class DB:
         self.conn = psycopg2.connect(
             host="localhost",
             database = database,
-            user="coinscan",
-            password="root"
         )
 
         self.cursor = self.conn.cursor()
