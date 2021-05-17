@@ -1,6 +1,7 @@
 import psycopg2
 
 class DB:
+    sandbox = True
     @staticmethod
     def placeholder(l: int):
         return ",".join(['%s'] * l )
@@ -17,9 +18,17 @@ class DB:
 	
         self.database = database
 	
+        
+        additional_args = {}
+        if not self.sandbox:
+            additional_args = dict(
+                user="coinscan",
+                password="root"
+            )
         self.conn = psycopg2.connect(
             host="localhost",
             database = database,
+            **additional_args
         )
 
         self.cursor = self.conn.cursor()

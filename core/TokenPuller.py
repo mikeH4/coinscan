@@ -1,5 +1,5 @@
 from core.sources.BSCheck import BSCheck
-from core.sources.BSCScan import BscScan
+from core.sources.BscScan import BscScan
 from core.sources.TokenFomo import TokenFomo
 from core.sources.TokenSniffer import TokenSniffer
 

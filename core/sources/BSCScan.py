@@ -35,6 +35,20 @@ class BscScan(BaseSource):
             "#ContentPlaceHolder1_trDecimals > div:first-child > div:nth-child(2)"
         )[0].get_text())
 
+        args["description"] = ""
+        args["bscscan_img"] = ""
+        try:
+            schema = self.parse_soup_json(soup,"script[type='application/ld+json']")
+            args["description"] = schema.get("description","")
+            args["bscscan_img"] = schema.get("image","")
+            trimstart = "https://BscScan.com/token/images/"
+            if args["bscscan_img"][:len(trimstart)] != trimstart:
+                raise Exception(f"Img Url is not formatted correctly: {args['bscscan_img']}")
+            args["bscscan_img"] = args["bscscan_img"][len(trimstart):]
+
+        except Exception as e:
+            print(e)
+
         res = self.address_res(address)
         soup = BeautifulSoup(res.text,"html.parser")
 

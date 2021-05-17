@@ -1,16 +1,20 @@
-from datetime import datetime
 from core.Address import Address
 
-class CoreToken:
+class CoreToken():
+    table = "tokens"
+    primary = ["address"]
+
     def __init__(self, 
         address:Address,
         name:str,
         symbol:str,
         block_time:int,
+        description:str,
+        bscscan_img:str,
         updated:int,
 
         # BscScan
-        total_supply:int,
+        total_supply:float,
         decimals:int,
         source_verified:bool,
 
@@ -39,31 +43,6 @@ class CoreToken:
                 continue
             setattr(self,key,_class(lcl[key]))
 
-
-    keys = [
-        "address",
-        "name",
-        "symbol",
-        "block_time",
-        "updated",
-        "total_supply",
-        "decimals",
-        "source_verified",
-        "rating",
-        "honeypot_check",
-        "owner_renounced",
-        "dev_liquidity_check",
-        "lp_check",
-        "top_holders_check",
-        "deployed",
-        "first_seen",
-        "source_md5",
-        "similar_count",
-        "similar_viewable",
-        "no_older_tokens",
-        "not_proxy",
-        "not_pausable"
-    ]
 
     def dict(self):
         return {key:getattr(self,key) for key in self.keys}
