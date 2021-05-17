@@ -1,6 +1,6 @@
 from library.sqlite import CreateSQLTables
 
-a = CreateSQLTables("tokens")
+a = CreateSQLTables("data/tokens.db")
 
 a += """
 CREATE TABLE tokens (
