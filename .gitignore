@@ -140,3 +140,4 @@ cython_debug/
 archive.zip
 data/*
 data/tokens.db
+*.DS_Store
