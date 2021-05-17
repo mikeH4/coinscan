@@ -14,7 +14,7 @@ subcmd_str =  "&& ".join(subcmd)
 cmds = [
     "git archive --format zip --output archive.zip master",
     "scp archive.zip coinscan:/home/coinscan",
-    "scp nginx.conf coinscan:/etc/nginx/nginx.conf",
+    "scp helpful_blobs/nginx.conf coinscan:/etc/nginx/nginx.conf",
     f"ssh coinscan '{subcmd_str}'",
 ]
 

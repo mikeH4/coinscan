@@ -182,7 +182,9 @@ class TokenPuller:
             )
         )
 
-        for record in data:
+        data_len = len(data)
+        
+        for i,record in enumerate(data):
             if record["chainId"] != "BSC":
                 continue
             if record["addr"] in existing_addrs:
@@ -210,6 +212,7 @@ class TokenPuller:
             init_args.update(self.tokensniffer(address))
             
             Token(**init_args).insert_or_update(db=self.db)
+            print(f"{i+1}/{data_len}")
             self.db.conn.commit()
 
         self.db.close()
