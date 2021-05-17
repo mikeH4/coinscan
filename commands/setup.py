@@ -1,6 +1,6 @@
-from library.db import CreateSQLTables
+from library.postgres import CreateSQLTables
 
-a = CreateSQLTables("data/tokens.db")
+a = CreateSQLTables("tokens")
 
 a += """
 CREATE TABLE tokens (

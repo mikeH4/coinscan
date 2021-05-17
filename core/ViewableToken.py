@@ -1,7 +1,7 @@
 import timeago
 from datetime import datetime
 from core.Token import Token
-from library.numbers import human_format
+from library.num import human_format
 
 class ViewableToken(Token):
     keys_rename = dict(

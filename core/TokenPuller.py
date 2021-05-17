@@ -8,7 +8,7 @@ from datetime import date, datetime
 from ratelimit import limits, sleep_and_retry
 
 from library.requests import get
-from library.db import DB
+from library.postgres import DB
 
 from core.Token import Token
 from core.Address import Address
@@ -54,7 +54,7 @@ class TokenPuller:
         placeholder = self.db.placeholder(len(of))
         sql = f"SELECT address FROM tokens WHERE address IN ({placeholder})"
         if updated_after is not None:
-            sql += " AND updated > ?"
+            sql += f" AND updated > {self.db.placeholder(1)}"
             of += [updated_after]
         addrs = [row[0] for row in self.db.get_all(sql,of)]
         return addrs
@@ -164,7 +164,7 @@ class TokenPuller:
         return args
 
     def __init__(self, ignore_existing = "recent") -> None:
-        self.db = DB("data/tokens.db")
+        self.db = DB("tokens")
 
         res = Request.tokenfomo()
         data = self.parse_soup_json(
