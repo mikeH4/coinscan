@@ -39,31 +39,8 @@ class CoreToken:
                 continue
             setattr(self,key,_class(lcl[key]))
 
-
-    keys = [
-        "address",
-        "name",
-        "symbol",
-        "block_time",
-        "updated",
-        "total_supply",
-        "decimals",
-        "source_verified",
-        "rating",
-        "honeypot_check",
-        "owner_renounced",
-        "dev_liquidity_check",
-        "lp_check",
-        "top_holders_check",
-        "deployed",
-        "first_seen",
-        "source_md5",
-        "similar_count",
-        "similar_viewable",
-        "no_older_tokens",
-        "not_proxy",
-        "not_pausable"
-    ]
-
     def dict(self):
         return {key:getattr(self,key) for key in self.keys}
+
+CoreToken.keys = list(CoreToken.__init__.__annotations__.keys())
+CoreToken.keys.remove("return")
