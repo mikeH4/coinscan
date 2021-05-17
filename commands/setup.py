@@ -1,4 +1,4 @@
-from library.postgres import CreateSQLTables
+from library.sqlite import CreateSQLTables
 
 a = CreateSQLTables("tokens")
 

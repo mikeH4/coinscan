@@ -1,5 +1,5 @@
 from library.sqlite import DB
-from library.postgres import DB as _DB
+from library.sqlite import DB as _DB
 from core.Token import Token
 
 db = DB("data/tokens.db")
