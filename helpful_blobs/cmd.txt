@@ -3,3 +3,7 @@ echo "" > /etc/nginx/nginx.conf && nano /etc/nginx/nginx.conf && sudo nginx -t &
 
 # Run server in backgorund
 /home/coinscan/env/bin/python /home/coinscan/server.py > /home/coinscan/server.log 2>&1 &
+
+# Monitor Status
+journalctl -f -u coinscan_api
+journalctl -f -u coinscan_service
