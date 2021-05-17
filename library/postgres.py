@@ -1,7 +1,7 @@
 import psycopg2
+import settings
 
 class DB:
-    sandbox = True
     @staticmethod
     def placeholder(l: int):
         return ",".join(['%s'] * l )
@@ -20,7 +20,7 @@ class DB:
 	
         
         additional_args = {}
-        if not self.sandbox:
+        if settings.sandbox != True:
             additional_args = dict(
                 user="coinscan",
                 password="root"

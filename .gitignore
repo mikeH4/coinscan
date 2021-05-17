@@ -141,3 +141,4 @@ archive.zip
 data/*
 data/tokens.db
 *.DS_Store
+settings.py

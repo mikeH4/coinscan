@@ -12,6 +12,7 @@ class ViewableToken(Token):
             "timestamp",
             lambda timestamp : timeago.format(datetime.fromtimestamp(timestamp))
         ],
+        description=[None],
         total_supply=[None,human_format],
         source_verified=[None,bool],
         rating=["bscheck_rating",lambda rating : "unrated" if not rating else rating],
