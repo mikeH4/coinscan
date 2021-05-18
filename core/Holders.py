@@ -21,9 +21,9 @@ class Holders(BaseModel):
 
         _dict = self.dict()
         for attr in ["contract","holder"]:
-            _dict[attr] = str(attr)
+            _dict[attr] = str(_dict[attr])
         _db.insert(
-            "tokens",
+            self.table,
             _dict,
             replace_insert_on=self.primary,
             commit=False

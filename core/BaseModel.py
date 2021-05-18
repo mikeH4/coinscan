@@ -71,7 +71,6 @@ class ModelOperator:
         return syntax
 
 class BaseModelMetaClass(type):
-
     def __init__(cls, name, bases, namespace, **kwargs):
         if len(bases) < 1:
             return None

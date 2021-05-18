@@ -58,9 +58,9 @@ class BscScan(BaseSource):
         except Exception as e:
             print(e)
         
-        args["source_verified"] = self.get_source() is not None
+        args["source_verified"] = self.get_source(address) is not None
 
-        holders = list(self.get_holders(self, soup, address))
+        holders = list(self.get_holders(soup, address))
         
         return args,holders
     
@@ -73,16 +73,16 @@ class BscScan(BaseSource):
             in parameters.items()
         ]
         param_string = "" if len(params) < 1 else "&" + ('&'.join(params))
-        return (get(
-            f"https://api.bscscan.com/api?module={module}&action={action}&apikey={self.apikey}{param_string}",
-        )).json()
+        query_string = f"?module={module}&action={action}&apikey={self.apikey}{param_string}"
+        url = f"https://api.bscscan.com/api{query_string}"
+        return (get(url)).json()
 
     def get_source(self,address):
-        data = self.api_call("contract","action",address=address)
-        if data["status"] == 0:
+        data = self.api_call("contract","getsourcecode",address=address)
+        if data["status"] == "0":
             raise Exception(data["result"])
         
-        source = data["result"]["SourceCode"]
+        source = data["result"][0]["SourceCode"]
         return None if source == "" else source
 
     @staticmethod
@@ -96,9 +96,14 @@ class BscScan(BaseSource):
         total_supply = 1000000
         res = self.request(f"/token/generic-tokenholders2?m=normal&a={address}&s={total_supply}&sid={sid}&p=1")
 
-        soup = BeautifulSoup(res.text)
+        soup = BeautifulSoup(res.text,"html.parser")
         for row in soup.select("table > tbody > tr"):
-            rank_col,address_col,quantity_col,perc_col,analytics_cols = row.select("td")
+            cols = row.select("td")
+            if len(cols) < 5:
+                print("No Holders")
+                return []
+                yield
+            rank_col,address_col,quantity_col,perc_col,analytics_cols = cols
             holder_args = dict(
                 contract=address,
                 holder=None,
@@ -111,8 +116,8 @@ class BscScan(BaseSource):
             if "data-original-title" in span.attrs:
                 holder_args["holder_tag"] = span.get_text()
             
-            holder_args["holder"] = span.select("a").attrs["href"].split("?a=")[-1]
+            holder_args["holder"] = span.select("a")[0].attrs["href"].split("?a=")[-1]
 
-            holder_args["holding"] = float(quantity_col.get_text())
+            holder_args["holding"] = float(quantity_col.get_text().replace(",",""))
 
-            yield holder_args
+            yield Holders(**holder_args)
