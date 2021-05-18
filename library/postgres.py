@@ -33,7 +33,6 @@ class DB:
 
         self.cursor = self.conn.cursor()
 
-
     def close(self):
         
         if self.conn:
@@ -41,16 +40,20 @@ class DB:
             self.cursor.close()
             self.conn.close()
 
-
     def __enter__(self):
         
         return self
 
     def __exit__(self,exc_type,exc_value,traceback):
-        
         self.close()
 
-    def insert(self,table,data, commit: bool = True, ignore_insert=False, replace_insert_on = False):
+    def insert(self,
+        table,
+        data,
+        commit: bool = True,
+        ignore_insert=False,
+        replace_insert_on:list = False
+    ):
         cols = list(data.keys())
         cols_str = ",".join(data.keys())
         placeholder = self.placeholder(len(data))
@@ -62,15 +65,16 @@ class DB:
         sql = f"INSERT {insert_option} INTO {table} ({cols_str}) VALUES ({placeholder})"
                 
         if replace_insert_on:
-            if replace_insert_on not in cols:
-                raise Exception("replace_insert_on must be a column inserted")
+            for replace_col in replace_insert_on:
+                if replace_col not in cols:
+                    raise Exception("replace_insert_on must be of columns inserted")
             update_str = ", ".join([
                 (f"{key} = excluded.{key}")
                 for key in cols
-                if key != replace_insert_on
+                if key not in replace_insert_on
             ])
             sql += f"""
-            ON CONFLICT ({replace_insert_on}) DO UPDATE 
+            ON CONFLICT ({', '.join(replace_insert_on)}) DO UPDATE 
             SET {update_str};
             """
     

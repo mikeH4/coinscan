@@ -74,6 +74,7 @@ class TokenPuller:
                 # Token Sniffer
                 init_args.update(tokensniffer.get(address))
                 
+                print(init_args)
                 Token(**init_args).insert_or_update(db=self.db)
                 print(f"{i+1}/{data_len}")
                 self.db.conn.commit()

@@ -6,10 +6,9 @@ db = DB("tokens")
 
 for _class in [CoreToken,Holders]:
     print(_class)
-    print("New Columns:",_class._db_new_cols())
 
-    if input("Sure you want to overwrite?").lower() != "y":
+    if input(f"Create table '{_class.table}'?").lower() != "y":
         continue
 
-    db.query(_class._db_recreate())
+    db.query(_class._db_create())
     db.conn.commit()

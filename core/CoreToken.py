@@ -1,6 +1,8 @@
+from core.BaseModel import BaseModel
 from core.Address import Address
 
-class CoreToken():
+
+class CoreToken(BaseModel):
     table = "tokens"
     primary = ["address"]
 
@@ -36,16 +38,4 @@ class CoreToken():
         not_proxy:bool,
         not_pausable:bool,
 
-    ) -> None:
-        lcl = locals()
-        for key,_class in CoreToken.__init__.__annotations__.items():
-            if key == "return":
-                continue
-            setattr(self,key,_class(lcl[key]))
-
-
-    def dict(self):
-        return {key:getattr(self,key) for key in self.keys}
-
-CoreToken.keys = list(CoreToken.__init__.__annotations__.keys())
-CoreToken.keys.remove("return")
+    ) -> None: pass
