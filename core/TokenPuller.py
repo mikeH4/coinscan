@@ -5,8 +5,7 @@ from core.sources.TokenFomo import TokenFomo
 from core.sources.TokenSniffer import TokenSniffer
 
 from library.backoff import backoff
-from bs4 import BeautifulSoup
-from datetime import date, datetime
+from datetime import datetime
 
 from library.postgres import DB
 
