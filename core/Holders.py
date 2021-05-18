@@ -1,4 +1,5 @@
 from library.postgres import DB
+
 from core.Address import Address
 from core.BaseModel import BaseModel
 
@@ -9,7 +10,8 @@ class Holders(BaseModel):
     def __init__(self, 
         contract:Address,
         holder:Address,
-        quantity:str,
+        holder_tag:str,
+        holding:float,
         updated_time:int,
         source:str,
     ) -> None: pass

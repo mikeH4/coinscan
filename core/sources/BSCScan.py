@@ -1,5 +1,11 @@
-from core.sources.BaseSource import BaseSource
+from core.Holders import Holders
+from time import time
 from bs4 import BeautifulSoup
+from ratelimit import limits, sleep_and_retry
+from library.requests import get
+import re
+
+from core.sources.BaseSource import BaseSource
 
 class BscScan(BaseSource):
     url = "https://bscscan.com/"
@@ -7,6 +13,9 @@ class BscScan(BaseSource):
     limit_calls = 3
     limit_period = 6
 
+    def __init__(self, apikey) -> None:
+        self.apikey = apikey
+        
     def address_token_res(self,address):
         return self.request(f"/token/{address}#readContract")
 
@@ -20,7 +29,7 @@ class BscScan(BaseSource):
             "#ContentPlaceHolder1_divSummary .card-header-title [data-original-title]"
         )[0].get_text()
         if token_type != "BEP-20":
-            return None
+            return [None,None]
         
         args = {}
 
@@ -48,10 +57,62 @@ class BscScan(BaseSource):
 
         except Exception as e:
             print(e)
-
-        res = self.address_res(address)
-        soup = BeautifulSoup(res.text,"html.parser")
-
-        args["source_verified"] = bool(soup.select("#ContentPlaceHolder1_contractCodeDiv"))
         
-        return args
+        args["source_verified"] = self.get_source() is not None
+
+        holders = list(self.get_holders(self, soup, address))
+        
+        return args,holders
+    
+    @sleep_and_retry
+    @limits(calls=4,period=1)
+    def api_call(self,module,action,**parameters):
+        params = [
+            f"{key}={value}"
+            for key,value
+            in parameters.items()
+        ]
+        param_string = "" if len(params) < 1 else "&" + ('&'.join(params))
+        return (get(
+            f"https://api.bscscan.com/api?module={module}&action={action}&apikey={self.apikey}{param_string}",
+        )).json()
+
+    def get_source(self,address):
+        data = self.api_call("contract","action",address=address)
+        if data["status"] == 0:
+            raise Exception(data["result"])
+        
+        source = data["result"]["SourceCode"]
+        return None if source == "" else source
+
+    @staticmethod
+    def parse_sid(soup):
+        pattern = '(?<=var sid = \')([\s\S][^\']+)'
+        script_tag = soup.select('body > script[type="text/javascript"]')[0]
+        return re.search(pattern,script_tag.string).group(0)
+
+    def get_holders(self,previous_soup,address):
+        sid = self.parse_sid(previous_soup)
+        total_supply = 1000000
+        res = self.request(f"/token/generic-tokenholders2?m=normal&a={address}&s={total_supply}&sid={sid}&p=1")
+
+        soup = BeautifulSoup(res.text)
+        for row in soup.select("table > tbody > tr"):
+            rank_col,address_col,quantity_col,perc_col,analytics_cols = row.select("td")
+            holder_args = dict(
+                contract=address,
+                holder=None,
+                holder_tag="",
+                holding=None,
+                updated_time=time(),
+                source="bscscan"
+            )
+            span = address_col.select("span")[0]
+            if "data-original-title" in span.attrs:
+                holder_args["holder_tag"] = span.get_text()
+            
+            holder_args["holder"] = span.select("a").attrs["href"].split("?a=")[-1]
+
+            holder_args["holding"] = float(quantity_col.get_text())
+
+            yield holder_args

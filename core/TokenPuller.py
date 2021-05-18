@@ -1,13 +1,15 @@
 from time import time
+
 from core.sources.BSCheck import BSCheck
 from core.sources.BscScan import BscScan
 from core.sources.TokenFomo import TokenFomo
 from core.sources.TokenSniffer import TokenSniffer
 
 from library.backoff import backoff
+from library.postgres import DB
+
 from datetime import datetime
 
-from library.postgres import DB
 
 from core.Token import Token
 from core.Address import Address
@@ -26,7 +28,7 @@ class TokenPuller:
     def __init__(self, ignore_existing = "recent") -> None:
         bscheck = BSCheck()
         tokensniffer = TokenSniffer()
-        bscscan = BscScan()
+        bscscan = BscScan(apikey="REDACTED")
         tokenfomo = TokenFomo()
 
         self.db = DB("tokens")
@@ -63,7 +65,7 @@ class TokenPuller:
                 )
                 
                 # BscScan
-                updt = backoff(bscscan.get,address)
+                updt,holders = backoff(bscscan.get,address)
                 if updt is None:
                     continue
                 init_args.update(updt)
@@ -74,9 +76,12 @@ class TokenPuller:
                 # Token Sniffer
                 init_args.update(tokensniffer.get(address))
                 
-                print(init_args)
                 Token(**init_args).insert_or_update(db=self.db)
+                for holder in holders:
+                    holder.insert_or_update()
+
                 print(f"{i+1}/{data_len}")
+
                 self.db.conn.commit()
 
                 if time() - cycle_start > 120:
