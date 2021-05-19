@@ -10,6 +10,13 @@ for _class in [CoreToken,Holders]:
 
     if input("Sure you want to overwrite?").lower() != "y":
         continue
-
-    db.query(_class._db_recreate())
-    db.conn.commit()
+    
+    try:
+        db.query(_class._db_recreate())
+        db.conn.commit()
+    except Exception as e:
+        if input("Delete old temp table?").lower() == "y":
+            db.rollback()
+            db.query(f"DROP TABLE {_class.table}_temp;")
+            db.query(_class._db_recreate())
+            db.conn.commit()

@@ -15,7 +15,7 @@ class BscScan(BaseSource):
 
     def __init__(self, apikey) -> None:
         self.apikey = apikey
-        
+
     def address_token_res(self,address):
         return self.request(f"/token/{address}#readContract")
 
@@ -39,6 +39,12 @@ class BscScan(BaseSource):
         )[0].get_text().strip().split(" ")[0]
         args["total_supply"] = float(total_supply.replace(",",""))
         
+        holders_count = int(soup.select(
+            "#ContentPlaceHolder1_tr_tokenHolders > div:nth-child(2) > div:last-child"
+        )[0].get_text().replace(" addresses","").replace(",",""))
+
+        args["holders"] = holders_count
+
         # Decimals
         args["decimals"] = int(soup.select(
             "#ContentPlaceHolder1_trDecimals > div:first-child > div:nth-child(2)"
@@ -60,7 +66,7 @@ class BscScan(BaseSource):
         
         args["source_verified"] = self.get_source(address) is not None
 
-        holders = self.get_holders(soup, address)
+        holders = [] if holders_count == 0 else self.get_holders(soup, address)
         
         return args,holders
     
@@ -120,6 +126,9 @@ class BscScan(BaseSource):
             holder_args["holder"] = span.select("a")[0].attrs["href"].split("?a=")[-1]
 
             holder_args["holding"] = float(quantity_col.get_text().replace(",",""))
+            if holder_args["holding"] == 0:
+                print("Wait, what?")
+                print(row)
 
             holder = Holders(**holder_args)
             holders.append(holder)

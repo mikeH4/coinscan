@@ -76,6 +76,3 @@ class Holders(BaseModel):
             placeholder = db.placeholder(1)
             rows = db.get_all(f"SELECT * FROM holders WHERE contract = {placeholder} ORDER BY holding DESC {limit_cond}",[str(address)])
             return [cls._from_row(row) for row in rows]
-        
-    def alert(self):
-        return ""

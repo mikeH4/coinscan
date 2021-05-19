@@ -13,6 +13,7 @@ class CoreToken(BaseModel):
         block_time:int,
         description:str,
         bscscan_img:str,
+        holders:int,
         updated:int,
 
         # BscScan

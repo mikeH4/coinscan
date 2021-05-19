@@ -40,9 +40,9 @@ class TokenPuller:
             addrs = [row["addr"] for row in data]
             existing_addrs = [] if not ignore_existing else self.get_existing_addresses(
                 addrs,
-                # In last 30 min
+                # In last 45 min
                 updated_after=(
-                    int(datetime.now().timestamp()-(60*60*2))
+                    int(datetime.now().timestamp()-(60*60*0.85))
                     if ignore_existing == "recent"
                     else None
                 )

@@ -6,7 +6,7 @@ class ModelOperator:
         str: "TEXT",
         Address: "VARCHAR(42)",
         int: "INTEGER",
-        float: "FLOAT",
+        float: "DECIMAL",
         bool: "BOOLEAN"
     }
     defaults = {
@@ -56,7 +56,7 @@ class ModelOperator:
 
     def filled_old_col_string(self):
         return ",".join([
-            attr if attr not in self.new_cols else self.defaults[_class]
+            attr if attr not in self.new_cols else str(self.defaults[_class])
             for attr,_class
             in self.cols.items()
         ])
