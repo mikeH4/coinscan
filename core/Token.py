@@ -18,6 +18,7 @@ class Token(CoreToken):
 
     @classmethod
     def search(cls,keyword,limit=10):
+        lkey = keyword.lower()
         limit_cond = ""
         if limit is not None:
             limit_cond = f"LIMIT {int(limit)}"
@@ -27,11 +28,12 @@ class Token(CoreToken):
             SELECT * FROM tokens
             WHERE
             address = {placeholder}
-            OR symbol LIKE {placeholder}
-            OR name LIKE {placeholder}
+            OR LOWER(symbol) LIKE {placeholder}
+            OR LOWER(name) LIKE {placeholder}
             {limit_cond}
             """
-            rows = db.get_all(sql,[keyword,*["%" + keyword + "%"] * 2])
+            rows = db.get_all(sql,[keyword,*[f"%{lkey}%"] * 2])
+            Holders._prep_holders([row[0] for row in rows])
             return [cls._from_row(row) for row in rows]
 
     @classmethod

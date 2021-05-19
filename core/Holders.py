@@ -37,6 +37,8 @@ class Holders(BaseModel):
 
     @classmethod
     def _prep_holders(cls, addresses, limit=5):
+        if len(addresses) < 1:
+            return []
         with DB("tokens") as db:
             plc = db.placeholder(len(addresses))
             holders_result = db.get_all(f"""
