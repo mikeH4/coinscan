@@ -17,7 +17,7 @@ def get(url,params={},headers={},cookies={},wait=0,proxy=None):
 
     print("Request: ", url)
 
-    if useragent is not None:
+    if useragent is not None and "User-Agent" not in headers:
         headers["User-Agent"] = useragent
 
     if proxy is not None:

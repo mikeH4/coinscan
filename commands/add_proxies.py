@@ -17,6 +17,7 @@ print("Proxies Active: ")
 print(list(active))
 
 new_ips = set()
+apikeys = {}
 n = ""
 while True:
     print("Add new IP in format IP:port (n to exit)")
@@ -37,13 +38,15 @@ while True:
         print("Already exists")
         continue
 
+    apikey = input("Enter API Key: ")
+    apikeys[inpt] = apikey
     new_ips.add(inpt)
 
 db = DB("tokens")
 added = set()
 removed = set()
 for ip in new_ips.union(active):
-    if Proxies.test(ip):
+    if Proxies.test_proxy(ip):
         if ip in active:
             removed.add(ip)
             proxy_by_ip[ip].remove()
@@ -51,8 +54,9 @@ for ip in new_ips.union(active):
             Proxies(
                 ip=ip,
                 agent=Proxies.random_agent(),
+                apikey=apikeys[ip],
                 status="active",
-                added=time()
+                added=time(),
             ).insert(db)
             added.add(ip)
 
@@ -63,3 +67,5 @@ print(list(new_ips - added))
 
 print("Added:")
 print(list(added))
+
+db.close()

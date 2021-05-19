@@ -23,13 +23,17 @@ class BaseSourceMetaClass(type):
             )(cls.request)
         )
         
-
-
 # Abstract Clas
 class BaseSource(metaclass=BaseSourceMetaClass):
     url = None
     limit_calls = 1
     limit_period = 1
+
+    def __new__(cls,**kwds):
+        self = super(BaseSource, cls).__new__(cls)
+        self.proxy = kwds.get("proxy",None)
+        self.agent = kwds.get("agent",None)
+        return self
 
     @staticmethod
     def parse_soup_json(soup,selector):
@@ -37,7 +41,10 @@ class BaseSource(metaclass=BaseSourceMetaClass):
         return json.loads(script_content)
 
     def request(self,path):
-        return get(urljoin(self.url,path))
+        headers = {}
+        if self.agent is not None:
+            headers["User-Agent"] = self.agent
+        return get(urljoin(self.url,path),proxy=self.proxy,headers=headers)
 
     def get():
         raise NotImplementedError("get() must be defined in class")

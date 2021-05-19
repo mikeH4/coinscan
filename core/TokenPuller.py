@@ -1,4 +1,4 @@
-from time import time
+from time import sleep, time
 
 from core.sources.BSCheck import BSCheck
 from core.sources.BscScan import BscScan
@@ -26,10 +26,10 @@ class TokenPuller:
         return addrs
 
     def __init__(self, ignore_existing = "recent") -> None:
+        tokenfomo = TokenFomo()
         bscheck = BSCheck()
         tokensniffer = TokenSniffer()
         bscscan = BscScan(apikey="REDACTED")
-        tokenfomo = TokenFomo()
 
         self.db = DB("tokens")
 
@@ -40,9 +40,9 @@ class TokenPuller:
             addrs = [row["addr"] for row in data]
             existing_addrs = [] if not ignore_existing else self.get_existing_addresses(
                 addrs,
-                # In last 45 min
+                # In last 1 Hour
                 updated_after=(
-                    int(datetime.now().timestamp()-(60*60*0.85))
+                    int(datetime.now().timestamp()-(60*60*1))
                     if ignore_existing == "recent"
                     else None
                 )
@@ -85,11 +85,13 @@ class TokenPuller:
 
                 self.db.conn.commit()
 
-                if time() - cycle_start > 120:
+                if time() - cycle_start > 60*2:
                     break
             
             if time() - cycle_start < 5:
-                print("Closed")
+                pass
+                # sleep(20)
+                # print("Closed")
                 break
 
         self.db.close()

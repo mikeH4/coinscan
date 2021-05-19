@@ -16,12 +16,22 @@ class Holders(BaseModel):
         source:str,
     ) -> None: pass
 
+    @staticmethod
+    def delete_all(contract,db = None):
+        _db = db if db is not None else DB("tokens")
+        
+        db.query(f"DELETE FROM holders WHERE contract = {db.placeholder(1)}",[contract])
+        
+        if db is None:
+            _db.close()
+
     def insert_or_update(self,db:DB = None):
         _db = db if db is not None else DB("tokens")
 
         _dict = self.dict()
         for attr in ["contract","holder"]:
             _dict[attr] = str(_dict[attr])
+        
         _db.insert(
             self.table,
             _dict,

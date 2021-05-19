@@ -1,4 +1,3 @@
 from core.TokenPuller import TokenPuller
 
-while True:
-    TokenPuller(ignore_existing="recent")
+TokenPuller(ignore_existing="recent")

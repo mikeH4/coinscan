@@ -12,6 +12,7 @@ class Proxies(BaseModel):
     def __init__(self, 
         ip:str,
         agent:str,
+        apikey:str,
         status:str,
         added:int
     ) -> None: pass
@@ -22,14 +23,17 @@ class Proxies(BaseModel):
             return [cls._from_row(row) for row in db.get_all("SELECT * FROM proxies")]
 
     @staticmethod
-    def test(ip):
+    def test_proxy(ip):
         try: get("https://google.com",proxy=ip)
         except ProxyError: return False
         return True
 
+    def test(self):
+        return self.test_proxy(self.ip)
+
     @staticmethod
     def random_agent():
-        with open("dataset/useragents.json","w+") as fp:
+        with open("dataset/useragents.json","r") as fp:
             return choice(json.load(fp))
 
     def remove(self, db: DB = None, replace = False):
