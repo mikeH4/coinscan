@@ -73,6 +73,14 @@ class DB:
                 for key in cols
                 if key not in replace_insert_on
             ])
+            # if table == "holders":
+            #     print("_"*10)
+            #     print(f"""
+            #     ON CONFLICT ({', '.join(replace_insert_on)}) DO UPDATE 
+            #     SET {update_str};
+            #     """)
+            #     print(data.values())
+            #     print("_"*10)
             sql += f"""
             ON CONFLICT ({', '.join(replace_insert_on)}) DO UPDATE 
             SET {update_str};

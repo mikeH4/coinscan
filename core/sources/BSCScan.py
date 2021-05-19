@@ -60,7 +60,7 @@ class BscScan(BaseSource):
         
         args["source_verified"] = self.get_source(address) is not None
 
-        holders = list(self.get_holders(soup, address))
+        holders = self.get_holders(soup, address)
         
         return args,holders
     
@@ -96,13 +96,14 @@ class BscScan(BaseSource):
         total_supply = 1000000
         res = self.request(f"/token/generic-tokenholders2?m=normal&a={address}&s={total_supply}&sid={sid}&p=1")
 
+        holders = []
+
         soup = BeautifulSoup(res.text,"html.parser")
         for row in soup.select("table > tbody > tr"):
             cols = row.select("td")
             if len(cols) < 5:
                 print("No Holders")
                 return []
-                yield
             rank_col,address_col,quantity_col,perc_col,analytics_cols = cols
             holder_args = dict(
                 contract=address,
@@ -120,4 +121,7 @@ class BscScan(BaseSource):
 
             holder_args["holding"] = float(quantity_col.get_text().replace(",",""))
 
-            yield Holders(**holder_args)
+            holder = Holders(**holder_args)
+            holders.append(holder)
+
+        return holders

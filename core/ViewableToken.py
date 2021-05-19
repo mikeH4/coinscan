@@ -1,7 +1,15 @@
+from core.Holders import Holders
 import timeago
 from datetime import datetime
 from core.Token import Token
 from library.num import human_format
+
+def get_largest_holder(self):
+    holders = Holders.get_by_address(self.address)
+    if len(holders) < 1:
+        return "No holders"
+    return holders[0].alert()
+
 
 class ViewableToken(Token):
     keys_rename = dict(
@@ -23,7 +31,10 @@ class ViewableToken(Token):
         deployed=["ts_found",bool],
         no_older_tokens=["ts_no_prior_similar",bool],
         not_proxy=["ts_not_proxy",bool],
-        not_pausable=["ts_not_pausable",bool]
+        not_pausable=["ts_not_pausable",bool],
+    )
+    added_attr = dict(
+        largest_holder= get_largest_holder
     )
 
     @classmethod
@@ -45,3 +56,6 @@ class ViewableToken(Token):
             new_key = new_key[0]
             new_key = key if new_key is None else new_key
             setattr(self,new_key,attrs[new_key])
+        
+        for key,get_func in self.added_attr.items():
+            setattr(self,key,get_func(self))

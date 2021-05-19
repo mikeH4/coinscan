@@ -1,24 +1,19 @@
+from core.Holders import Holders
 from core.CoreToken import CoreToken
 from library.postgres import DB
 
 class Token(CoreToken):
     @staticmethod
     def _get_latest_in_rows(limit=100):
-        limit_cond = ""
-        if limit is not None:
-            limit_cond = f"LIMIT {int(limit)}"
+        limit_cond = Token.limit_cond(limit)
 
         with DB("tokens") as db:
             return db.get_all(f"SELECT * FROM tokens ORDER BY block_time DESC {limit_cond}")
 
     @classmethod
-    def _from_row(cls,row):
-        token = cls({key:row[i] for i,key in enumerate(cls.keys)})
-        return token
-
-    @classmethod
     def get_latest(cls,limit=100):
         rows = cls._get_latest_in_rows(limit=limit)
+        Holders._prep_holders([row[0] for row in rows])
         return [cls._from_row(row) for row in rows]
 
     @classmethod

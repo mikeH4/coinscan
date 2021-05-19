@@ -37,8 +37,9 @@ class TokenPuller:
             cycle_start = time()
             data = tokenfomo.get()
 
+            addrs = [row["addr"] for row in data]
             existing_addrs = [] if not ignore_existing else self.get_existing_addresses(
-                [row["addr"] for row in data],
+                addrs,
                 # In last 30 min
                 updated_after=(
                     int(datetime.now().timestamp()-(60*60*2))

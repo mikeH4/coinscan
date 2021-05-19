@@ -80,12 +80,13 @@ class BaseModelMetaClass(type):
         cls.keys = list(cls.__init__.__annotations__.keys())
         cls.keys.remove("return") 
 
-    def __call__(self, *args, **kwargs):
-        for key,_class in self.__init__.__annotations__.items():
+    def __call__(cls, *args, **kwargs):
+        self = super().__call__(**kwargs)
+        for key,_class in cls.__init__.__annotations__.items():
             if key == "return":
                 continue
             setattr(self,key,_class(kwargs[key]))
-        return super().__call__(**kwargs)
+        return self
 
 # abstract
 class BaseModel(metaclass=BaseModelMetaClass):
@@ -94,8 +95,20 @@ class BaseModel(metaclass=BaseModelMetaClass):
 
     __model_operator = None
 
+    @classmethod
+    def _from_row(cls,row):
+        obj = cls(**{key:row[i] for i,key in enumerate(cls.keys)})
+        return obj
+
     def dict(self):
         return {key:getattr(self,key) for key in self.keys}
+
+    @staticmethod
+    def limit_cond(limit):
+        limit_cond = ""
+        if limit is not None:
+            limit_cond = f"LIMIT {int(limit)}"
+        return limit_cond
 
     @classmethod
     def _mo(cls):
