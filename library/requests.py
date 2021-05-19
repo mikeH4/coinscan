@@ -4,7 +4,13 @@ from time import time,sleep
 last_request = 0
 useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"
 
-def get(url,params={},headers={},cookies={},wait=0):
+def _create_req_dict(ip):
+    return { 
+        "http"  : f"http://{ip}", 
+        "https" : f"http://{ip}",
+    }
+
+def get(url,params={},headers={},cookies={},wait=0,proxy=None):
     global last_request
     sleep(max(0,wait-(time()-last_request)))
     last_request = time()
@@ -14,10 +20,14 @@ def get(url,params={},headers={},cookies={},wait=0):
     if useragent is not None:
         headers["User-Agent"] = useragent
 
+    if proxy is not None:
+        proxy = _create_req_dict(proxy)
+
     raw_content = requests.get(
         url,
         headers=headers,
         params=params,
-        cookies=cookies
+        cookies=cookies,
+        proxies=proxy
     )
     return raw_content
