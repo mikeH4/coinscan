@@ -13,7 +13,6 @@ class Token(CoreToken):
     @classmethod
     def get_latest(cls,limit=100):
         rows = cls._get_latest_in_rows(limit=limit)
-        Holders._prep_holders([row[0] for row in rows])
         return [cls._from_row(row) for row in rows]
 
     @classmethod
@@ -33,7 +32,6 @@ class Token(CoreToken):
             {limit_cond}
             """
             rows = db.get_all(sql,[keyword,*[f"%{lkey}%"] * 2])
-            Holders._prep_holders([row[0] for row in rows])
             return [cls._from_row(row) for row in rows]
 
     @classmethod

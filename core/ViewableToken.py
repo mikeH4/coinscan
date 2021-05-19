@@ -50,7 +50,6 @@ class ViewableToken(Token):
         not_pausable=["ts_not_pausable",bool],
     )
     added_attr = dict(
-        largest_holder= get_largest_holder
     )
 
     def __init__(self, **attrs) -> None:

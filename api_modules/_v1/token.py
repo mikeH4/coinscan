@@ -23,3 +23,11 @@ def token(address: str):
         raise HTTPException(status_code=404, detail="Not found")
 
     return {"token": token}
+
+@router.get("/{address}")
+def token(address: str):
+    token = ViewableToken.get(address)
+    if token is None:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return {"token": token}
