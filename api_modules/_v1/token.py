@@ -1,3 +1,5 @@
+from core.ViewableHolders import ViewableHolders
+from core.Holders import Holders
 from fastapi import APIRouter,HTTPException
 from core.ViewableToken import ViewableToken
 
@@ -24,10 +26,6 @@ def token(address: str):
 
     return {"token": token}
 
-@router.get("/{address}")
+@router.get("/{address}/holders")
 def token(address: str):
-    token = ViewableToken.get(address)
-    if token is None:
-        raise HTTPException(status_code=404, detail="Not found")
-
-    return {"token": token}
+    return {"holders": ViewableHolders.top(address)}

@@ -32,3 +32,10 @@ class Holders(BaseModel):
 
         if db is None:
             _db.close()
+    
+    @classmethod
+    def top(cls, address, limit=10):
+        limit_cond = cls.limit_cond(10)
+        with DB("tokens") as db:
+            tokens = db.get_all(f'SELECT * FROM holders WHERE contract = {db.placeholder(1)} {limit_cond}',[address])
+            return [cls._from_row(token) for token in tokens]

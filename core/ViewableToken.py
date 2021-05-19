@@ -5,28 +5,6 @@ from core.Token import Token
 from core.CoreToken import CoreToken
 from library.num import human_format
 
-def get_largest_holder(**attrs):
-    token = CoreToken(**attrs)
-    holders = Holders.get_by_address(token.address)
-    if len(holders) < 1:
-        return "No holders"
-    sply = token.total_supply
-    top_holdings = [holders[0].holding]
-    for i,holder in enumerate(holders[1:]):
-        # i+1-1
-        last_perc = holders[i].holding/sply*100
-        perc = holder.holding/sply*100
-        if last_perc - perc < 15:
-            top_holdings.append(holder.holding)
-        else:
-            break
-
-    grammar = f"{len(top_holdings)} own"
-    if len(top_holdings) == 1:
-        grammar = f"wallet owns"
-    return f"Top {grammar} {round(sum(top_holdings)/sply*100,2)}% of supply"
-
-
 class ViewableToken(Token):
     keys_rename = dict(
         name=[None],
