@@ -67,7 +67,7 @@ class BscScan(BaseSource):
         args["source_verified"] = self.get_source(address) is not None
 
         holders = [] if holders_count == 0 else self.get_holders(soup, address)
-        
+
         return args,holders
     
     @sleep_and_retry
@@ -129,6 +129,7 @@ class BscScan(BaseSource):
             if holder_args["holding"] == 0:
                 print("Wait, what?")
                 print(row)
+                continue
 
             holder = Holders(**holder_args)
             holders.append(holder)
