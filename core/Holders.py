@@ -71,7 +71,7 @@ class Holders(BaseModel):
 
     @classmethod
     def get_by_address(cls, address, limit = 5):
-        if address in cls._holders_cache[limit]:
+        if limit in cls._holders_cache and address in cls._holders_cache[limit]:
             return cls._holders_cache[limit][address]
         limit_cond = cls.limit_cond(limit)
         with DB("tokens") as db:
