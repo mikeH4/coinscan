@@ -1,0 +1,14 @@
+[Unit]
+Description=Coin Scan Rescaner
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+WorkingDirectory=/home/coinscan/
+ExecStart=/home/coinscan/env/bin/python /home/coinscan/cmd.py rescanner
+
+[Install]
+WantedBy=multi-user.target
