@@ -18,7 +18,7 @@ while True:
     with timer("Took"):
         proxies = Proxies.get_all()
 
-        proxies = [proxy for proxy in proxies if proxy.test()][:2]
+        proxies = [proxy for proxy in proxies if proxy.test()]
 
         print("Using proxies:")
         print(proxies)
@@ -39,7 +39,7 @@ while True:
 
         for i in range(len(proxies)):
             _from,_to  = [i*each,(i+1)*each]
-            chunk = tokens[_from:_to][:25]
+            chunk = tokens[_from:_to]
             chunks[proxies[i]] = chunk
 
         chunks[proxies[0]] += extra
@@ -98,4 +98,3 @@ while True:
 
             for future in as_completed(processes):
                 print(future.result())
-        break
