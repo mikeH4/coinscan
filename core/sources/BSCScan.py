@@ -13,7 +13,10 @@ class BscScan(BaseSource):
     limit_calls = 3
     limit_period = 6
 
-    def __init__(self, apikey) -> None:
+    def __init__(self, apikey, **kwds) -> None:
+        for attr in ["proxy","agent"]:
+            kwds.pop(attr, None)
+            setattr(self,attr,kwds.get(attr,None))
         self.apikey = apikey
 
     def address_token_res(self,address):

@@ -1,5 +1,5 @@
-from concurrent.futures import ThreadPoolExecutor
-from threading import Thread
+from concurrent.futures import ThreadPoolExecutor,as_completed
+from datetime import date, datetime,timedelta
 
 from core.Holders import Holders
 from time import time
@@ -21,7 +21,10 @@ print("Using proxies:")
 print(proxies)
 print("")
 
-tokens = Token.get_latest(limit=None)[100:]
+tokens = Token.get_latest(
+    limit=None,
+    before=datetime.now()-timedelta(hours=24).timestamp()
+)[100:]
 
 remainder = len(tokens) % len(proxies)
 extra = tokens[:remainder]
@@ -49,6 +52,8 @@ def pull_chunk(ip,agent,apikey,tokens):
 
     with DB("tokens") as db:
         for i,token in enumerate(tokens):
+            if str(token.address) != "0x7092da3604d448c96e0bf96feed7ba435c229646":
+                continue
             # BscScan
             args,holders = backoff(bscscan.get,token.address)
             attrs = ["total_supply","holders","decimals","description",
@@ -79,12 +84,16 @@ def pull_chunk(ip,agent,apikey,tokens):
 
 
             token.updated = time()
+            print(token)
             token.insert_or_update(db=db)
             db.conn.commit()
 
             print(f"{i+1}/{tokens_len}")
 
-            
-with ThreadPoolExecutor(max_workers=3) as executor:
+with ThreadPoolExecutor(max_workers=1) as executor:
+    processes = []
     for ip,tokens in chunks.items():
-        executor.submit(pull_chunk,ip.ip,ip.agent,ip.apikey,tokens)
+        processes.append(executor.submit(pull_chunk,ip.ip,ip.agent,ip.apikey,tokens))
+
+    for future in as_completed(processes):
+        print(future.result())

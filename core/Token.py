@@ -4,15 +4,16 @@ from library.postgres import DB
 
 class Token(CoreToken):
     @staticmethod
-    def _get_latest_in_rows(limit=100):
+    def _get_latest_in_rows(limit=100,before=None):
         limit_cond = Token.limit_cond(limit)
+        before_cond = Token.before_cond(before)
 
         with DB("tokens") as db:
-            return db.get_all(f"SELECT * FROM tokens ORDER BY block_time DESC {limit_cond}")
+            return db.get_all(f"SELECT * FROM tokens {before_cond} ORDER BY block_time DESC {limit_cond}")
 
     @classmethod
-    def get_latest(cls,limit=100):
-        rows = cls._get_latest_in_rows(limit=limit)
+    def get_latest(cls, limit=100, before=None):
+        rows = cls._get_latest_in_rows(limit=limit, before=before)
         return [cls._from_row(row) for row in rows]
 
     @classmethod

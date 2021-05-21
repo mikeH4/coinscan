@@ -22,18 +22,12 @@ class BaseSourceMetaClass(type):
                 period=cls.limit_period
             )(cls.request)
         )
-        
+
 # Abstract Clas
 class BaseSource(metaclass=BaseSourceMetaClass):
     url = None
     limit_calls = 1
     limit_period = 1
-
-    def __new__(cls,**kwds):
-        self = super(BaseSource, cls).__new__(cls)
-        self.proxy = kwds.get("proxy",None)
-        self.agent = kwds.get("agent",None)
-        return self
 
     @staticmethod
     def parse_soup_json(soup,selector):

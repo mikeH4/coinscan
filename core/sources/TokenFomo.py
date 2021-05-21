@@ -4,6 +4,11 @@ from bs4 import BeautifulSoup
 class TokenFomo(BaseSource):
     url = "https://tokenfomo.io/"
 
+    def __init__(self,**kwds) -> None:
+        for attr in ["proxy","agent"]:
+            kwds.pop(attr, None)
+            setattr(self,attr,kwds.get(attr,None))
+
     def get(self):
         res = self.request("/")
         data = self.parse_soup_json(

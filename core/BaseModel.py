@@ -109,6 +109,13 @@ class BaseModel(metaclass=BaseModelMetaClass):
         if limit is not None:
             limit_cond = f"LIMIT {int(limit)}"
         return limit_cond
+    
+    @staticmethod
+    def before_cond(before,timestamp_key = "updated"):
+        before_cond = ""
+        if before is not None:
+            before_cond = f" WHERE updated < {int(before)}"
+        return before_cond
 
     @classmethod
     def _mo(cls):

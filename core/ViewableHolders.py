@@ -2,11 +2,9 @@ from core.Holders import Holders
 
 class ViewableHolders(Holders):
     keys_rename = dict(
-        contract=[None,str],
         holder=[None,str],
         holder_tag=["tag"],
         holding=[None],
-        updated_time=[None],
     )
     added_attr = dict()
 
@@ -16,7 +14,7 @@ class ViewableHolders(Holders):
             new_key = key if new_key is None else new_key
             val = attrs[key]
             if len(new_key_tuple) > 1:
-                val = new_key_tuple[1](val)
+                val = new_key_tuple[1](val,**attrs)
             setattr(self,new_key,val)
         
         for key,get_func in self.added_attr.items():

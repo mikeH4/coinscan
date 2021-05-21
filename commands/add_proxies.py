@@ -6,7 +6,7 @@ from core.Proxies import Proxies
 
 proxies = Proxies.get_all()
 
-proxy_by_ip = set()
+proxy_by_ip = {}
 
 active = set()
 for proxy in proxies:

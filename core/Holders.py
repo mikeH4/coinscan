@@ -20,7 +20,10 @@ class Holders(BaseModel):
     def delete_all(contract,db = None):
         _db = db if db is not None else DB("tokens")
         
-        db.query(f"DELETE FROM holders WHERE contract = {db.placeholder(1)}",[contract])
+        db.query(
+            f"DELETE FROM holders WHERE contract = {db.placeholder(1)}",
+            [str(contract)]
+        )
         
         if db is None:
             _db.close()

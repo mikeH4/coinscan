@@ -8,6 +8,12 @@ class TokenSniffer(BaseSource):
     limit_calls = 2
     limit_period = 3
 
+    def __init__(self,**kwds) -> None:
+        for attr in ["proxy","agent"]:
+            kwds.pop(attr, None)
+            setattr(self,attr,kwds.get(attr,None))
+
+
     def address_res(self,address):
         return self.request(f"/token/{address}")
     

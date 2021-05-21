@@ -17,7 +17,10 @@ class BSCheck(BaseSource):
         script_tag = soup.select("html > script")[0]
         return re.search(pattern,script_tag.string).group(0)
     
-    def __init__ (self) -> None:
+    def __init__ (self,**kwds) -> None:
+        for attr in ["proxy","agent"]:
+            kwds.pop(attr, None)
+            setattr(self,attr,kwds.get(attr,None))
         self.nonce = backoff(self._get_nonce)
 
     def address_res(self, address):
@@ -50,11 +53,11 @@ class BSCheck(BaseSource):
             try:
                 new_args = dict(
                     rating=soup.select("#report_group3 + div:last-child")[0].get_text().replace("SAFESCORE:","").lower(),
-                    honeypot_check=soup.select("#report_honeypot > #report_tile_result")[0].get_text() == "Sell is OK",
-                    owner_renounced=soup.select("#report_owner > #report_tile_result")[0].get_text() == "Owner renounced !",
-                    dev_liquidity_check=soup.select("#report_dev > #report_tile_result")[0].get_text() == "Dev liquidity OK !",
-                    lp_check=soup.select("#report_lp > #report_tile_result")[0].get_text() == "LP check OK !",
-                    top_holders_check=soup.select("#report_holders > #report_tile_result")[0].get_text() == "Top holders liquidity OK"
+                    honeypot_check=soup.select("#report_honeypot #report_tile_result")[0].get_text() == "Sell is OK",
+                    owner_renounced=soup.select("#report_owner #report_tile_result")[0].get_text() == "Owner renounced !",
+                    dev_liquidity_check=soup.select("#report_dev #report_tile_result")[0].get_text() == "Dev liquidity OK !",
+                    lp_check=soup.select("#report_lp #report_tile_result")[0].get_text() == "LP check OK !",
+                    top_holders_check=soup.select("#report_holders #report_tile_result")[0].get_text() == "Top holders liquidity OK"
                 )
                 return new_args
             except Exception as e:
