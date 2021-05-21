@@ -14,8 +14,5 @@ class ViewableHolders(Holders):
             new_key = key if new_key is None else new_key
             val = attrs[key]
             if len(new_key_tuple) > 1:
-                val = new_key_tuple[1](val,**attrs)
+                val = new_key_tuple[1](val)
             setattr(self,new_key,val)
-        
-        for key,get_func in self.added_attr.items():
-            setattr(self,key,get_func(**attrs))

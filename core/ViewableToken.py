@@ -26,6 +26,7 @@ class ViewableToken(Token):
         no_older_tokens=["ts_no_prior_similar",bool],
         not_proxy=["ts_not_proxy",bool],
         not_pausable=["ts_not_pausable",bool],
+        holders=[None,human_format],
     )
     added_attr = dict(
     )
