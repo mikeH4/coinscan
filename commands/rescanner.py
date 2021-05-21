@@ -23,8 +23,8 @@ print("")
 
 tokens = Token.get_latest(
     limit=None,
-    before=datetime.now()-timedelta(hours=24).timestamp()
-)[100:]
+    before=(datetime.now()-timedelta(hours=24)).timestamp()
+)
 
 remainder = len(tokens) % len(proxies)
 extra = tokens[:remainder]
