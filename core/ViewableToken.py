@@ -12,7 +12,7 @@ class ViewableToken(Token):
         address=[None],
         block_time=[
             "timestamp",
-            lambda timestamp : timeago.format(datetime.fromtimestamp(timestamp))
+            lambda timestamp : None if timestamp == 0 else timeago.format(datetime.fromtimestamp(timestamp))
         ],
         description=[None],
         total_supply=[None,human_format],

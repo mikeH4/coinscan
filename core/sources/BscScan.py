@@ -34,7 +34,13 @@ class BscScan(BaseSource):
         if token_type != "BEP-20":
             return [None,None]
         
-        args = {}
+        args= {}
+
+        args["name"] = soup.select(
+            "h1 span.text-secondary"
+        )[0].get_text().strip()
+
+        args["symbol"] = soup.select("#ContentPlaceHolder1_hdnSymbol")[0].attrs["value"]
 
         # Total Supply
         total_supply = soup.select(
@@ -63,7 +69,6 @@ class BscScan(BaseSource):
             if args["bscscan_img"][:len(trimstart)] != trimstart:
                 raise Exception(f"Img Url is not formatted correctly: {args['bscscan_img']}")
             args["bscscan_img"] = args["bscscan_img"][len(trimstart):]
-
         except Exception as e:
             print(e)
         

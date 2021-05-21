@@ -58,8 +58,6 @@ class TokenPuller:
 
                 address = Address(record["addr"])
                 init_args = dict(
-                    name=record["name"],
-                    symbol=record["symbol"],
                     address=address,
                     block_time=int(record["blockTime"]),
                     updated=int(datetime.now().timestamp())
@@ -76,7 +74,7 @@ class TokenPuller:
                 
                 # Token Sniffer
                 init_args.update(tokensniffer.get(address))
-                
+
                 Token(**init_args).insert_or_update(db=self.db)
                 for holder in holders:
                     holder.insert_or_update()
