@@ -7,7 +7,7 @@ class ViewableHolders(Holders):
         holder_tag=["tag"],
     )
     added_attr = dict(
-        holding=lambda token,holding,**attrs : holding/token.total_supply
+        holding=lambda token,holding,**attrs : float(holding)/float(token.total_supply)
     )
 
     @staticmethod
