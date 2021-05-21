@@ -52,8 +52,6 @@ def pull_chunk(ip,agent,apikey,tokens):
 
     with DB("tokens") as db:
         for i,token in enumerate(tokens):
-            if str(token.address) != "0x7092da3604d448c96e0bf96feed7ba435c229646":
-                continue
             # BscScan
             args,holders = backoff(bscscan.get,token.address)
             attrs = ["total_supply","holders","decimals","description",
