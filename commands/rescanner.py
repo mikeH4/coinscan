@@ -84,11 +84,12 @@ def pull_chunk(ip,agent,apikey,tokens):
             token.updated = time()
             print(token)
             token.insert_or_update(db=db)
+            print("With IP:",ip)
             db.conn.commit()
 
             print(f"{i+1}/{tokens_len}")
 
-with ThreadPoolExecutor(max_workers=1) as executor:
+with ThreadPoolExecutor(max_workers=len(chunks)) as executor:
     processes = []
     for ip,tokens in chunks.items():
         processes.append(executor.submit(pull_chunk,ip.ip,ip.agent,ip.apikey,tokens))

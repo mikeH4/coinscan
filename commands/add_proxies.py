@@ -48,17 +48,18 @@ removed = set()
 for ip in new_ips.union(active):
     if Proxies.test_proxy(ip):
         if ip in active:
-            removed.add(ip)
-            proxy_by_ip[ip].remove()
-        else:
-            Proxies(
-                ip=ip,
-                agent=Proxies.random_agent(),
-                apikey=apikeys[ip],
-                status="active",
-                added=time(),
-            ).insert(db)
-            added.add(ip)
+            continue
+        Proxies(
+            ip=ip,
+            agent=Proxies.random_agent(),
+            apikey=apikeys[ip],
+            status="active",
+            added=time(),
+        ).insert(db)
+        added.add(ip)
+    elif ip in active:
+        removed.add(ip)
+        proxy_by_ip[ip].remove()
 
 print("Removed:")
 print(list(removed))
