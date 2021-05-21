@@ -28,8 +28,7 @@ class ViewableToken(Token):
         not_pausable=["ts_not_pausable",bool],
         holders=[None,human_format],
     )
-    added_attr = dict(
-    )
+    added_attr = dict()
 
     def __init__(self, **attrs) -> None:
         for key,new_key_tuple in self.keys_rename.items():

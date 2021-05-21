@@ -127,6 +127,8 @@ class BscScan(BaseSource):
                 holder_args["holder_tag"] = span.get_text()
             
             holder_args["holder"] = span.select("a")[0].attrs["href"].split("?a=")[-1]
+            if holder_args["holder"].lower() == "0x000000000000000000000000000000000000dead":
+                holder_args["holder"] = "0x0000000000000000000000000000000000000000"
 
             holder_args["holding"] = float(quantity_col.get_text().replace(",",""))
             if holder_args["holding"] == 0:

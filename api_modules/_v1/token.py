@@ -28,4 +28,4 @@ def token(address: str):
 
 @router.get("/{address}/holders")
 def token(address: str):
-    return {"holders": ViewableHolders.top(address)}
+    return {"holders": ViewableHolders.filter_top_holders(ViewableHolders.top(address))}
