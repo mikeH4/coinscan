@@ -1,7 +1,7 @@
 from core.Holders import Holders
 from time import time
 from bs4 import BeautifulSoup
-from ratelimit import limits, sleep_and_retry
+from library.ratelimit import limits, sleep_and_retry
 from library.requests import get
 import re
 

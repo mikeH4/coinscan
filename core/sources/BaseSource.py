@@ -1,5 +1,5 @@
 from core.BaseModel import BaseModelMetaClass
-from ratelimit import limits, sleep_and_retry
+from library.ratelimit import limits, sleep_and_retry
 import json
 from urllib.parse import urljoin
 
