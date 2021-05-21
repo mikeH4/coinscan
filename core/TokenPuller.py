@@ -85,7 +85,7 @@ class TokenPuller:
 
                 self.db.conn.commit()
 
-                if time() - cycle_start > 60*2:
+                if time() - cycle_start > 60*1.25:
                     break
             
             if time() - cycle_start < 5:
