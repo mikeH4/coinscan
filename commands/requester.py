@@ -84,6 +84,7 @@ while True:
 
                     with DB("tokens") as db:
                         Token(**init_args).insert_or_update(db=db)
+                        Holders.delete_all(init_args["address"],db=db)
                         for holder in holders:
                             holder.insert_or_update(db=db)
                         

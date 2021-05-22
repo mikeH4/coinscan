@@ -78,7 +78,7 @@ class TokenPuller:
                 
                 Token(**init_args).insert_or_update(db=self.db)
                 for holder in holders:
-                    holder.insert_or_update(db=db)
+                    holder.insert_or_update(db=self.db)
 
                 print(f"{i+1}/{data_len}")
 
