@@ -74,10 +74,11 @@ class TokenPuller:
                 
                 # Token Sniffer
                 init_args.update(tokensniffer.get(address))
-
+                
+                
                 Token(**init_args).insert_or_update(db=self.db)
                 for holder in holders:
-                    holder.insert_or_update()
+                    holder.insert_or_update(db=db)
 
                 print(f"{i+1}/{data_len}")
 

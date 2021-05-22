@@ -18,6 +18,7 @@ print(list(active))
 
 new_ips = set()
 apikeys = {}
+tasks = {}
 n = ""
 while True:
     print("Add new IP in format IP:port (n to exit)")
@@ -39,7 +40,13 @@ while True:
         continue
 
     apikey = input("Enter API Key: ")
+    
+    task = None
+    while task not in ["rescanner","request"]:
+        task = input("Enter Task: ")
+    
     apikeys[inpt] = apikey
+    tasks[inpt] = task
     new_ips.add(inpt)
 
 db = DB("tokens")
@@ -53,6 +60,7 @@ for ip in new_ips.union(active):
             ip=ip,
             agent=Proxies.random_agent(),
             apikey=apikeys[ip],
+            task=tasks[ip],
             status="active",
             added=time(),
         ).insert(db)

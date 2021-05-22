@@ -16,7 +16,7 @@ from core.Token import Token
 
 while True:
     with timer("Took"):
-        proxies = Proxies.get_all()
+        proxies = Proxies.get_all(task="rescanner")
 
         proxies = [proxy for proxy in proxies if proxy.test()]
 

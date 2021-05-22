@@ -1,11 +1,13 @@
+from core.Token import Token
 from core.CoreToken import CoreToken
 from core.Holders import Holders
 from core.Proxies import Proxies
+from core.TokenRequest import TokenRequest
 from library.postgres import DB
 
 db = DB("tokens")
 
-for _class in [CoreToken,Holders,Proxies]:
+for _class in [CoreToken,Holders,Proxies,TokenRequest]:
     print(_class)
     print("New Columns:",_class._db_new_cols())
 

@@ -14,13 +14,17 @@ class Proxies(BaseModel):
         agent:str,
         apikey:str,
         status:str,
+        task:str,
         added:int
     ) -> None: pass
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls,task):
         with DB("tokens") as db:
-            return [cls._from_row(row) for row in db.get_all("SELECT * FROM proxies")]
+            return [cls._from_row(row) for row in db.get_all(
+                f"SELECT * FROM proxies WHERE task = {db.placeholder(1)}",
+                [task]
+            )]
 
     @staticmethod
     def test_proxy(ip):
