@@ -28,6 +28,14 @@ class BscScan(BaseSource):
     def get(self,address):
         res = self.address_token_res(address)
         soup = BeautifulSoup(res.text,"html.parser")
+
+        overview = soup.select(
+            "#ContentPlaceHolder1_divSummary .card-header-title"
+        )[0].get_text().strip()
+        if overview == "Overview":
+            # Not a token/Not found
+            return [None,None]
+
         token_type = soup.select(
             "#ContentPlaceHolder1_divSummary .card-header-title [data-original-title]"
         )[0].get_text()
