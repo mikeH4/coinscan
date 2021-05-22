@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from library.ratelimit import limits, sleep_and_retry
 from library.requests import get
 import re
+import threading
 
 from core.sources.BaseSource import BaseSource
 
@@ -29,46 +30,54 @@ class BscScan(BaseSource):
         res = self.address_token_res(address)
         soup = BeautifulSoup(res.text,"html.parser")
 
-        overview = soup.select(
-            "#ContentPlaceHolder1_divSummary .card-header-title"
-        )[0].get_text().strip()
-        if overview == "Overview":
-            # Not a token/Not found
-            return [None,None]
+        try:
+            overview = soup.select(
+                "#ContentPlaceHolder1_divSummary .card-header-title"
+            )[0].get_text().strip()
+            if overview == "Overview":
+                # Not a token/Not found
+                return [None,None]
 
-        token_type = soup.select(
-            "#ContentPlaceHolder1_divSummary .card-header-title [data-original-title]"
-        )[0].get_text()
-        if token_type != "BEP-20":
-            return [None,None]
-        
-        args= {}
+            token_type = soup.select(
+                "#ContentPlaceHolder1_divSummary .card-header-title [data-original-title]"
+            )[0].get_text()
+            if token_type != "BEP-20":
+                return [None,None]
+            
+            args= {}
 
-        args["name"] = soup.select(
-            "h1 span.text-secondary"
-        )[0].get_text().strip()
+            args["name"] = soup.select(
+                "h1 span.text-secondary"
+            )[0].get_text().strip()
 
-        args["symbol"] = soup.select("#ContentPlaceHolder1_hdnSymbol")[0].attrs["value"]
+            args["symbol"] = soup.select("#ContentPlaceHolder1_hdnSymbol")[0].attrs["value"]
 
-        # Total Supply
-        total_supply = soup.select(
-            "#ContentPlaceHolder1_tr_valuepertoken + div > div:nth-child(2)"
-        )[0].get_text().strip().split(" ")[0]
-        args["total_supply"] = float(total_supply.replace(",",""))
-        
-        holders_count = int(soup.select(
-            "#ContentPlaceHolder1_tr_tokenHolders > div:nth-child(2) > div:last-child"
-        )[0].get_text().replace(" addresses","").replace(",",""))
+            # Total Supply
+            total_supply = soup.select(
+                "#ContentPlaceHolder1_tr_valuepertoken + div > div:nth-child(2)"
+            )[0].get_text().strip().split(" ")[0]
+            args["total_supply"] = float(total_supply.replace(",",""))
+            
+            holders_count = int(soup.select(
+                "#ContentPlaceHolder1_tr_tokenHolders > div:nth-child(2) > div:last-child"
+            )[0].get_text().replace(" addresses","").replace(",",""))
 
-        args["holders"] = holders_count
+            args["holders"] = holders_count
 
-        # Decimals
-        args["decimals"] = int(soup.select(
-            "#ContentPlaceHolder1_trDecimals > div:first-child > div:nth-child(2)"
-        )[0].get_text())
+            # Decimals
+            args["decimals"] = int(soup.select(
+                "#ContentPlaceHolder1_trDecimals > div:first-child > div:nth-child(2)"
+            )[0].get_text())
 
-        args["description"] = ""
-        args["bscscan_img"] = ""
+            args["description"] = ""
+            args["bscscan_img"] = ""
+        except Exception as e:
+            print("This went wrong: ")
+            print("Thread ID/IP ID:",threading.current_thread().ident)
+            print("&-&-&-"*100)
+            print(soup)
+            print("&&&"*100)
+            raise Exception(e)
         try:
             schema = self.parse_soup_json(soup,"script[type='application/ld+json']")
             args["description"] = schema.get("description","")

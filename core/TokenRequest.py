@@ -37,13 +37,13 @@ class TokenRequest(BaseModel):
             _db.close()
 
     @staticmethod
-    def _get_latest_in_rows(limit=1000):
+    def _get_ordered_in_rows(limit=1000):
         limit_cond = TokenRequest.limit_cond(limit)
 
         with DB("tokens") as db:
-            return db.get_all(f"SELECT * FROM token_requests ORDER BY request_time DESC {limit_cond}")
+            return db.get_all(f"SELECT * FROM token_requests ORDER BY request_time ASC {limit_cond}")
 
     @classmethod
-    def get_latest(cls, limit=1000):
-        rows = cls._get_latest_in_rows(limit=limit)
+    def get_ordered(cls, limit=1000):
+        rows = cls._get_ordered_in_rows(limit=limit)
         return [cls._from_row(row) for row in rows]

@@ -24,10 +24,11 @@ while True:
         print(proxies)
         print("")
 
+
         tokens = Token.get_latest(
             limit=None,
             before=(datetime.now()-timedelta(hours=24)).timestamp()
-        )
+        ).reverse()
 
         remainder = len(tokens) % len(proxies)
         extra = tokens[:remainder]
@@ -61,7 +62,7 @@ while True:
                 with timer(desc):
                     with timer("Pulling"):
                         # BscScan
-                        args,holders = backoff(bscscan.get,token.address)
+                        args,holders = backoff(bscscan.get,token.address,time=120)
                         attrs = ["total_supply","holders","decimals","description",
                         "bscscan_img","source_verified"]
                         for attr in attrs:

@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor,as_completed
-from datetime import datetime,timedelta
-from time import time,sleep
+from datetime import datetime
+from time import sleep
 
 from core.Holders import Holders
 from library.timer import timer
@@ -17,7 +17,7 @@ from core.Token import Token
 
 while True:
     with timer("Took"):
-        token_requests = TokenRequest.get_latest(limit=1000)
+        token_requests = TokenRequest.get_ordered(limit=1000)
 
         if len(token_requests) < 1:
             print("Sleeping for 1 min, nothing to do: bored")
@@ -83,7 +83,10 @@ while True:
                     init_args.update(args)
 
                     with DB("tokens") as db:
-                        Token(**init_args).insert_or_update(db=db)
+                        Token(**init_args).insert_or_update(
+                            db=db,
+                            dont_update=["block_time"]
+                        )
                         Holders.delete_all(init_args["address"],db=db)
                         for holder in holders:
                             holder.insert_or_update(db=db)

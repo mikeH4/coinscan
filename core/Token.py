@@ -44,7 +44,7 @@ class Token(CoreToken):
                 return None
             return cls._from_row(token)
         
-    def insert_or_update(self,db:DB = None):
+    def insert_or_update(self,db:DB = None,dont_update:list=[]):
         _db = db if db is not None else DB("tokens")
 
         _dict = self.dict()
@@ -54,7 +54,8 @@ class Token(CoreToken):
             "tokens",
             _dict,
             replace_insert_on=["address"],
-            commit=False
+            commit=False,
+            dont_update=dont_update
         )
         print("Inserted:", address)
 

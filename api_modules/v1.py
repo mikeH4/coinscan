@@ -1,5 +1,5 @@
 from fastapi import APIRouter,HTTPException
-from api_modules._v1 import latest,token
+from api_modules._v1 import latest,token,private
 
 app = APIRouter(
     prefix="/v1"
@@ -8,6 +8,7 @@ app = APIRouter(
 routers = [
     latest.router,
     token.router,
+    private.router,
 ]
 
 for router in routers:

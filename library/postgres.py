@@ -52,7 +52,8 @@ class DB:
         data,
         commit: bool = True,
         ignore_insert=False,
-        replace_insert_on:list = False
+        replace_insert_on:list = False,
+        dont_update = []
     ):
         cols = list(data.keys())
         cols_str = ",".join(data.keys())
@@ -67,7 +68,7 @@ class DB:
             update_str = ", ".join([
                 (f"{key} = excluded.{key}")
                 for key in cols
-                if key not in replace_insert_on
+                if key not in replace_insert_on and key not in dont_update
             ])
             do_conflict = "NOTHING" if ignore_insert else f"UPDATE SET {update_str}"
             sql += f"""
