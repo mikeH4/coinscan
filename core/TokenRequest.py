@@ -11,7 +11,7 @@ class TokenRequest(BaseModel):
         request_time:int,
     ) -> None: pass
 
-    def insert_or_update(self,db:DB = None):
+    def insert_or_ignore(self,db:DB = None):
         _db = db if db is not None else DB("tokens")
 
         _dict = self.dict()
@@ -22,9 +22,10 @@ class TokenRequest(BaseModel):
             self.table,
             _dict,
             replace_insert_on=self.primary,
+            ignore_insert=True,
             commit=False
         )
-        print("Inserted token request for ", self.address )
+        print("Inserted/Ignored token request for ", self.address )
 
         if db is None:
             _db.close()

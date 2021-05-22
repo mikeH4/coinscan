@@ -118,7 +118,10 @@ class BscScan(BaseSource):
             if len(cols) < 5:
                 print("No Holders")
                 return []
-            rank_col,address_col,quantity_col,perc_col,analytics_cols = cols
+            if len(cols) == 5:
+                rank_col,address_col,quantity_col,perc_col,analytics_cols = cols
+            elif len(cols) == 6:
+                rank_col,address_col,quantity_col,perc_col,value_col,analytics_cols = cols
             holder_args = dict(
                 contract=address,
                 holder=None,

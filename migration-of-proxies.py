@@ -26,4 +26,4 @@ db.conn.commit()
 TokenRequest(
     address=Address("0x27Ae27110350B98d564b9A3eeD31bAeBc82d878d"),
     request_time=time()
-).insert_or_update()
+).insert_or_ignore()

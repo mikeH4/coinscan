@@ -20,8 +20,8 @@ while True:
         token_requests = TokenRequest.get_latest(limit=1000)
 
         if len(token_requests) < 1:
-            print("Sleeping for 5 min, nothing to do: bored")
-            sleep(60*5)
+            print("Sleeping for 1 min, nothing to do: bored")
+            sleep(60*1)
 
         proxies = Proxies.get_all(task="request")
 

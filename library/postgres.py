@@ -58,11 +58,7 @@ class DB:
         cols_str = ",".join(data.keys())
         placeholder = self.placeholder(len(data))
         
-        insert_option = ""
-        if ignore_insert:
-            insert_option = "OR IGNORE"
-        
-        sql = f"INSERT {insert_option} INTO {table} ({cols_str}) VALUES ({placeholder})"
+        sql = f"INSERT INTO {table} ({cols_str}) VALUES ({placeholder})"
                 
         if replace_insert_on:
             for replace_col in replace_insert_on:
@@ -73,9 +69,10 @@ class DB:
                 for key in cols
                 if key not in replace_insert_on
             ])
+            do_conflict = "NOTHING" if ignore_insert else f"UPDATE SET {update_str}"
             sql += f"""
-            ON CONFLICT ({', '.join(replace_insert_on)}) DO UPDATE 
-            SET {update_str};
+            ON CONFLICT ({', '.join(replace_insert_on)}) DO
+            {do_conflict};
             """
     
         self.query(sql,data.values())

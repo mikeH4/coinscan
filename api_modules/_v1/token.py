@@ -1,3 +1,5 @@
+from time import time
+from core.TokenRequest import TokenRequest
 from core.ViewableHolders import ViewableHolders
 from core.Holders import Holders
 from fastapi import APIRouter,HTTPException
@@ -22,6 +24,7 @@ def token(search: str):
 def token(address: str):
     token = ViewableToken.get(address)
     if token is None:
+        TokenRequest(address=address,request_time=time()).insert_or_ignore()
         raise HTTPException(status_code=404, detail="Not found")
 
     return {"token": token}
