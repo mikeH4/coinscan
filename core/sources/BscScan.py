@@ -139,6 +139,7 @@ class BscScan(BaseSource):
                 rank_col,address_col,quantity_col,perc_col,analytics_cols = cols
             elif len(cols) == 6:
                 rank_col,address_col,quantity_col,perc_col,value_col,analytics_cols = cols
+            
             holder_args = dict(
                 contract=address,
                 holder=None,
