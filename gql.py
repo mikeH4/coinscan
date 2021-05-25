@@ -1,7 +1,0 @@
-baseCurrency: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
-exchangeAddresses: ["0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73"]
-quoteCurrency: "0xe9e7cea3dedca5984780bafc599bd69add087d56"
-
-baseCurrency: "0x7abf7f54f30a45c7c43d728a75d6741440d7c591"
-exchangeAddresses: ["0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73"]
-quoteCurrency: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"

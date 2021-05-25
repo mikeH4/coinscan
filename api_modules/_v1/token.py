@@ -4,7 +4,6 @@ from core.ViewableHolders import ViewableHolders
 from core.Holders import Holders
 from fastapi import APIRouter,HTTPException
 from core.ViewableToken import ViewableToken
-from api_modules._v1.history_data import history_data
 
 router = APIRouter(
     prefix="/token"
@@ -33,7 +32,3 @@ def token(address: str):
 @router.get("/{address}/holders")
 def holders(address: str):
     return {"holders": ViewableHolders.filter_top_holders(ViewableHolders.top(address))}
-
-@router.get("/{address}/history")
-def history(address: str):
-    return {"history": history_data}
