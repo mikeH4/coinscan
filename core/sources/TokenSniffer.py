@@ -29,6 +29,9 @@ class TokenSniffer(BaseSource):
             not_proxy=False,
             not_pausable=False
         )
+        if res.status_code == 403:
+            print("Rate limited by Token Sniffer again!")
+            return default
         if res.status_code == 500:
             # deployed 0 will tell us it hasn't been scanned
             return default
