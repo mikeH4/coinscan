@@ -25,10 +25,10 @@ while True:
         print("")
 
 
-        tokens = Token.get_latest(
+        tokens = list(reversed(Token.get_latest(
             limit=None,
             before=(datetime.now()-timedelta(hours=24)).timestamp()
-        ).reverse()
+        )))
 
         remainder = len(tokens) % len(proxies)
         extra = tokens[:remainder]
