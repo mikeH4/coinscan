@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 class TokenSniffer(BaseSource):
     url = "https://tokensniffer.com/"
 
-    limit_calls = 2
-    limit_period = 3
+    limit_calls = 1
+    limit_period = 4
 
     def __init__(self,**kwds) -> None:
         for attr in ["proxy","agent"]:
