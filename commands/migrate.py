@@ -1,4 +1,3 @@
-from core.Token import Token
 from core.CoreToken import CoreToken
 from core.Holders import Holders
 from core.Proxies import Proxies
