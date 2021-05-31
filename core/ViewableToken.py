@@ -1,3 +1,4 @@
+from core.Listing import Listing
 from core.Holders import Holders
 import timeago
 from datetime import datetime
@@ -28,7 +29,9 @@ class ViewableToken(Token):
         not_pausable=["ts_not_pausable",bool],
         holders=[None,human_format],
     )
-    added_attr = dict()
+    added_attr = dict(
+        listings=lambda address,**attrs : [listing.platform for listing in Listing.get_listings(address)]
+    )
 
     def __init__(self, **attrs) -> None:
         for key,new_key_tuple in self.keys_rename.items():

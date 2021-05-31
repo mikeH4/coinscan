@@ -14,3 +14,7 @@ def read_items():
 @router.get("/get")
 def all():
     return ViewableToken.get_latest(100)
+
+@router.get("/listings")
+def all():
+    return ViewableToken.get_newly_listed()

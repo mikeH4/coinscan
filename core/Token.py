@@ -1,4 +1,4 @@
-from core.Holders import Holders
+from core.Listing import Listing
 from core.CoreToken import CoreToken
 from library.postgres import DB
 
@@ -14,6 +14,8 @@ class Token(CoreToken):
     @classmethod
     def get_latest(cls, limit=100, before=None):
         rows = cls._get_latest_in_rows(limit=limit, before=before)
+        addresses = [row[0] for row in rows]
+        Listing.cache_listings(addresses)
         return [cls._from_row(row) for row in rows]
 
     @classmethod
@@ -33,7 +35,23 @@ class Token(CoreToken):
             {limit_cond}
             """
             rows = db.get_all(sql,[keyword,*[f"%{lkey}%"] * 2])
+            addresses = [row[0] for row in rows]
+            Listing.cache_listings(addresses)
             return [cls._from_row(row) for row in rows]
+    
+    @classmethod
+    def _get_these(cls, addresses):
+        with DB("tokens") as db:
+            placeholder = db.placeholder(len(addresses))
+            sql = f"SELECT * FROM tokens WHERE address IN ({placeholder})"
+            rows = db.get_all(sql,addresses)
+            return [cls._from_row(row) for row in rows]
+
+    @classmethod
+    def get_newly_listed(cls):
+        with DB("tokens") as db:
+            return cls._get_these(Listing.new_listings())
+
 
     @classmethod
     def get(cls, address):

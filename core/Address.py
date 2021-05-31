@@ -1,6 +1,6 @@
 class Address:
     def __init__(self,string_repr: str) -> None:
-        string_repr = str(string_repr)
+        string_repr = str(string_repr).lower()
         if len(string_repr) != 42:
             raise TypeError("Address must be of length 42")
         self.string_repr = string_repr
