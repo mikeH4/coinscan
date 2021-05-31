@@ -1,13 +1,11 @@
 from core.sources.CoinGecko import CoinGecko
-from time import time
+from time import sleep, time
 from datetime import datetime
 from core.Address import Address
 from core.Listing import Listing
 from library.ratelimit import limits,sleep_and_retry
 from core.sources.CoinMarketCap import CoinMarketCap
 
-@sleep_and_retry
-@limits(calls=2,period=60*20)
 def update():
     # CoinMarketCap
 
@@ -54,4 +52,6 @@ def update():
     print("Updated")
 
 while True:
+    next_in = 15*60
     update()
+    sleep(next_in)

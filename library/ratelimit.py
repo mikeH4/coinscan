@@ -89,12 +89,14 @@ class RateLimitDecorator(object):
                 self.init_thread_slot()
 
                 period_remaining = self.__period_remaining()
+                print(period_remaining)
 
                 # If the time window has elapsed then reset.
                 if period_remaining <= 0:
                     self.num_calls[self.thread_id()] = 0
                     self.last_reset[self.thread_id()] = self.clock()
 
+                print("CALL")
                 # Increase the number of attempts to call the function.
                 self.num_calls[self.thread_id()] += 1
 
