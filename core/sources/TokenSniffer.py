@@ -18,7 +18,6 @@ class TokenSniffer(BaseSource):
         return self.request(f"/token/{address}")
     
     def get(self,address):
-        res = self.address_res(address)
         default = dict(
             deployed=0,
             first_seen=0,
@@ -29,6 +28,9 @@ class TokenSniffer(BaseSource):
             not_proxy=False,
             not_pausable=False
         )
+        print("Returning default for TokenSniffer")
+        return default
+        res = self.address_res(address)
         if res.status_code == 403:
             print("Rate limited by Token Sniffer again!")
             return default

@@ -31,6 +31,7 @@ class ViewableToken(Token):
         holders=[None,human_format],
     )
     added_attr = dict(
+        total_supply_num=lambda total_supply,**attrs : total_supply,
         listings=lambda address,**attrs : [listing.platform for listing in Listing.get_listings(str(Address(address)))]
     )
 
