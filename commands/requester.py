@@ -83,11 +83,12 @@ while True:
                     init_args.update(args)
 
                     with DB("tokens") as db:
-                        Token(**init_args).insert_or_update(
+                        token = Token(**init_args)
+                        token.insert_or_update(
                             db=db,
                             dont_update=["block_time"]
                         )
-                        Holders.delete_all(init_args["address"],db=db)
+                        Holders.delete_all(token.address,db=db)
                         for holder in holders:
                             holder.insert_or_update(db=db)
                         

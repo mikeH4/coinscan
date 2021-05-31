@@ -17,7 +17,8 @@ class Holders(BaseModel):
     ) -> None: pass
 
     @staticmethod
-    def delete_all(contract,db = None):
+    def delete_all(contract: Address,db = None):
+        contract = str(Address(contract))
         _db = db if db is not None else DB("tokens")
         
         db.query(
@@ -47,7 +48,8 @@ class Holders(BaseModel):
             _db.close()
     
     @classmethod
-    def top(cls, address, limit=10):
+    def top(cls, address: Address, limit=10):
+        address = str(Address(address))
         limit_cond = cls.limit_cond(10)
         with DB("tokens") as db:
             tokens = db.get_all(f'SELECT * FROM holders WHERE contract = {db.placeholder(1)} ORDER BY holding DESC {limit_cond}',[address])

@@ -1,3 +1,4 @@
+from core.Address import Address
 from core.Listing import Listing
 from core.CoreToken import CoreToken
 from library.postgres import DB
@@ -54,7 +55,8 @@ class Token(CoreToken):
 
 
     @classmethod
-    def get(cls, address):
+    def get(cls, address: Address):
+        address = str(Address(address))
         with DB("tokens") as db:
             placeholder = db.placeholder(1)
             token = db.get(f"SELECT * FROM tokens WHERE address = {placeholder}",[address])

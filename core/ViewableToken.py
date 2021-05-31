@@ -1,3 +1,4 @@
+from core.Address import Address
 from core.Listing import Listing
 from core.Holders import Holders
 import timeago
@@ -30,7 +31,7 @@ class ViewableToken(Token):
         holders=[None,human_format],
     )
     added_attr = dict(
-        listings=lambda address,**attrs : [listing.platform for listing in Listing.get_listings(address)]
+        listings=lambda address,**attrs : [listing.platform for listing in Listing.get_listings(str(Address(address)))]
     )
 
     def __init__(self, **attrs) -> None:

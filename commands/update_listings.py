@@ -36,12 +36,12 @@ def update():
     listings = cg.listings()
     for listing in listings:
         token_address = listing["platforms"].get("binance-smart-chain",None) or ""
-        token_address = token_address.strip().lower()
+        token_address = str(Address(token_address.strip().lower()))
         if token_address == "":
             continue
         
         Listing(
-            token=Address(token_address),
+            token=token_address,
             local_id=listing["id"],
             local_slug=listing["id"],
             platform="coingecko",
