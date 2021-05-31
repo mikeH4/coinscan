@@ -50,7 +50,7 @@ class Listing(BaseModel):
 
     @classmethod
     def get_listings(cls, token_address: Address):
-        token_address = Address(str(token_address))
+        token_address = str(Address(token_address))
         if token_address in cls._listings_cache:
             return cls._listings_cache[token_address]
         with DB("tokens") as db:
