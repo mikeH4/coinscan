@@ -67,6 +67,6 @@ def update():
     print("Updated")
 
 while True:
-    next_in = 15*60
+    next_in = 30*60
     update()
     sleep(next_in)
