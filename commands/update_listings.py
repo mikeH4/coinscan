@@ -9,22 +9,35 @@ from core.sources.CoinMarketCap import CoinMarketCap
 def update():
     # CoinMarketCap
 
+    existing_cmc = Listing.get_by_platform("coinmarketcap")
+    existing_slugs = [listing.local_slug for listing in existing_cmc]
+
     cmc = CoinMarketCap()
-    listings = cmc.listings()
+    listings = cmc.new()
     for listing in listings:
-        platform = listing.get("platform",None)
-        if platform is None:
+        if listing.get("platforms",False) and listing["platforms"][0]["id"] != 1839:
             continue
-        if platform["name"] != "Binance Smart Chain":
+        if listing["slug"] in existing_slugs:
             continue
+        token = cmc.single(slug=listing["slug"])
         
+        platforms = token.get("platforms",[])
+        if not platforms:
+            continue
+        address = None
+        for platform in platforms:
+            if platform["name"] == "Binance Smart Chain":
+                address = platform["contractAddress"]
+        if address is None:
+            continue
+
         Listing(
-            token=Address(platform["token_address"]),
-            local_id=listing["id"],
-            local_slug=listing["slug"],
+            token=Address(address),
+            local_id=token["id"],
+            local_slug=token["slug"],
             platform="coinmarketcap",
             added=datetime.strptime(
-                listing["date_added"],
+                token["date_added"],
                 "%Y-%m-%dT%H:%M:%S.%fZ"
             ).timestamp(),
             updated=time()
