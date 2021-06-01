@@ -3,7 +3,6 @@ from time import sleep, time
 from datetime import datetime
 from core.Address import Address
 from core.Listing import Listing
-from library.ratelimit import limits,sleep_and_retry
 from core.sources.CoinMarketCap import CoinMarketCap
 
 def update():
@@ -15,7 +14,7 @@ def update():
     cmc = CoinMarketCap()
     listings = cmc.new()
     for listing in listings:
-        if listing.get("platforms",False) and listing["platforms"][0]["id"] != 1839:
+        if not listing.get("platforms",False) or listing["platforms"][0]["id"] != 1839:
             continue
         if listing["slug"] in existing_slugs:
             continue
@@ -26,7 +25,7 @@ def update():
             continue
         address = None
         for platform in platforms:
-            if platform["name"] == "Binance Smart Chain":
+            if platform["contractPlatform"] == "Binance Smart Chain":
                 address = platform["contractAddress"]
         if address is None:
             continue
@@ -37,7 +36,7 @@ def update():
             local_slug=token["slug"],
             platform="coinmarketcap",
             added=datetime.strptime(
-                token["date_added"],
+                token["dateAdded"],
                 "%Y-%m-%dT%H:%M:%S.%fZ"
             ).timestamp(),
             updated=time()
@@ -49,7 +48,10 @@ def update():
     listings = cg.listings()
     for listing in listings:
         token_address = listing["platforms"].get("binance-smart-chain",None) or ""
-        token_address = str(Address(token_address.strip().lower()))
+        try:
+            token_address = str(Address(token_address.strip().lower()))
+        except TypeError:
+            continue
         if token_address == "":
             continue
         

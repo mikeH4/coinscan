@@ -39,6 +39,15 @@ class Listing(BaseModel):
                 cls._listings_cache[notfound] = []
 
     @classmethod
+    def get_by_platform(cls,platform):
+        with DB("tokens") as db:
+            addresses = [cls._from_row(row) for row in db.get_all(
+                f"SELECT * FROM listings WHERE platform = %s",
+                [platform]
+            )]
+            return addresses
+
+    @classmethod
     def new_listings(cls):
         with DB("tokens") as db:
             addresses = [row[0] for row in db.get_all(
