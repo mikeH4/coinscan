@@ -114,7 +114,7 @@ class BaseModel(metaclass=BaseModelMetaClass):
     def before_cond(before,timestamp_key = "updated"):
         before_cond = ""
         if before is not None:
-            before_cond = f" WHERE updated < {int(before)}"
+            before_cond = f" WHERE {timestamp_key} < {int(before)}"
         return before_cond
 
     @classmethod
