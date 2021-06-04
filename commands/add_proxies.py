@@ -8,8 +8,6 @@ proxies = Proxies.get_all(task="rescanner") + Proxies.get_all(task="request")
 
 proxy_by_ip = {}
 
-
-
 active = set()
 for proxy in proxies:
     active.add(proxy.ip)
@@ -20,6 +18,8 @@ print(list(active))
 
 to_remove = input("IPs to remove, seperated by commas: ").split(",")
 for ip in to_remove:
+    if ip == "":
+        continue
     try: ip in active
     except Exception as e: continue
 

@@ -7,6 +7,5 @@ echo "" > /etc/nginx/nginx.conf && nano /etc/nginx/nginx.conf && sudo nginx -t &
 # Monitor Status
 journalctl -f -u coinscan_api
 journalctl -f -u coinscan_service
-journalctl -f -u coinscan_rescanner
 journalctl -f -u coinscan_requester
 journalctl -f -u coinscan_listings

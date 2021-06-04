@@ -54,7 +54,6 @@ const scan = async (startFrom = 0) => {
     const addresses = await DB.getall();
     const blockNumber = await provider.getBlockNumber();
     const startAt = Math.max(blockNumber - 300, startFrom);
-    console.log("Blocks",blockNumber-startAt);
     const filter = {
         fromBlock: -300,
         topics: [
@@ -73,15 +72,3 @@ const scan = async (startFrom = 0) => {
     await sleep();
     return blockNumber;
 }
-
-(async () => {
-    client = new Client({
-        host: 'localhost',
-        database: 'tokens',
-    })
-    await client.connect()
-    let startFrom = 0;
-    while (true) {
-        startFrom = await scan(startFrom)
-    }
-})();

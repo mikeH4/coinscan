@@ -23,7 +23,9 @@ while True:
             print("Sleeping for 1 min, nothing to do: bored")
             sleep(60*1)
 
-        proxies = Proxies.get_all(task="request")
+        proxies = Proxies.get_all(task="rescanner")
+
+        print(proxies)
 
         proxies = [proxy for proxy in proxies if proxy.test()]
 

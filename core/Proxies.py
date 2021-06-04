@@ -22,7 +22,7 @@ class Proxies(BaseModel):
     def get_all(cls,task):
         with DB("tokens") as db:
             return [cls._from_row(row) for row in db.get_all(
-                f"SELECT * FROM proxies WHERE task = {db.placeholder(1)}",
+                f"SELECT * FROM proxies",
                 [task]
             )]
 
