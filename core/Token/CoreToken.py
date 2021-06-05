@@ -1,5 +1,5 @@
-from core.BaseModel import BaseModel
-from core.Address import Address
+from library.BaseModel import BaseModel
+from core.types.Address import Address
 
 
 class CoreToken(BaseModel):

@@ -1,7 +1,7 @@
-from core.Address import Address
+from core.types.Address import Address
 from typing import List, Optional
 from time import time
-from core.TokenRequest import TokenRequest
+from core.misc.TokenRequest import TokenRequest
 from core.Token import Token
 from fastapi import APIRouter,HTTPException,Header
 from pydantic import BaseModel

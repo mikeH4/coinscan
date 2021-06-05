@@ -1,5 +1,5 @@
-from core.Holders import Holders
-from core.Token import Token
+from core.Holders.Holders import Holders
+from core.Token.Token import Token
 
 class ViewableHolders(Holders):
     keys_rename = dict(

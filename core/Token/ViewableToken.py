@@ -1,10 +1,8 @@
-from core.Address import Address
-from core.Listing import Listing
-from core.Holders import Holders
+from core.types.Address import Address
+from core.misc.Listing import Listing
 import timeago
 from datetime import datetime
-from core.Token import Token
-from core.CoreToken import CoreToken
+from core.Token.Token import Token
 from library.num import human_format
 
 class ViewableToken(Token):

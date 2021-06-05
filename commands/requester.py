@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor,as_completed
 from datetime import datetime
 from time import sleep
 
-from core.Holders import Holders
+from core.Holders.Holders import Holders
 from library.timer import timer
 from library.backoff import backoff
 from library.postgres import DB
@@ -11,9 +11,9 @@ from core.sources.BSCheck import BSCheck
 from core.sources.BscScan import BscScan
 from core.sources.TokenSniffer import TokenSniffer
 
-from core.Proxies import Proxies
-from core.TokenRequest import TokenRequest
-from core.Token import Token
+from core.misc.Proxies import Proxies
+from core.misc.TokenRequest import TokenRequest
+from core.Token.Token import Token
 
 while True:
     with timer("Took"):

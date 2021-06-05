@@ -1,4 +1,4 @@
-from core.Holders import Holders
+from core.Holders.Holders import Holders
 from time import time
 from bs4 import BeautifulSoup
 from library.ratelimit import limits, sleep_and_retry

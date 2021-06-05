@@ -1,7 +1,7 @@
 from requests.exceptions import ProxyError
 from library.requests import get
 from library.postgres import DB
-from core.BaseModel import BaseModel
+from library.BaseModel import BaseModel
 from random import choice
 import json
 

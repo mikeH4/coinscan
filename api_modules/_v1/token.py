@@ -1,9 +1,9 @@
 from time import time
-from core.TokenRequest import TokenRequest
-from core.ViewableHolders import ViewableHolders
-from core.Holders import Holders
+from core.misc.TokenRequest import TokenRequest
+from core.Holders.ViewableHolders import ViewableHolders
+from core.Holders.Holders import Holders
 from fastapi import APIRouter,HTTPException
-from core.ViewableToken import ViewableToken
+from core.Token.ViewableToken import ViewableToken
 
 router = APIRouter(
     prefix="/token"

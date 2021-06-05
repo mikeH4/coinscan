@@ -1,8 +1,8 @@
-from core.CoreToken import CoreToken
-from core.Holders import Holders
-from core.Proxies import Proxies
-from core.TokenRequest import TokenRequest
-from core.Listing import Listing
+from core.Token.CoreToken import CoreToken
+from core.Holders.Holders import Holders
+from core.misc.Proxies import Proxies
+from core.misc.TokenRequest import TokenRequest
+from core.misc.Listing import Listing
 from library.postgres import DB
 
 db = DB("tokens")

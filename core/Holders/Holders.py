@@ -1,7 +1,7 @@
 from library.postgres import DB
 
-from core.Address import Address
-from core.BaseModel import BaseModel
+from core.types.Address import Address
+from library.BaseModel import BaseModel
 
 class Holders(BaseModel):
     table = "holders"

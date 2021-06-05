@@ -1,4 +1,4 @@
-from core.Address import Address
+from core.types.Address import Address
 from library.postgres import DB
 
 class ModelOperator:
@@ -74,7 +74,7 @@ class BaseModelMetaClass(type):
     def __init__(cls, name, bases, namespace, **kwargs):
         if len(bases) < 1:
             return None
-        if str(bases[0]) != "<class 'core.BaseModel.BaseModel'>":
+        if str(bases[0]) != "<class 'library.BaseModel.BaseModel'>":
             return None
 
         cls.keys = list(cls.__init__.__annotations__.keys())

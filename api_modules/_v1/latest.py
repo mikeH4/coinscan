@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from core.ViewableToken import ViewableToken
+from core.Token.ViewableToken import ViewableToken
 
 router = APIRouter(
     prefix="/latest"

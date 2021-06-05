@@ -1,8 +1,8 @@
 from core.sources.CoinGecko import CoinGecko
 from time import sleep, time
 from datetime import datetime
-from core.Address import Address
-from core.Listing import Listing
+from core.types.Address import Address
+from core.misc.Listing import Listing
 from core.sources.CoinMarketCap import CoinMarketCap
 
 def update():

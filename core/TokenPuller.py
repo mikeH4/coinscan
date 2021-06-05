@@ -11,8 +11,8 @@ from library.postgres import DB
 from datetime import datetime
 
 
-from core.Token import Token
-from core.Address import Address
+from core.Token.Token import Token
+from core.types.Address import Address
 
 class TokenPuller:
     def get_existing_addresses(self,of=[],updated_after=None):

@@ -1,6 +1,6 @@
 from library.postgres import DB
-from core.BaseModel import BaseModel
-from core.Address import Address
+from library.BaseModel import BaseModel
+from core.types.Address import Address
 from time import time
 
 class Listing(BaseModel):

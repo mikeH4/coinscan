@@ -1,6 +1,6 @@
-from core.Address import Address
-from core.Listing import Listing
-from core.CoreToken import CoreToken
+from core.types.Address import Address
+from core.misc.Listing import Listing
+from core.Token.CoreToken import CoreToken
 from library.postgres import DB
 
 class Token(CoreToken):

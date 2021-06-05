@@ -1,4 +1,4 @@
-from core.BaseModel import BaseModelMetaClass
+from library.BaseModel import BaseModelMetaClass
 from library.ratelimit import limits, sleep_and_retry
 import json
 from urllib.parse import urljoin
