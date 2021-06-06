@@ -9,6 +9,4 @@ sudo -u postgres psql -d tokens
 
 # Monitor Status
 journalctl -f -u coinscan_api
-journalctl -f -u coinscan_service
-journalctl -f -u coinscan_requester
-journalctl -f -u coinscan_listings
+journalctl -f -u coinscan_pullnew
