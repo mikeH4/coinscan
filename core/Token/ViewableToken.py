@@ -10,7 +10,7 @@ class ViewableToken(BaseModel):
 
         source_verified:bool,
         holders:int,
-        block_time:int,
+        created:int,
 
         listings:str,
     ) -> None:
@@ -25,7 +25,7 @@ class ViewableToken(BaseModel):
             tokens.symbol,
             bool_or(token_meta.source_verified) AS source_verified,
             min(token_meta.holders) AS holders,
-            min(token_meta.block_time) AS block_time,
+            min(token_meta.block_time) AS created,
             string_agg(listings.platform, ',') AS listings
         FROM tokens
         LEFT JOIN listings ON tokens.address = listings.token
@@ -63,7 +63,7 @@ class ViewableToken(BaseModel):
         limit_cond = cls.limit_cond(limit)
         query = cls._build_query()
         query += f"""
-        ORDER BY block_time DESC
+        ORDER BY created DESC
         {limit_cond}
         """
         with DB("tokens") as db:
