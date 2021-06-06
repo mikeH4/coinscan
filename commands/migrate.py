@@ -14,6 +14,8 @@ from core.misc.Listing import Listing
 
 with DB("tokens") as db:
     for _class in BaseModel.__subclasses__():
+        if _class.table is None:
+            continue
         print(_class)
         print("New Columns:",_class._db_new_cols())
 

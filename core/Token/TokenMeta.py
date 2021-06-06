@@ -31,3 +31,29 @@ class TokenMeta(BaseModel):
                 f"SELECT * FROM token_meta WHERE address = {db.placeholder(1)}",
                 [address]
             ))
+
+    @classmethod
+    def update(
+        cls,
+        address:Address,
+        db = None,
+        **kwds
+    ):
+        with cls.with_db(db) as db:
+            cols = kwds.keys()
+            col_string = ','.join(cols)
+            placeholder = db.placeholder(len(kwds)+1)
+
+            keyed_str = ", ".join([
+                f"{key} = excluded.{key}"
+                for key in cols
+            ])
+            insert_sql = f"INSERT INTO token_meta (address,{col_string}) VALUES ({placeholder})"
+
+            update_sql = f"UPDATE SET {keyed_str}"
+            sql = f"""
+            {insert_sql}
+            ON CONFLICT (address)
+            DO {update_sql}
+            """
+            db.query(sql,[str(address)] + list(kwds.values()))

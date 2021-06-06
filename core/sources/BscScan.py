@@ -16,7 +16,6 @@ class BscScan(BaseSource):
 
     def __init__(self, apikey, **kwds) -> None:
         for attr in ["proxy","agent"]:
-            kwds.pop(attr, None)
             setattr(self,attr,kwds.get(attr,None))
         self.apikey = apikey
 
