@@ -1,4 +1,4 @@
-from library.BaseSource import RequestPool
+from library.request import get
 from requests.exceptions import ProxyError
 from library.postgres import DB
 from library.BaseModel import BaseModel
@@ -35,7 +35,7 @@ class Proxies(BaseModel):
     @staticmethod
     def test_proxy(proxy):
         try:
-            RequestPool._actual_request(
+            get(
                 "https://google.com",
                 proxy=proxy
             )

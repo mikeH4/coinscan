@@ -8,7 +8,7 @@ from core.Token.BSCheckRating import BSCheckRating
 from core.Token.TokenSnifferRating import TokenSnifferRating
 
 from core.Holders.Holders import Holders
-from core.misc.Proxies import Proxies
+from library.Proxies import Proxies
 from core.misc.TokenRequest import TokenRequest
 from core.misc.Listing import Listing
 

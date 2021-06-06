@@ -1,4 +1,4 @@
-from core.misc.Proxies import Proxies
+from library.Proxies import Proxies
 import json
 from urllib.parse import urljoin
 from time import time
@@ -46,23 +46,20 @@ class NoProxyInPool(Exception):
 
 class RequestPool:
     _proxies = []
-    _track = {
-        BaseSource: {
-            Proxies(): [0,time()]
-        }
-    }
+    _track = {}
 
     @classmethod
     def _init_proxies(cls):
         proxies = Proxies.get_all()
+        print(proxies)
         for proxy in proxies:
             if proxy.test():
                 cls._proxies.append(proxy)
     
-    @classmethod
-    def _class_valid(cls):
-        if not issubclass(cls,BaseSource):
-            raise TypeError(f"{cls.__name__} does not inherit from BaseSource")
+    @staticmethod
+    def _class_valid(_class):
+        if not issubclass(_class,BaseSource):
+            raise TypeError(f"{_class.__name__} does not inherit from BaseSource")
 
     @classmethod
     def _prepare_slot(cls,_class,proxy):
@@ -105,23 +102,5 @@ class RequestPool:
             cls._increment(_class,proxy)
             return cls._actual_request(url,proxy,**kwargs)
         raise NoProxyInPool(min_available_in)
-    
-    @classmethod
-    def _actual_request(cls,url,proxy,params={},headers={},cookies={}):
-        headers["User-Agent"] = proxy.agent
 
-        req_proxy = None
-        # Empty Proxy means self
-        if proxy.ip != "":
-            req_proxy = { 
-                "http"  : f"http://{proxy.ip}:{proxy.port}", 
-                "https" : f"http://{proxy.ip}:{proxy.port}",
-            }
-        
-        return requests.get(
-            url,
-            params=params,
-            headers=headers,
-            cookies=cookies,
-            proxy=req_proxy,
-        )
+RequestPool._init_proxies()

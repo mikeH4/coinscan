@@ -17,7 +17,7 @@ tokenfomo_min_update = 60*1
 
 
 with DB("tokens") as db:
-    bscscan_api = BscScanApi("REDACTED")
+    bscscan_api = BscScanApi()
 
     last_tokenfomo = 0
 

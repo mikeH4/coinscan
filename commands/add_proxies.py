@@ -2,7 +2,7 @@ from ipaddress import ip_address
 from library.postgres import DB
 from time import time
 
-from core.misc.Proxies import Proxies
+from library.Proxies import Proxies
 
 proxies = Proxies.get_all(task="rescanner") + Proxies.get_all(task="request")
 
