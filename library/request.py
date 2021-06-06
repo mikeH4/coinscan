@@ -13,10 +13,11 @@ def get(url,proxy,params={},headers={},cookies={}):
             "https" : f"http://{proxy.ip}:{proxy.port}",
         }
     
-    return requests.get(
+    res = requests.get(
         url,
         params=params,
         headers=headers,
         cookies=cookies,
         proxies=req_proxy,
     )
+    return res
