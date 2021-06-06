@@ -23,10 +23,6 @@ with DB("tokens") as db:
 
     while True:
         sleep_for = tokenfomo_min_update - (time() - last_tokenfomo)
-        print("Sleep For")
-        print(tokenfomo_min_update,time() - last_tokenfomo)
-        print(sleep_for)
-        print("")
         if sleep_for > 0:
             sleep(sleep_for)
 
@@ -44,6 +40,7 @@ with DB("tokens") as db:
             if token_data["chainId"] != "BSC":
                 continue
             if token_data["addr"] in existing_addrs:
+                print("Existing: Skipped")
                 continue
             address = Address(token_data["addr"])
 
@@ -58,6 +55,5 @@ with DB("tokens") as db:
             print(f"{i+1}/{data_len} Token Inserted")
 
             if (time() - last_tokenfomo) > tokenfomo_max_update:
-                print("Break")
                 # Scan from TokenFomo again
                 break
