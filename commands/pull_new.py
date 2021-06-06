@@ -13,7 +13,7 @@ def get_existing(of:list, db:DB):
     return addrs
 
 tokenfomo_max_update = 60*1.5
-tokenfomo_min_update = 60*1
+tokenfomo_min_update = 45*1
 
 
 with DB("tokens") as db:
@@ -24,6 +24,7 @@ with DB("tokens") as db:
     while True:
         sleep_for = tokenfomo_min_update - (time() - last_tokenfomo)
         if sleep_for > 0:
+            print("Sleep for",sleep_for)
             sleep(sleep_for)
 
         tokenfomo = TokenFomo()
@@ -40,7 +41,6 @@ with DB("tokens") as db:
             if token_data["chainId"] != "BSC":
                 continue
             if token_data["addr"] in existing_addrs:
-                print("Existing: Skipped")
                 continue
             address = Address(token_data["addr"])
 
@@ -57,3 +57,4 @@ with DB("tokens") as db:
             if (time() - last_tokenfomo) > tokenfomo_max_update:
                 # Scan from TokenFomo again
                 break
+        print("Ended loop, no timeout")
