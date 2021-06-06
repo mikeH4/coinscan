@@ -14,12 +14,12 @@ class BaseSourceMetaClass(type):
         if cls.url is None:
             raise NotImplementedError("Class is invalid, url must be present")
         
-# Abstract Clas
+# Abstract Class
 class BaseSource(metaclass=BaseSourceMetaClass):
     url = None
     limit_calls = 1
     limit_period = 1
-    require_in_proxy=[]
+    param_from_proxy={}
 
     @staticmethod
     def parse_soup_json(soup,selector):
@@ -30,7 +30,7 @@ class BaseSource(metaclass=BaseSourceMetaClass):
         return RequestPool.request(
             _class=self.__class__,
             url=urljoin(self.url,path),
-            require_in_proxy=self.__class__.require_in_proxy,
+            param_from_proxy=self.__class__.param_from_proxy,
             params=params,
             headers=headers,
             cookies=cookies
@@ -89,13 +89,17 @@ class RequestPool:
         cls._track[_class][proxy][0] += 1
 
     @classmethod
-    def request(cls,_class,url,require_in_proxy=[],**kwargs):
+    def request(cls,_class,url,param_from_proxy={},**kwargs):
         cls._class_valid(_class)
         min_available_in = float("inf")
         for proxy in cls._proxies:
-            if not proxy.has(require_in_proxy):
-                print("Does not have:",require_in_proxy)
+            params = proxy.update_params(
+                param_from_proxy,
+                kwargs["params"]
+            )
+            if params is None:
                 continue
+            kwargs["params"] = params
             
             available_in = cls._available_in(_class,proxy)
             min_available_in = min(min_available_in,available_in)

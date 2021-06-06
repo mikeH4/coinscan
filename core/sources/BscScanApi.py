@@ -7,17 +7,19 @@ class BscScanApi(BaseSource):
     limit_calls = 4
     limit_period = 1
 
-    require_in_proxy = ["bscscan_apikey"]
+    param_from_proxy = dict(
+        bscscan_apikey="apikey"
+    )
 
     def call(self,module,action,**parameters):
-        params = [
-            f"{key}={value}"
-            for key,value
-            in parameters.items()
-        ]
-        param_string = "" if len(params) < 1 else "&" + ('&'.join(params))
-        query_string = f"?module={module}&action={action}&apikey={self.apikey}{param_string}"
-        return self.request(f"/api{query_string}").json()
+        parameters.update(
+            module=module,
+            action=action
+        )
+        return self.request(
+            f"/api",
+            params=parameters
+        ).json()
 
     def source_code(self,address:Address):
         data = self.call("contract","getsourcecode",address=str(address))

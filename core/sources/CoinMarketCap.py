@@ -38,7 +38,9 @@ class CoinMarketCapProApi(BaseSource):
     limit_calls = 1
     limit_period = 5
 
-    require_in_proxy = ["cmc_apikey"]
+    param_from_proxy = dict(
+        cmc_apikey="CMC_PRO_API_KEY"
+    )
 
     def all(self):
         ls = []
@@ -47,7 +49,6 @@ class CoinMarketCapProApi(BaseSource):
             res = self.request(
                 f"/v1/cryptocurrency/listings/latest",
                 params=dict(
-                    CMC_PRO_API_KEY=self.apikey,
                     limit=5000,
                     start=(page*5000)+1
                 )

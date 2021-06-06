@@ -19,17 +19,19 @@ class Proxies(BaseModel):
         cmc_apikey:str
     ) -> None: pass
 
-    def has(self,require_params):
-        for param in require_params:
-            if getattr(self,param,"") == "":
-                return False
-        return True
+    def update_params(self,attr_to_param_map,params):
+        for attr,param in attr_to_param_map.items():
+            value = getattr(self,attr,"")
+            if value == "":
+                return None
+            params[param] = value
+        return params
 
     @classmethod
     def get_all(cls):
         with DB("tokens") as db:
             return [cls._from_row(row) for row in db.get_all(
-                f"SELECT * FROM proxies"
+                f"SELECT * FROM proxies ORDER BY ip ASC"
             )]
 
     @staticmethod
@@ -61,3 +63,6 @@ class Proxies(BaseModel):
     
     def __str__(self) -> str:
         return f"{self.ip}:{self.port}"
+    
+    def __repr__(self) -> str:
+        return f"<Proxies: {str(self)}>"
