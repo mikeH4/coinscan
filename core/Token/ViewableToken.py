@@ -4,7 +4,7 @@ from library.BaseModel import BaseModel
 
 class ViewableToken(BaseModel):
     def __init__(self,
-        address:Address,
+        address:str,
         name:str,
         symbol:str,
 
