@@ -53,6 +53,7 @@ with DB("tokens") as db:
 
             print(f"{i+1}/{data_len} Token Inserted")
 
-            if time() - last_tokenfomo > tokenfomo_max_update:
+            if (time() - last_tokenfomo) > tokenfomo_max_update:
+                print("Break")
                 # Scan from TokenFomo again
                 break
