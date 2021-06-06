@@ -1,0 +1,2 @@
+class numeric(int):
+    pass

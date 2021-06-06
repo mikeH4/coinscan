@@ -5,6 +5,8 @@ from library.BaseModel import BaseModel
 from core.Token.Token import Token
 from core.Token.TokenMeta import TokenMeta
 from core.Token.BSCheckRating import BSCheckRating
+from core.Token.TokenSnifferRating import TokenSnifferRating
+
 from core.Holders.Holders import Holders
 from core.misc.Proxies import Proxies
 from core.misc.TokenRequest import TokenRequest

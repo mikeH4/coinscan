@@ -1,3 +1,4 @@
+from core.types.db_types import numeric
 from core.types.Address import Address
 from library.postgres import DB
 from contextlib import contextmanager
@@ -7,6 +8,7 @@ class ModelOperator:
         str: "TEXT",
         Address: "VARCHAR(42)",
         int: "INTEGER",
+        numeric: "NUMERIC",
         float: "DECIMAL",
         bool: "BOOLEAN"
     }
@@ -14,6 +16,7 @@ class ModelOperator:
         str: "''",
         Address: None,
         int: 0,
+        numeric: 0,
         float: 0,
         bool: False
     }
@@ -36,7 +39,7 @@ class ModelOperator:
 
     def attribute_columns(self) -> dict:
         return {
-            attr:(f"{attr} {self.mapping[_type]} {'' if attr in self.cls.null_cols else 'NOT '}" )
+            attr:(f"{attr} {self.mapping[_type]} {'' if attr in self.cls.null_cols else 'NOT '} NULL" )
             for attr,_type
             in self.cols.items()
         }

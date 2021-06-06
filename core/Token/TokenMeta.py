@@ -1,3 +1,4 @@
+from core.types.db_types import numeric
 from library.BaseModel import BaseModel
 from core.types.Address import Address
 
@@ -16,7 +17,7 @@ class TokenMeta(BaseModel):
     def __init__(self,
         address:Address,
         decimals:int = None,
-        total_supply:int = None,
+        total_supply:numeric = None,
         source_verified:bool = None,
         holders:int = None,
         block_time:int = None
