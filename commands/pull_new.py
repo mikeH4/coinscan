@@ -23,6 +23,10 @@ with DB("tokens") as db:
 
     while True:
         sleep_for = tokenfomo_min_update - (time() - last_tokenfomo)
+        print("Sleep For")
+        print(tokenfomo_min_update,time() - last_tokenfomo)
+        print(sleep_for)
+        print("")
         if sleep_for > 0:
             sleep(sleep_for)
 
