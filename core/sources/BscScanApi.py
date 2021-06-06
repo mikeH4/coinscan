@@ -7,6 +7,8 @@ class BscScanApi(BaseSource):
     limit_calls = 4
     limit_period = 1
 
+    require_in_proxy = ["bscscan_apikey"]
+
     def call(self,module,action,**parameters):
         params = [
             f"{key}={value}"

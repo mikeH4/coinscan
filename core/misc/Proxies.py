@@ -19,6 +19,12 @@ class Proxies(BaseModel):
         cmc_apikey:str
     ) -> None: pass
 
+    def has(self,require_params):
+        for param in require_params:
+            if getattr(self,param,"") == "":
+                return False
+        return True
+
     @classmethod
     def get_all(cls):
         with DB("tokens") as db:

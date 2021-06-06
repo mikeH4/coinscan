@@ -38,6 +38,8 @@ class CoinMarketCapProApi(BaseSource):
     limit_calls = 1
     limit_period = 5
 
+    require_in_proxy = ["cmc_apikey"]
+
     def all(self):
         ls = []
         page = 0
