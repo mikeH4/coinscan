@@ -9,24 +9,24 @@ class ViewableToken(BaseModel):
         symbol:str,
 
         source_verified:bool,
-        block_time:int,
         holders:int,
+        block_time:int,
 
         listings:str,
     ) -> None:
         pass
 
     @staticmethod
-    def _build_query(where:str):
+    def _build_query(where:str = ""):
         query = f"""
         SELECT
             tokens.address,
             tokens.name,
             tokens.symbol,
-            string_agg(listings.platform, ',') AS listings,
-            token_meta.source_verified AS source_verified,
-            token_meta.holders AS holders,
-            token_meta.block_time AS block_time,
+            bool_or(token_meta.source_verified) AS source_verified,
+            min(token_meta.holders) AS holders,
+            min(token_meta.block_time) AS block_time,
+            string_agg(listings.platform, ',') AS listings
         FROM tokens
         JOIN listings ON tokens.address = listings.token
         JOIN token_meta ON tokens.address = token_meta.address
@@ -63,7 +63,7 @@ class ViewableToken(BaseModel):
         limit_cond = cls.limit_cond(limit)
         query = cls._build_query()
         query += f"""
-        ORDER BY token_meta.block_time DESC
+        ORDER BY block_time DESC
         {limit_cond}
         """
         with DB("tokens") as db:
