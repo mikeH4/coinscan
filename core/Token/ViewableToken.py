@@ -28,8 +28,8 @@ class ViewableToken(BaseModel):
             min(token_meta.block_time) AS block_time,
             string_agg(listings.platform, ',') AS listings
         FROM tokens
-        JOIN listings ON tokens.address = listings.token
-        JOIN token_meta ON tokens.address = token_meta.address
+        LEFT JOIN listings ON tokens.address = listings.token
+        LEFT JOIN token_meta ON tokens.address = token_meta.address
         {where}
         GROUP BY tokens.address
         """

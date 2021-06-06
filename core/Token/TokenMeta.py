@@ -1,5 +1,6 @@
 from core.types.db_types import numeric
 from library.BaseModel import BaseModel
+from library.postgres import DB
 from core.types.Address import Address
 
 class TokenMeta(BaseModel):
@@ -22,9 +23,11 @@ class TokenMeta(BaseModel):
         holders:int = None,
         block_time:int = None
     ) -> None: pass
-
+    
     @classmethod
-    def update(cls,address:Address,key,value):
-        address = Address(address)
-        if key not in cls.null_cols:
-            raise TypeError("Not a valid key")
+    def get(cls,address):
+        with DB("tokens") as db:
+            return cls._from_row(db.get(
+                f"SELECT * FROM token_meta WHERE address = {db.placeholder(1)}",
+                [address]
+            ))

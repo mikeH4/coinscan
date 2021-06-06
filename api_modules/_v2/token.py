@@ -9,18 +9,16 @@ router = APIRouter(
     prefix="/token"
 )
 
-@router.get("/")
-def read_items():
-    return {
-        "actions": [route.path for route in router.routes]
-    }
+@router.get("/latest")
+def all():
+    return ViewableToken.get_latest(100)
 
 @router.get("/search/{search}")
 def search(search: str):
     tokens = ViewableToken.search(search)
     return tokens
 
-@router.get("/{address}")
+@router.get("/get/{address}")
 def token(address: str):
     token = ViewableToken.get(address)
     if token is None:
@@ -29,6 +27,6 @@ def token(address: str):
 
     return {"token": token}
 
-@router.get("/{address}/holders")
+@router.get("/get/{address}/holders")
 def holders(address: str):
-    return {"holders": ViewableHolders.filter_top_holders(ViewableHolders.top(address))}
+    return {"holders": ViewableHolders.top(address)}

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api_modules import v1
+from api_modules import v2
 import settings
 
 app = FastAPI(openapi_url=None)
@@ -16,9 +16,7 @@ if settings.sandbox == True:
     )
 
 
-routers = [
-    v1.app,
-]
+routers = [v2.app]
 
 @app.get("/")
 async def root():

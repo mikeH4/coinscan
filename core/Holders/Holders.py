@@ -1,3 +1,4 @@
+from fastapi.params import Query
 from library.postgres import DB
 
 from core.types.Address import Address
@@ -50,7 +51,8 @@ class Holders(BaseModel):
     @classmethod
     def top(cls, address: Address, limit=10):
         address = str(Address(address))
-        limit_cond = cls.limit_cond(10)
+        limit_cond = cls.limit_cond(limit)
         with DB("tokens") as db:
-            tokens = db.get_all(f'SELECT * FROM holders WHERE contract = {db.placeholder(1)} ORDER BY holding DESC {limit_cond}',[address])
+            query = f"SELECT * FROM holders WHERE contract = {db.placeholder(1)} ORDER BY holding DESC {limit_cond}"
+            tokens = db.get_all(query,[address])
             return [cls._from_row(token) for token in tokens]
