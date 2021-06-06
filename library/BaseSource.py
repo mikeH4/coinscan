@@ -1,8 +1,8 @@
+from library.request import get
 from library.Proxies import Proxies
 import json
 from urllib.parse import urljoin
 from time import time
-import requests
 
 class BaseSourceMetaClass(type):
     def __init__(cls, name, bases, namespace, **kwargs) -> None:
@@ -51,7 +51,6 @@ class RequestPool:
     @classmethod
     def _init_proxies(cls):
         proxies = Proxies.get_all()
-        print(proxies)
         for proxy in proxies:
             if proxy.test():
                 cls._proxies.append(proxy)
@@ -79,13 +78,15 @@ class RequestPool:
             cls._track[_class][proxy] = [0,t]
         
         num,last_reset = cls._track[_class][proxy]
+        if num < _class.limit_calls:
+            return 0
 
         return (last_reset+_class.limit_period)-t
 
     @classmethod
     def _increment(cls,_class,proxy):
         cls._prepare_slot(_class,proxy)
-        cls._track[_class][proxy] += 1
+        cls._track[_class][proxy][0] += 1
 
     @classmethod
     def request(cls,_class,url,require_in_proxy=[],**kwargs):
@@ -93,6 +94,7 @@ class RequestPool:
         min_available_in = float("inf")
         for proxy in cls._proxies:
             if not proxy.has(require_in_proxy):
+                print("Does not have:",require_in_proxy)
                 continue
             
             available_in = cls._available_in(_class,proxy)
@@ -100,7 +102,8 @@ class RequestPool:
             if available_in > 0:
                 continue
             cls._increment(_class,proxy)
-            return cls._actual_request(url,proxy,**kwargs)
+            return get(url,proxy,**kwargs)
+        
         raise NoProxyInPool(min_available_in)
 
 RequestPool._init_proxies()

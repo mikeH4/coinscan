@@ -58,3 +58,6 @@ class Proxies(BaseModel):
                 replace_insert_on=["ip"] if replace else False,
                 commit=False
             )
+    
+    def __str__(self) -> str:
+        return f"{self.ip}:{self.port}"

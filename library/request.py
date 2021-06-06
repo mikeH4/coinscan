@@ -1,6 +1,7 @@
 import requests
 
 def get(url,proxy,params={},headers={},cookies={}):
+    print(f"Request from {proxy}: {url}")
     headers["User-Agent"] = proxy.agent
 
     req_proxy = None
@@ -16,5 +17,5 @@ def get(url,proxy,params={},headers={},cookies={}):
         params=params,
         headers=headers,
         cookies=cookies,
-        proxy=req_proxy,
+        proxies=req_proxy,
     )
