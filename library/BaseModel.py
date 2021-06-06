@@ -1,5 +1,6 @@
 from core.types.Address import Address
 from library.postgres import DB
+from contextlib import contextmanager
 
 class ModelOperator:
     mapping = {
@@ -35,7 +36,7 @@ class ModelOperator:
 
     def attribute_columns(self) -> dict:
         return {
-            attr:(f"{attr} {self.mapping[_type]} NOT NULL" )
+            attr:(f"{attr} {self.mapping[_type]} {'' if attr in self.cls.null_cols else 'NOT '}" )
             for attr,_type
             in self.cols.items()
         }
@@ -85,13 +86,15 @@ class BaseModelMetaClass(type):
         for key,_class in cls.__init__.__annotations__.items():
             if key == "return":
                 continue
-            setattr(self,key,_class(kwargs[key]))
+            val = None if kwargs[key] is None else _class(kwargs[key])
+            setattr(self,key,val)
         return self
 
 # abstract
 class BaseModel(metaclass=BaseModelMetaClass):
     table = None
     primary = []
+    null_cols = []
 
     __model_operator = None
 
@@ -133,3 +136,11 @@ class BaseModel(metaclass=BaseModelMetaClass):
     @classmethod
     def _db_new_cols(cls):
         return cls._mo().new_cols
+
+    @staticmethod
+    @contextmanager
+    def with_db(db=None):
+        _db = db if db is not None else DB("tokens")
+        yield _db
+        if db is None:
+            _db.close()

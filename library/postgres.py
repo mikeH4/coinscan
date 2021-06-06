@@ -1,13 +1,16 @@
 import psycopg2
 import settings
+from signal import *
 
 class DB:
+    # To keep track of open clients, and shut them down
+    __active = []
+
     @staticmethod
     def placeholder(l: int):
         return ",".join(['%s'] * l )
 
     def __init__(self, database=None):
-        
         self.conn = None
         self.cursor = None
 
@@ -15,9 +18,9 @@ class DB:
             self.open(database)
     
     def open(self,database):
+        DB.__active.append(self)
 	
         self.database = database
-	
         
         additional_args = {}
         if settings.sandbox != True:
@@ -34,6 +37,7 @@ class DB:
         self.cursor = self.conn.cursor()
 
     def close(self):
+        DB.__active.remove(self)
         
         if self.conn:
             self.conn.commit()
@@ -99,6 +103,17 @@ class DB:
 
     def rollback(self):
         self.query("ROLLBACK;")
+
+    @staticmethod
+    def _register_cleanup():
+        def clean(*args):
+            for db in DB.__active:
+                db.close()
+            raise SystemExit(0)
+
+        for sig in (SIGABRT, SIGILL, SIGINT, SIGTERM):
+            signal(sig, clean)
+
 
 class CreateSQLTables:
 

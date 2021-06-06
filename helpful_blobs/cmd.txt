@@ -1,6 +1,9 @@
 # Replace Nginx Conf
 echo "" > /etc/nginx/nginx.conf && nano /etc/nginx/nginx.conf && sudo nginx -t && sudo systemctl restart nginx
 
+# Open DB
+sudo -u postgres psql -d tokens
+
 # Run server in backgorund
 /home/coinscan/env/bin/python /home/coinscan/server.py > /home/coinscan/server.log 2>&1 &
 
