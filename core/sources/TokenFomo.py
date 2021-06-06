@@ -1,4 +1,4 @@
-from core.sources.BaseSource import BaseSource
+from library.BaseSource import BaseSource
 from bs4 import BeautifulSoup
 
 class TokenFomo(BaseSource):

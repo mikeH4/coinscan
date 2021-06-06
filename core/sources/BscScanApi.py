@@ -1,16 +1,11 @@
 from core.types.Address import Address
-from core.sources.BaseSource import BaseSource
+from library.BaseSource import BaseSource
 
 class BscScanApi(BaseSource):
     url = "https://api.bscscan.com/"
 
     limit_calls = 4
     limit_period = 1
-
-    def __init__(self, apikey, **kwds) -> None:
-        for attr in ["proxy","agent"]:
-            setattr(self,attr,kwds.get(attr,None))
-        self.apikey = apikey
 
     def call(self,module,action,**parameters):
         params = [
