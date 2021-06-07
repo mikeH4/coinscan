@@ -1,5 +1,5 @@
 from core.Holders.Holders import Holders
-from time import time
+from time import sleep, time
 from core.types.Address import Address
 from library.BaseSource import BaseSource
 from bs4 import BeautifulSoup
@@ -72,3 +72,4 @@ class BscScan(BaseSource):
             except Exception as e:
                 print("Error parsing holders from BscScan:")
                 print(soup)
+                sleep(3)
