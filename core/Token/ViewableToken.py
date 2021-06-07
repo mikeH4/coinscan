@@ -68,4 +68,5 @@ class ViewableToken(BaseModel):
         """
         with DB("tokens") as db:
             rows = db.get_all(query)
+            print(rows[0])
             return [cls._from_row(row) for row in rows]

@@ -8,7 +8,7 @@ class BscScan(BaseSource):
     url = "https://bscscan.com/"
 
     limit_calls = 1
-    limit_period = 3
+    limit_period = 4
 
     def holders(self,address:Address):
         res = self.request("/token/generic-tokenholders2",params=dict(
