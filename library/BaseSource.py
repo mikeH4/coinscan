@@ -44,7 +44,8 @@ class BaseSource(metaclass=BaseSourceMetaClass):
                     cookies=cookies
                 )
             except NoProxyInPool as e:
-                sleep(self.available_in)
+                print(f"Limit exhausted: Sleeping for {e.available_in}")
+                sleep(e.available_in)
 
 class RequestPool:
     _proxies = []
@@ -92,6 +93,9 @@ class RequestPool:
 
     @classmethod
     def request(cls,_class,url,param_from_proxy={},**kwargs):
+        print("\n***")
+        print(cls._track)
+        print("***\n")
         cls._class_valid(_class)
         min_available_in = float("inf")
         for proxy in cls._proxies:
