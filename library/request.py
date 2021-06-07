@@ -2,7 +2,6 @@ import requests
 from urllib.parse import urlencode
 
 def get(url,proxy,params={},headers={},cookies={}):
-    print(f"Request from {proxy}: {url}?{urlencode(params)}")
     headers["User-Agent"] = proxy.agent
 
     req_proxy = None
@@ -12,7 +11,10 @@ def get(url,proxy,params={},headers={},cookies={}):
             "http"  : f"http://{proxy.ip}:{proxy.port}", 
             "https" : f"http://{proxy.ip}:{proxy.port}",
         }
+
+    print(f"Request from {proxy}: {url}?{urlencode(params)}\n",req_proxy)
     
+
     res = requests.get(
         url,
         params=params,

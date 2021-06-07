@@ -84,6 +84,7 @@ class RequestPool:
 
         num,last_reset = cls._track[_class][proxy]
         print(_class.__name__ + ":",num,"=>",time()-last_reset)
+        print(_class.__name__ + ":",_class.limit_calls)
         if num < _class.limit_calls:
             return 0
 
@@ -113,7 +114,7 @@ class RequestPool:
             available_in = cls._available_in(_class,proxy)
             min_available_in = min(min_available_in,available_in)
             if available_in > 0:
-                print(available_in)
+                print("Available In:",available_in)
                 continue
             
             cls._increment(_class,proxy)
