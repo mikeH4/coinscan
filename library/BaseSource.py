@@ -2,7 +2,7 @@ from library.request import get
 from library.Proxies import Proxies
 import json
 from urllib.parse import urljoin
-from time import time
+from time import sleep, time
 
 class BaseSourceMetaClass(type):
     def __init__(cls, name, bases, namespace, **kwargs) -> None:
@@ -14,6 +14,11 @@ class BaseSourceMetaClass(type):
         if cls.url is None:
             raise NotImplementedError("Class is invalid, url must be present")
         
+class NoProxyInPool(Exception):
+    def __init__(self, available_in:int) -> None:
+        self.available_in = available_in
+        super(NoProxyInPool, self).__init__("No proxy in pool")
+
 # Abstract Class
 class BaseSource(metaclass=BaseSourceMetaClass):
     url = None
@@ -27,19 +32,19 @@ class BaseSource(metaclass=BaseSourceMetaClass):
         return json.loads(script_content)
 
     def request(self,path,params={},headers={},cookies={}):
-        return RequestPool.request(
-            _class=self.__class__,
-            url=urljoin(self.url,path),
-            param_from_proxy=self.__class__.param_from_proxy,
-            params=params,
-            headers=headers,
-            cookies=cookies
-        )
-
-class NoProxyInPool(Exception):
-    def __init__(self, available_in:int) -> None:
-        self.available_in = available_in
-        super(NoProxyInPool, self).__init__("No proxy in pool")
+        # Sleep and retry
+        while True:
+            try:
+                return RequestPool.request(
+                    _class=self.__class__,
+                    url=urljoin(self.url,path),
+                    param_from_proxy=self.__class__.param_from_proxy,
+                    params=params,
+                    headers=headers,
+                    cookies=cookies
+                )
+            except NoProxyInPool as e:
+                sleep(self.available_in)
 
 class RequestPool:
     _proxies = []

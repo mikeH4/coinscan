@@ -7,7 +7,7 @@ def main():
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=45,max=60*1.5)
+        repeater = Repeater(min=60*1.5,max=60*5)
         bscscan_api = BscScanApi()
         scanner_api = ScannerApi()
 

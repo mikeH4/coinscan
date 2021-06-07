@@ -5,6 +5,8 @@ subcmd = [
     "cd /home/coinscan/",
     "unzip -o archive.zip",
     "rm archive.zip",
+    "systemctl restart coinscan_services",
+    "systemctl status coinscan_services",
     "systemctl restart coinscan_api",
     "systemctl status coinscan_api",
     "systemctl restart nginx",

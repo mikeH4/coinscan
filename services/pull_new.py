@@ -2,7 +2,6 @@ from library.Repeater import Repeater
 
 def main():
     from core.sources.BscScanApi import BscScanApi
-    from time import sleep, time
     from core.Token.Token import Token
     from core.types.Address import Address
     from library.postgres import DB
