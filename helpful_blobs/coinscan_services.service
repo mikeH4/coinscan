@@ -1,5 +1,5 @@
 [Unit]
-Description=Coin Scan Pull New
+Description=Coin Scan Services
 After=network.target
 StartLimitIntervalSec=0
 [Service]
@@ -8,7 +8,7 @@ Restart=always
 RestartSec=1
 User=root
 WorkingDirectory=/home/coinscan/
-ExecStart=/home/coinscan/env/bin/python /home/coinscan/cmd.py pull_new
+ExecStart=/home/coinscan/env/bin/python /home/coinscan/run_services.py
 
 [Install]
 WantedBy=multi-user.target

@@ -63,7 +63,7 @@ class ViewableToken(BaseModel):
         limit_cond = cls.limit_cond(limit)
         query = cls._build_query()
         query += f"""
-        ORDER BY created DESC
+        ORDER BY created DESC NULLS LAST
         {limit_cond}
         """
         with DB("tokens") as db:
