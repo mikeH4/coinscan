@@ -10,4 +10,9 @@ class CoinGecko(BaseSource):
         res = self.request(f"/api/v3/coins/list",params=dict(
             include_platform="true"
         ))
-        return res.json()
+        try:
+            return res.json()
+        except ValueError:
+            print("CoinGecko JSON error")
+            print(res.text)
+            return []
