@@ -1,4 +1,3 @@
-from fastapi.params import Query
 from library.postgres import DB
 
 from core.types.Address import Address
@@ -18,35 +17,28 @@ class Holders(BaseModel):
     ) -> None: pass
 
     @staticmethod
-    def delete_all(contract: Address,db = None):
-        contract = str(Address(contract))
-        _db = db if db is not None else DB("tokens")
-        
-        db.query(
-            f"DELETE FROM holders WHERE contract = {db.placeholder(1)}",
-            [str(contract)]
-        )
-        
-        if db is None:
-            _db.close()
+    def delete_all(contract: Address,db:DB = None):
+        with Holders.with_db(db) as db:
+            contract = str(Address(contract))
+            
+            db.query(
+                f"DELETE FROM holders WHERE contract = {db.placeholder(1)}",
+                [str(contract)]
+            )
 
     def insert_or_update(self,db:DB = None):
-        _db = db if db is not None else DB("tokens")
-
-        _dict = self.dict()
-        for attr in ["contract","holder"]:
-            _dict[attr] = str(_dict[attr])
-        
-        _db.insert(
-            self.table,
-            _dict,
-            replace_insert_on=self.primary,
-            commit=False
-        )
-        print("Inserted holder for ", self.contract, ":",self.holder )
-
-        if db is None:
-            _db.close()
+        with Holders.with_db(db) as db:
+            _dict = self.dict()
+            for attr in ["contract","holder"]:
+                _dict[attr] = str(_dict[attr])
+            
+            db.insert(
+                self.table,
+                _dict,
+                replace_insert_on=self.primary,
+                commit=False
+            )
+            print("Inserted holder for ", self.contract, ":",self.holder )
     
     @classmethod
     def top(cls, address: Address, limit=10):
