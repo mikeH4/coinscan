@@ -29,7 +29,7 @@ class BscScan(BaseSource):
             cols = row.select("td")
             if len(cols) < 5:
                 print("No Holders")
-                return []
+                return [total_holders,[]]
             if len(cols) == 5:
                 rank_col,address_col,quantity_col,perc_col,analytics_cols = cols
             elif len(cols) == 6:
@@ -44,7 +44,7 @@ class BscScan(BaseSource):
                 source="bscscan"
             )
             span = address_col.select("span")[0]
-            if "data-original-title" in span.attrs:
+            if "title" in span.attrs:
                 holder_args["holder_tag"] = span.get_text()
             
             holder_args["holder"] = span.select("a")[0].attrs["href"].split("?a=")[-1]

@@ -12,7 +12,7 @@ def get(url,proxy,params={},headers={},cookies={}):
             "https" : f"http://{proxy.ip}:{proxy.port}",
         }
 
-    print(f"Request from {proxy}: {url}?{urlencode(params)}\n",)
+    print(f"Request from {proxy}: {url}?{urlencode(params)}",)
 
     res = requests.get(
         url,
