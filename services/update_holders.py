@@ -24,16 +24,16 @@ def main():
                     total,top = bscscan.holders(
                         address=address
                     )
-                    print(total)
                     TokenMeta.update(
                         address=address,
                         db=db,
                         holders=total
                     )
-                    Holders.delete_all(contract=address)
+                    Holders.delete_all(contract=address,db=db)
                     for holder in top:
                         holder.insert_or_update(db=db)
 
+                    db.conn.commit()
                     print(f"{i+1}/{addresses_len} Token Holders Updated")
 
                     if repeater.should_repeat():

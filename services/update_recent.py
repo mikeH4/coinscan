@@ -27,6 +27,7 @@ def main():
                         db=db,
                         source_verified=source_verified
                     )
+                    db.conn.commit()
 
                     print(f"{i+1}/{addresses_len} Token Updated")
 
