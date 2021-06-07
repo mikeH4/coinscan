@@ -50,6 +50,7 @@ class BaseSource(metaclass=BaseSourceMetaClass):
 class RequestPool:
     _proxies = []
     _track = {}
+    _total = {}
 
     @classmethod
     def _init_proxies(cls):
@@ -65,10 +66,11 @@ class RequestPool:
 
     @classmethod
     def _prepare_slot(cls,_class,proxy):
-        if _class not in cls._track:
-            cls._track[_class] = {}
-        if proxy not in cls._track[_class]:
-            cls._track[_class][proxy] = [0,time()]
+        for _dict in [cls._track,cls._total]:
+            if _class not in _dict:
+                _dict[_class] = {}
+            if proxy not in _dict[_class]:
+                _dict[_class][proxy] = [0,time()]
 
     @classmethod
     def _available_in(cls,_class,proxy):
@@ -90,12 +92,17 @@ class RequestPool:
     def _increment(cls,_class,proxy):
         cls._prepare_slot(_class,proxy)
         cls._track[_class][proxy][0] += 1
+        cls._total[_class][proxy][0] += 1
+
+        time_in = time() - cls._total[_class][proxy][1]
+        hits = cls._total[_class][proxy][0]
+        try:
+            print(f"{_class.__name__}=>:","Average per second:",round(hits/time_in,2))
+        except ZeroDivisionError: pass
+
 
     @classmethod
     def request(cls,_class,url,param_from_proxy={},**kwargs):
-        print("\n***")
-        print(cls._track)
-        print("***\n")
         cls._class_valid(_class)
         min_available_in = float("inf")
         for proxy in cls._proxies:
@@ -113,6 +120,7 @@ class RequestPool:
             if available_in > 0:
                 print(available_in)
                 continue
+            
             cls._increment(_class,proxy)
             return get(url,proxy,**kwargs)
         
