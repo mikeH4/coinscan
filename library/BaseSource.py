@@ -87,6 +87,7 @@ class RequestPool:
         if num < _class.limit_calls:
             return 0
 
+        print("Exed:",(last_reset+_class.limit_period)-t)
         return (last_reset+_class.limit_period)-t
 
     @classmethod
