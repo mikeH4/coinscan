@@ -81,7 +81,7 @@ class RequestPool:
         # time since last reset > limit_period
         if (t - last_reset) > _class.limit_period:
             cls._track[_class][proxy] = [0,t]
-        
+
         num,last_reset = cls._track[_class][proxy]
         if num < _class.limit_calls:
             return 0
@@ -93,13 +93,6 @@ class RequestPool:
         cls._prepare_slot(_class,proxy)
         cls._track[_class][proxy][0] += 1
         cls._total[_class][proxy][0] += 1
-
-        time_in = time() - cls._total[_class][proxy][1]
-        hits = cls._total[_class][proxy][0]
-        try:
-            print(f"{_class.__name__}=>:","Average per second:",round(hits/time_in,2))
-        except ZeroDivisionError: pass
-
 
     @classmethod
     def request(cls,_class,url,param_from_proxy={},**kwargs):
