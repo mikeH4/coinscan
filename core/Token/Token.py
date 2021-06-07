@@ -1,10 +1,8 @@
 from core.Token.TokenMeta import TokenMeta
-from re import S
 from library.BaseModel import BaseModel
 from library.postgres import DB
 from core.sources.BscScanApi import BscScanApi
 
-from core.types.db_types import numeric
 from core.types.Address import Address
 
 class Token(BaseModel):
@@ -53,3 +51,14 @@ class Token(BaseModel):
                 symbol=symbol
             ).insert_or_update(db=db,ignore=True)
             TokenMeta.update(address,**kwds,db=db)
+    
+    @classmethod
+    def existing_from(cls,of:list=[],db:DB=None):
+        with cls.with_db(db) as db:
+            if len(of) < 1:
+                return []
+            of = list(map(str,of))
+            placeholder = db.placeholder(len(of))
+            sql = f"SELECT address FROM tokens WHERE address IN ({placeholder})"
+            addrs = [row[0] for row in db.get_all(sql,of)]
+            return addrs

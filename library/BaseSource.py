@@ -36,9 +36,6 @@ class BaseSource(metaclass=BaseSourceMetaClass):
             cookies=cookies
         )
 
-    def get():
-        raise NotImplementedError("get() must be defined in class")
-
 class NoProxyInPool(Exception):
     def __init__(self, available_in:int) -> None:
         self.available_in = available_in
@@ -98,12 +95,14 @@ class RequestPool:
                 kwargs["params"]
             )
             if params is None:
+                print(proxy.bscscan_apikey)
                 continue
             kwargs["params"] = params
             
             available_in = cls._available_in(_class,proxy)
             min_available_in = min(min_available_in,available_in)
             if available_in > 0:
+                print(available_in)
                 continue
             cls._increment(_class,proxy)
             return get(url,proxy,**kwargs)

@@ -1,3 +1,5 @@
+from library.Repeater import Repeater
+
 def main():
     from core.sources.BscScanApi import BscScanApi
     from time import sleep, time
@@ -6,56 +8,38 @@ def main():
     from library.postgres import DB
     from core.sources.TokenFomo import TokenFomo
 
-    def get_existing(of:list, db:DB):
-        of = list(map(str,of))
-        placeholder = db.placeholder(len(of))
-        sql = f"SELECT address FROM tokens WHERE address IN ({placeholder})"
-        addrs = [row[0] for row in db.get_all(sql,of)]
-        return addrs
-
-    tokenfomo_max_update = 60*1.5
-    tokenfomo_min_update = 45*1
-
-
     with DB("tokens") as db:
+        repeater = Repeater(min=45,max=60*1.5)
         bscscan_api = BscScanApi()
-
-        last_tokenfomo = 0
+        tokenfomo = TokenFomo()
 
         while True:
-            sleep_for = tokenfomo_min_update - (time() - last_tokenfomo)
-            if sleep_for > 0:
-                print("Sleep for",sleep_for)
-                sleep(sleep_for)
+            with repeater.manager():
+                data = tokenfomo.get()
 
-            tokenfomo = TokenFomo()
-            data = tokenfomo.get()
+                addresses = [row["addr"] for row in data]
+                existing_addrs = Token.existing_from(addresses,db)
 
-            last_tokenfomo = time()
+                data_len = len(data)
 
-            addresses = [row["addr"] for row in data]
-            existing_addrs = get_existing(addresses,db)
+                for i,token_data in enumerate(data):
+                    if token_data["chainId"] != "BSC":
+                        continue
+                    if token_data["addr"] in existing_addrs:
+                        continue
+                    address = Address(token_data["addr"])
 
-            data_len = len(data)
+                    Token.insert_with_source(
+                        bscscan_api=bscscan_api,
+                        address=address,
+                        name=token_data["name"],
+                        symbol=token_data["symbol"],
+                        block_time=token_data["blockTime"],
+                    )
 
-            for i,token_data in enumerate(data):
-                if token_data["chainId"] != "BSC":
-                    continue
-                if token_data["addr"] in existing_addrs:
-                    continue
-                address = Address(token_data["addr"])
+                    print(f"{i+1}/{data_len} Token Inserted")
 
-                Token.insert_with_source(
-                    bscscan_api=bscscan_api,
-                    address=address,
-                    name=token_data["name"],
-                    symbol=token_data["symbol"],
-                    block_time=token_data["blockTime"],
-                )
-
-                print(f"{i+1}/{data_len} Token Inserted")
-
-                if (time() - last_tokenfomo) > tokenfomo_max_update:
-                    # Scan from TokenFomo again
-                    break
-            print("Ended loop, no timeout")
+                    if repeater.should_repeat():
+                        # Scan from TokenFomo again
+                        break
+                print("Ended loop, no timeout")
