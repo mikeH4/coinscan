@@ -83,6 +83,7 @@ class RequestPool:
             cls._track[_class][proxy] = [0,t]
 
         num,last_reset = cls._track[_class][proxy]
+        print(_class.__name__ + ":",num,"=>",time()-last_reset)
         if num < _class.limit_calls:
             return 0
 
