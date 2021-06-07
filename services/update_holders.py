@@ -32,7 +32,6 @@ def main():
                     )
                     Holders.delete_all(contract=address)
                     for holder in top:
-                        print(holder.dict())
                         holder.insert_or_update(db=db)
 
                     print(f"{i+1}/{addresses_len} Token Holders Updated")
