@@ -4,7 +4,7 @@ from library.BaseSource import BaseSource
 class BscScanApi(BaseSource):
     url = "https://api.bscscan.com/"
 
-    limit_calls = 4
+    limit_calls = 3
     limit_period = 1
 
     param_from_proxy = dict(

@@ -83,11 +83,11 @@ class RequestPool:
             cls._track[_class][proxy] = [0,t]
 
         num,last_reset = cls._track[_class][proxy]
-        print(f"{_class.__name__}: {num} => {time()-last_reset} [{proxy.ip}] # [{proxy.bscscan_apikey}]")
+        if _class.__name__ == "BscScanApi":
+            print(f"{_class.__name__}: {num} => {time()-last_reset} [{proxy.ip}] # [{proxy.bscscan_apikey}]")
         if num < _class.limit_calls:
             return 0
 
-        print("Exed:",(last_reset+_class.limit_period)-t)
         return (last_reset+_class.limit_period)-t
 
     @classmethod
@@ -113,7 +113,8 @@ class RequestPool:
             available_in = cls._available_in(_class,proxy)
             min_available_in = min(min_available_in,available_in)
             if available_in > 0:
-                print("Available In:",available_in)
+                if _class.__name__ == "BscScanApi":
+                    print("Available In:",available_in)
                 continue
             
             cls._increment(_class,proxy)
