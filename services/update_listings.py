@@ -3,7 +3,7 @@ from time import sleep, time
 from datetime import datetime
 from core.types.Address import Address
 from core.misc.Listing import Listing
-from core.sources.CoinMarketCap import CoinMarketCap
+from core.sources.CoinMarketCap import CoinMarketCap, CoinMarketCapInternalApi
 
 def update():
     # CoinMarketCap
@@ -12,13 +12,14 @@ def update():
     existing_slugs = [listing.local_slug for listing in existing_cmc]
 
     cmc = CoinMarketCap()
+    cmc_api = CoinMarketCapInternalApi()
     listings = cmc.new()
     for listing in listings:
         if not listing.get("platforms",False) or listing["platforms"][0]["id"] != 1839:
             continue
         if listing["slug"] in existing_slugs:
             continue
-        token = cmc.single(slug=listing["slug"])
+        token = cmc_api.single(slug=listing["slug"])
         
         platforms = token.get("platforms",[])
         if not platforms:
