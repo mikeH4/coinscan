@@ -71,7 +71,6 @@ class BscScan(BaseSource):
             
             except Exception as e:
                 print("Error parsing holders from BscScan:")
-                print(soup)
                 sleep(3)
     
     def creation(self,address:Address):
@@ -86,7 +85,4 @@ class BscScan(BaseSource):
             return (creator,creation_tx)
         except Exception as e:
             print("Error parsing creator from BscScan:")
-            print(soup.select(
-                "#ContentPlaceHolder1_trContract > div > div:nth-child(2)"
-            )[0].get_text().split(" at txn "))
             sleep(3)

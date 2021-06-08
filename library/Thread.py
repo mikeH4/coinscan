@@ -17,7 +17,12 @@ class Thread:
                 sleep(5)
 
     def start(self):
-        self.thread.start()
+        try:
+            self.thread.start()
+        except Exception as e:
+            print(e)
+            print("Thread Exception Caught, will restart in 5 sec")
+            sleep(5)
 
 class ThreadPool:
     def __init__(self) -> None:
