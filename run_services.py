@@ -11,11 +11,11 @@ if __name__ == "__main__":
     RequestPool._init_proxies()
     tp = ThreadPool()
 
-    # t1 = tp.run(pull_new)
-    # t1 = tp.run(pull_scanner)
-    # t1 = tp.run(update_listings)
-    # t1 = tp.run(update_recent)
-    # t1 = tp.run(update_holders)
+    t1 = tp.run(pull_new)
+    t1 = tp.run(pull_scanner)
+    t1 = tp.run(update_listings)
+    t1 = tp.run(update_recent)
+    t1 = tp.run(update_holders)
     t1 = tp.run(pull_creator)
 
     tp.collect()
