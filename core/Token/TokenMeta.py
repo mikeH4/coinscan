@@ -1,3 +1,4 @@
+from typing import KeysView
 from core.types.db_types import numeric
 from library.BaseModel import BaseModel
 from library.postgres import DB
@@ -37,6 +38,22 @@ class TokenMeta(BaseModel):
                 f"SELECT * FROM token_meta WHERE address = {db.placeholder(1)}",
                 [address]
             ))
+
+    @classmethod
+    def where_is_none(cls,key,limit=1000):
+        limit_cond = cls.limit_cond(limit)
+        if key not in cls.keys:
+            raise KeyError(f"TokenMeta doesn't have the attribute {key}")
+        with DB("tokens") as db:
+            return [cls._from_row(row) for row in db.get_all(
+                f"""
+                SELECT * FROM token_meta
+                WHERE {key} IS NULL
+                ORDER BY block_time DESC NULLS LAST
+                {limit_cond}
+                """,
+                [key]
+            )]
 
     @classmethod
     def update(

@@ -1,6 +1,6 @@
 from core.Holders.Holders import Holders
 from time import sleep, time
-from core.types.Address import Address
+from core.types.Address import Address, BlockOrTransactionHash
 from library.BaseSource import BaseSource
 from bs4 import BeautifulSoup
 
@@ -71,5 +71,21 @@ class BscScan(BaseSource):
             
             except Exception as e:
                 print("Error parsing holders from BscScan:")
+                print(soup)
+                sleep(3)
+    
+    def creation(self,address:Address):
+        while True:
+            try:
+                res = self.request(f"/address/{address}")
+                soup = BeautifulSoup(res.text,"html.parser")
+                creator_address, creation_txn = soup.select(
+                    "#ContentPlaceHolder1_trContract > div > div:nth-child(2)"
+                )
+                creator = Address(creator_address)
+                creation_tx = BlockOrTransactionHash(creation_txn)
+                return (creator,creation_tx)
+            except Exception as e:
+                print("Error parsing creator from BscScan:")
                 print(soup)
                 sleep(3)
