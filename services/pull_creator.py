@@ -27,8 +27,8 @@ def main():
                     TokenMeta.update(
                         address=address,
                         db=db,
-                        creator=creator,
-                        creation_tx=creation_tx
+                        creator=str(creator),
+                        creation_tx=str(creation_tx)
                     )
                     db.conn.commit()
 

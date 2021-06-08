@@ -1,4 +1,4 @@
-from core.types.Address import Address
+from core.types.Address import Address, BlockOrTransactionHash
 from library.postgres import DB
 from library.BaseModel import BaseModel
 
@@ -13,6 +13,7 @@ class ViewableToken(BaseModel):
         created:int,
 
         listings:str,
+        creator_labels:str,
     ) -> None:
         pass
 
@@ -27,11 +28,11 @@ class ViewableToken(BaseModel):
             min(token_meta.holders) AS holders,
             min(token_meta.block_time) AS created,
             string_agg(listings.platform, ',') AS listings,
-            string_agg(address_labels.label, ',') AS labels
+            string_agg(address_labels.label, ',') AS creator_labels
         FROM tokens
         LEFT JOIN listings ON tokens.address = listings.token
-        LEFT JOIN address_labels ON tokens.address = address_labels.label
         LEFT JOIN token_meta ON tokens.address = token_meta.address
+        LEFT JOIN address_labels ON token_meta.creator = address_labels.address
         {where}
         GROUP BY tokens.address
         """
