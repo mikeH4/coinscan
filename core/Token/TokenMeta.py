@@ -1,7 +1,7 @@
 from core.types.db_types import numeric
 from library.BaseModel import BaseModel
 from library.postgres import DB
-from core.types.Address import Address
+from core.types.Address import Address, BlockOrTransactionHash
 
 class TokenMeta(BaseModel):
     table = "token_meta"
@@ -12,6 +12,9 @@ class TokenMeta(BaseModel):
         "total_supply",
         "source_verified",
         "holders",
+        "liquidity",
+        "creation_tx",
+        "creator",
         "block_time"
     ]
 
@@ -21,6 +24,9 @@ class TokenMeta(BaseModel):
         total_supply:numeric = None,
         source_verified:bool = None,
         holders:int = None,
+        liquidity:numeric = None,
+        creation_tx:BlockOrTransactionHash = None,
+        creator:Address = None,
         block_time:int = None
     ) -> None: pass
     

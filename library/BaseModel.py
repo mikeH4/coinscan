@@ -1,5 +1,5 @@
 from core.types.db_types import numeric
-from core.types.Address import Address
+from core.types.Address import Address,BlockOrTransactionHash
 from library.postgres import DB
 from contextlib import contextmanager
 
@@ -7,6 +7,7 @@ class ModelOperator:
     mapping = {
         str: "TEXT",
         Address: "VARCHAR(42)",
+        BlockOrTransactionHash: "VARCHAR(66)",
         int: "INTEGER",
         numeric: "NUMERIC",
         float: "DECIMAL",
@@ -14,7 +15,8 @@ class ModelOperator:
     }
     defaults = {
         str: "''",
-        Address: None,
+        Address: "NULL",
+        BlockOrTransactionHash: "NULL",
         int: 0,
         numeric: 0,
         float: 0,

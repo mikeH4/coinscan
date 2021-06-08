@@ -26,9 +26,11 @@ class ViewableToken(BaseModel):
             bool_or(token_meta.source_verified) AS source_verified,
             min(token_meta.holders) AS holders,
             min(token_meta.block_time) AS created,
-            string_agg(listings.platform, ',') AS listings
+            string_agg(listings.platform, ',') AS listings,
+            string_agg(address_labels.label, ',') AS labels
         FROM tokens
         LEFT JOIN listings ON tokens.address = listings.token
+        LEFT JOIN address_labels ON tokens.address = address_labels.label
         LEFT JOIN token_meta ON tokens.address = token_meta.address
         {where}
         GROUP BY tokens.address

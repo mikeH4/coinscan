@@ -121,5 +121,3 @@ class RequestPool:
             return get(url,proxy,**kwargs)
         
         raise NoProxyInPool(min_available_in)
-
-RequestPool._init_proxies()
