@@ -4,10 +4,11 @@ from core.Token.TokenMeta import TokenMeta
 class ViewableHolders(Holders):
     keys_rename = dict(
         holder=[None,str],
+        holding=["amount"],
         holder_tag=["tag"],
     )
     added_attr = dict(
-        holding=lambda token_meta,holding,**attrs : float(holding)/float(token_meta.total_supply)
+        holding=lambda token_meta,holding,**attrs : 0 if token_meta.total_supply is None else float(holding)/float(token_meta.total_supply)
     )
 
     def __init__(self, **attrs) -> None:

@@ -1,4 +1,5 @@
 from threading import Thread as PythonThread
+from time import sleep
 
 class Thread:
     def __init__(self,pool,thread:PythonThread,name:str) -> None:
@@ -7,7 +8,13 @@ class Thread:
         self.name = name
     
     def wait(self):
-        self.pool.wait_for_thread(self)
+        while True:
+            try:
+                self.pool.wait_for_thread(self)
+            except Exception as e:
+                print(e)
+                print("Thread Exception Caught, will restart in 5 sec")
+                sleep(5)
 
     def start(self):
         self.thread.start()
