@@ -15,6 +15,7 @@ def main():
                     token.address
                     for token
                     in ViewableToken.get_latest()
+                    if not source_verified
                 ]
                 addresses_len = len(addresses)
 
