@@ -4,8 +4,12 @@ class LoadManager {
         this.__cacheTime = cacheTime;
 
         this.fetch = async () => {
-            await this.__request();
-            return this.__value;
+            try {
+                await this.__request();
+                return this.__value;                    
+            } catch (error) {
+                console.log("Error in fetching with LoadManager",sourceFunc)
+            }
         }
     }
 

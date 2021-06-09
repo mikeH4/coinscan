@@ -174,7 +174,7 @@ class TokenScanner {
             stack.add(blockHash,address)
 
             const thread = await this.threadPool.checkout("Liquidity of " + address);
-            (async () => {
+            ((async () => {
                 const token = new Token(address,thread.provider)
                 if (cachedPairs[token.address]) {
                     await safeHandler(() => token.getPair(cachedPairs[token.address]),{
@@ -188,9 +188,10 @@ class TokenScanner {
                     return
                 }
                 await batch.add(liquidity)    
-            })()
-            .catch(console.error)
-            .finally(() => thread.release())
+            })()).catch(error => {
+                console.error(error)
+                console.log("Error in Thread")
+            }).finally(() => thread.release())
         }
         await this.threadPool.completed()
         await batch.process()
