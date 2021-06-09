@@ -8,7 +8,7 @@ def main():
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=60*3,max=60*4)
+        repeater = Repeater(min=60*1,max=60*4)
         bscscan = BscScan()
 
         while True:
