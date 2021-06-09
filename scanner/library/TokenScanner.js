@@ -177,9 +177,13 @@ class TokenScanner {
             (async () => {
                 const token = new Token(address,thread.provider)
                 if (cachedPairs[token.address]) {
-                    await token.getPair(cachedPairs[token.address])
+                    await safeHandler(() => token.getPair(cachedPairs[token.address]),{
+                        log: "Error getting Pair",
+                    })
                 }
-                const liquidity = await token.getLiquidity(address)
+                const liquidity = await safeHandler(() => token.getLiquidity(address),{
+                    log: "Error getting liquidity",
+                })
                 if (liquidity === null) {
                     return
                 }
