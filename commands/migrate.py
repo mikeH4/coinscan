@@ -12,6 +12,7 @@ from core.Holders.AddressLabels import AddressLabels
 from library.Proxies import Proxies
 from core.misc.TokenRequest import TokenRequest
 from core.misc.Listing import Listing
+from core.misc.LiquidityPairs import LiquidityPairs
 
 with DB("tokens") as db:
     for _class in BaseModel.__subclasses__():

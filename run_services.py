@@ -11,12 +11,13 @@ from services.update_holders import main as update_holders
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
-        try:
-            return func(*args,**kwargs)
-        except Exception as e:
-            print(e)
-            print("Thread Exception Caught, will restart in 10 sec")
-            sleep(10)
+        while True:
+            try:
+                return func(*args,**kwargs)
+            except Exception as e:
+                print(e)
+                print("Thread Exception Caught, will restart in 10 sec")
+                sleep(10)
     return wrapper
 
 

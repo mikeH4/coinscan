@@ -1,4 +1,4 @@
-from core.types.db_types import numeric
+from core.types.db_types import numeric,smallint
 from core.types.Address import Address,BlockOrTransactionHash
 from library.postgres import DB
 from contextlib import contextmanager
@@ -10,6 +10,7 @@ class ModelOperator:
         BlockOrTransactionHash: "VARCHAR(66)",
         int: "INTEGER",
         numeric: "NUMERIC",
+        smallint: "SMALLINT",
         float: "DECIMAL",
         bool: "BOOLEAN"
     }
@@ -19,6 +20,7 @@ class ModelOperator:
         BlockOrTransactionHash: "NULL",
         int: 0,
         numeric: 0,
+        smallint: "SMALLINT",
         float: 0,
         bool: False
     }
