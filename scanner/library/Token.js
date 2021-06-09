@@ -168,6 +168,9 @@ class Token {
             return null
         }
         const decimals = await this.getDecimals()
+        if (decimals === -1) {
+            return null
+        }
         const { tokenPosition } = pair
         const reserves = await pair.getReserves();
         const token_reserves = parseFloat(Token.fNum(reserves[tokenPosition],decimals));

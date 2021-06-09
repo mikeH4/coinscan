@@ -7,7 +7,7 @@ const { sleep } = require("./library/Thread");
         console.log("Starting/Restarting scanner")
         const db = new DB("tokens")
         const scanner = await (new TokenScanner({
-            startFrom: -1,
+            startFrom: -10,
             threading: 11,
             chunks: 50,
             providers: [0,1,2,4],
