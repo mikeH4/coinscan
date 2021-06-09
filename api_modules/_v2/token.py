@@ -10,8 +10,11 @@ router = APIRouter(
 )
 
 @router.get("/latest")
-def all():
-    return ViewableToken.get_latest(100)
+def all(only_contract_verified: bool = False):
+    return ViewableToken.get_latest(
+        100,
+        "WHERE source_verified = TRUE" if only_contract_verified else ""
+    )
 
 @router.get("/search/{search}")
 def search(search: str):

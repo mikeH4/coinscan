@@ -8,17 +8,14 @@ def main():
         repeater = Repeater(min=0,max=60*5)
         bscscan = BscScan()
 
-        limit_stretch = 30
         while True:
             with repeater.manager():
                 addresses = [
                     token_meta.address
                     for token_meta
-                    in TokenMeta.where_is_none("creator",limit=limit_stretch)
+                    in TokenMeta.where_is_none("creator",limit=30)
                 ]
                 addresses_len = len(addresses)
-                if addresses_len <= 0:
-                    limit_stretch += 30
 
                 for i,address in enumerate(addresses):
                     creator,creation_tx = bscscan.creation(

@@ -62,9 +62,9 @@ class ViewableToken(BaseModel):
             return [cls._from_row(row) for row in rows]
     
     @classmethod
-    def get_latest(cls,limit=100):
+    def get_latest(cls,limit=100,where_cond = ""):
         limit_cond = cls.limit_cond(limit)
-        query = cls._build_query()
+        query = cls._build_query(where_cond)
         query += f"""
         ORDER BY created DESC NULLS LAST
         {limit_cond}

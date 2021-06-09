@@ -29,10 +29,10 @@ if __name__ == "__main__":
     threads_to_run = [
         pull_new,
         pull_scanner,
-        pull_creator,
         update_listings,
         update_recent,
-        update_holders
+        update_holders,
+        pull_creator,
     ]
 
     for func in threads_to_run:

@@ -6,21 +6,18 @@ def main():
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=0,max=60*3)
+        repeater = Repeater(min=0,max=60*6)
         bscscan_api = BscScanApi()
 
-        limit_stretch = 100
         while True:
             with repeater.manager():
                 addresses = [
                     token.address
                     for token
-                    in ViewableToken.get_latest(limit=limit_stretch)
+                    in ViewableToken.get_latest(limit=1000)
                     if not token.source_verified
                 ]
                 addresses_len = len(addresses)
-                if addresses_len <= 0:
-                    limit_stretch += 100
 
                 for i,address in enumerate(addresses):
                     source_verified = (bscscan_api.source_code(
