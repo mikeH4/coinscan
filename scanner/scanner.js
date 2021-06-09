@@ -1,25 +1,27 @@
-const { TokenScanner } = require("./lib/TokenScanner");
-const { DB } = require('./lib/DB');
-const { sleep } = require("./lib/Thread");
+const { TokenScanner } = require("./library/TokenScanner");
+const { DB } = require('./library/DB');
+const { sleep } = require("./library/Thread");
 
 (async () => {
     while (true) {
         console.log("Starting/Restarting scanner")
-        try {
-            const db = new DB("tokens")
-            const scanner = await (new TokenScanner({
-                startFrom: -1,
-                threading: 10,
-                chunks: 50,
-                providers: [0],
-                db
-            })).setup()
+        const db = new DB("tokens")
+        const scanner = await (new TokenScanner({
+            startFrom: -1,
+            threading: 11,
+            chunks: 50,
+            providers: [0,1,2,4],
+            db
+        })).setup();
         
-            await scanner.start()
-        } catch (error) {
-            console.error(error)
-            console.log(`Error in main script`)
-            await sleep(5000)
-        }
+        await (() => (new Promise((resolve) => {
+            scanner.start()
+            .catch(error => {
+                console.error(error)
+                console.log(`Error in main script`)
+            })
+            .finally(() => resolve())
+        })) )()
+        await sleep(5000)
     }
 })()
