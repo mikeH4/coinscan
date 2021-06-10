@@ -28,4 +28,4 @@ def main():
                     )
                     db.conn.commit()
 
-                    print(f"{i+1}/{addresses_len} Token Updated")
+                    print(f"{i+1}/{addresses_len} Source Updated")
