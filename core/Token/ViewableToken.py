@@ -1,6 +1,7 @@
-from core.types.Address import Address, BlockOrTransactionHash
+from core.types.Address import Address
 from library.postgres import DB
 from library.BaseModel import BaseModel
+from itertools import combinations
 
 class ViewableToken(BaseModel):
     def __init__(self,
@@ -83,7 +84,6 @@ class ViewableToken(BaseModel):
             rows = db.get_all(query,[keyword,*[f"%{lkey}%"] * 2])
             return [cls._from_row(row) for row in rows]
     
-
     @classmethod
     def get_latest(cls,limit=100,where_cond = "",with_liquidity=False):
         limit_cond = cls.limit_cond(limit)
@@ -94,5 +94,25 @@ class ViewableToken(BaseModel):
         """
         with DB("tokens") as db:
             rows = db.get_all(query)
-            print(rows[0])
             return [cls._from_row(row) for row in rows]
+
+    @classmethod
+    def get_frequent_addresses(cls):
+        wheres = (
+            "source_verified = TRUE",
+            "liquidity.liquidity > 500"
+        )
+        addresses = []
+        for l in range(len(wheres)+1):
+            for posb in combinations(wheres,l):
+                cond = ""
+                if len(posb) > 0:
+                    joined = " AND ".join(posb)
+                    cond = f"WHERE {joined}"
+                cond_addresses = cls.get_latest(
+                    limit=100,
+                    where_cond=cond,
+                    with_liquidity=True
+                )
+                addresses += cond_addresses
+        return list(set(addresses))

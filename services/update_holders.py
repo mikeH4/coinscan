@@ -16,7 +16,7 @@ def main():
                 addresses = [
                     token.address
                     for token
-                    in ViewableToken.get_latest()
+                    in ViewableToken.get_frequent_addresses()
                 ]
                 addresses_len = len(addresses)
 

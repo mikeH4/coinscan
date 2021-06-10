@@ -7,7 +7,7 @@ from services.pull_new import main as pull_new
 from services.pull_scanner import main as pull_scanner
 from services.sweep_creator import main as sweep_creator
 from services.poll_listings import main as poll_listings
-from services.recently_verified import main as recently_verified
+from services.poll_verified import main as poll_verified
 from services.update_holders import main as update_holders
 from services.sweep_verified import main as sweep_verified
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         poll_listings,
         update_holders,
         sweep_creator,
-        recently_verified,
+        poll_verified,
         sweep_verified,
     ]
 
