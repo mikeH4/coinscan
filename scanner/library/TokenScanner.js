@@ -4,8 +4,7 @@ const { Token } = require('./Token');
 const { Batch } = require('./Batch');
 const { Threads, ThreadPool, sleep } = require('./Thread');
 const { safeHandler } = require('./errors');
-const { LoadManager } = require('./LoadManager');
-const { SectionedStack } = require('./SectionedStack');
+const { KeyedDelayedBatcher } = require('./DelayedBatcher');
 
 const PROVIDER_URLS = [
     // Main
@@ -32,17 +31,19 @@ class TokenScanner {
     constructor ({
         startFrom=1,
         threading=6,
-        blockThreading=1,
         providers=[0],
         chunks=4500,
         db=null
     }) {
+        // This new class concept defines -1 differently,
+        // like a normal array/list, where -1 is the last item,
+        // -2, the second last, and so on, instead of currentBlock-1
+        // "latest" does not exist, since it has been replaced by -1
         if (startFrom === 0) {
             throw new Error("startFrom cannot be 0")
         }
         this.startFrom = startFrom
         this.threading = threading
-        this.blockThreading = blockThreading
         this.chunks = chunks
         // Database DB
         this.db = db instanceof DB ? db : new DB("tokens")
@@ -59,31 +60,13 @@ class TokenScanner {
         this.threadPool = new ThreadPool(threads)
     }
 
-    __prov () {
-        // We're not adding this to the thread
-        // Should only be used for non heavy/too many requests
-        return this.threadPool.__threads[0].provider
-    }
-
-    async currentBlock () {} // In Setup
-
     async setup () {
-        this.currentBlock = (new LoadManager(
-            this.__prov().getBlockNumber.bind(this.__prov()),
-            10000
-        )).fetch
-
-        if (this.startFrom === "latest" || this.startFrom < 1) {
-            const currentBlock = await this.currentBlock()
-            this.startFrom = (
-                this.startFrom === "latest" ?
-                currentBlock :
-                currentBlock+this.startFrom
-            )-1;
-        }
-        else if (this.startFrom >= 1) {}
-        else {
-            throw new Error("startFrom unknown:",this.startFrom)
+        if (this.startFrom < 1) {
+            const thread = await this.threadPool.checkout(`currentBlock`)
+            const currentBlock = await thread.provider.getBlockNumber()
+            thread.release()
+            const fromEnd = (this.startFrom*-1)-1
+            this.startFrom = currentBlock-fromEnd
         }
         return this
     }
@@ -101,29 +84,16 @@ class TokenScanner {
         })
     }
 
-    async start () {
+    async pull () {
         // Initialize stack that is used to let go of existing tokens
-        this.stack = new SectionedStack(60)
+        this.batcher = new KeyedDelayedBatcher()
 
-        const blockThread = new Threads(this.blockThreading,"Block Thread")
         // -1 Since we're starting from here, indicates, we left off before it
         this.processedUntil = this.startFrom-1
         while (true) {
-            await blockThread.freed()
-            // Also cached, will not fire in most cases
-            const current = await this.currentBlock()
-
-            // +1 because we don't to repeat/overlap the ending boundary block
-            const from = Math.min(current,this.processedUntil+1)
-            // -1 since both from and to are inclusive
-            const to = Math.min(current,from+this.chunks-1)
-            if (this.processedUntil === to) {
-                // sameBlock, useful for new scanning
-                // Don't repeat, try again in half a second
-                console.log("Try again in half a sec")
-                await sleep(500)
-                continue
-            }
+            const from = this.processedUntil+1
+            // -1 Since filters are inclusive
+            const to = from+this.chunks-1
             this.processedUntil = to
 
             const filters = {
@@ -133,70 +103,67 @@ class TokenScanner {
                     ethers.utils.id("Transfer(address,address,uint256)")
                 ]
             }
-            const thread = blockThread.checkout(`Chunk ${from}-${to}`)
-            this.chunk(filters)
-            .catch(error => {
-                console.error(error)
-                console.log("Error creating chunk")
-            })
-            .finally(() => thread.release())
+            const thread = await this.threadPool.checkout(`getLogs ${from}-${to}`)
+            const logs = await safeHandler(
+                () => thread.provider.getLogs(filters),{
+                    log: `Error pullings logs of chunk: ${chunkRange}`
+                }
+            )
+            for (const log of logs) {
+                log.address = Token.fAddress(log.address,false)
+    
+                const [parsed,standard] = Token.parseLog(log)
+                if (standard !== "erc20") {
+                    continue
+                }
+
+                this.batcher.update(log.address,log.address)
+            }
+            thread.release()
         }
         await this.db.close()
     }
 
-    async chunk (filters) {
-        const chunkRange = `${filters.fromBlock}-${filters.toBlock}`
-        const thread = await this.threadPool.checkout(`getLogs ${chunkRange}`)
-        const logs = await safeHandler(
-            () => thread.provider.getLogs(filters),{
-                log: `Error pullings logs of chunk: ${chunkRange}`
+    async process () {
+        let i = 0
+        while (true) {
+            i++;
+            const addresses = this.batcher.collect()
+            // Addresses are already unique inside a keyed batcher
+            const existingPairs = await this.getExistingPairs(
+                addresses
+            )
+
+            const batch = new Batch(this.commitLiquidityBatch.bind(this),20)
+
+            for (const address of addresses) {
+                const thread = await this.threadPool.checkout(`Processing batch ${i}`);
+                (async () => {
+                    try {
+                        const token = new Token(address,thread.provider)
+                        if (existingPairs[token.address]) {
+                            await safeHandler(() => token.getPair(existingPairs[token.address]),{
+                                log: "Error getting Pair",
+                            })
+                        }
+                        const liquidity = await safeHandler(() => token.getLiquidity(address),{
+                            log: "Error getting liquidity",
+                        })
+                        if (liquidity === null) {
+                            return
+                        }
+                        await batch.add(liquidity)
+    
+                    } catch (error) {
+                        console.error("Error with token")
+                    }
+                })()
+                .catch(console.error)
+                .finally(() => {
+                    thread.release()
+                })    
             }
-        )
-        thread.release()
-        if (logs === null) {
-            return
         }
-        console.log(`Blocks:`,chunkRange)
-        console.log("Logs:",logs.length)
-        const cachedPairs = await this.getExistingPairs(
-            [...new Set(logs.map(log => Token.fAddress(log.address)))]
-        )
-
-        const batch = new Batch(this.commitLiquidityBatch.bind(this),20)
-        for (const log of logs) {
-            log.blockHash = Token.fAddress(log.blockHash,true)
-            log.transactionHash = Token.fAddress(log.transactionHash,true)
-            log.address = Token.fAddress(log.address,false)
-
-            const { address, blockHash } = log
-            const [parsed,standard] = Token.parseLog(log)
-            if (this.stack.exists(address) || standard !== "erc20") {
-                continue
-            }
-            this.stack.add(blockHash,address)
-
-            const thread = await this.threadPool.checkout("Liquidity of " + address);
-            ((async () => {
-                const token = new Token(address,thread.provider)
-                if (cachedPairs[token.address]) {
-                    await safeHandler(() => token.getPair(cachedPairs[token.address]),{
-                        log: "Error getting Pair",
-                    })
-                }
-                const liquidity = await safeHandler(() => token.getLiquidity(address),{
-                    log: "Error getting liquidity",
-                })
-                if (liquidity === null) {
-                    return
-                }
-                await batch.add(liquidity)    
-            })()).catch(error => {
-                console.error(error)
-                console.log("Error in Thread")
-            }).finally(() => thread.release())
-        }
-        await this.threadPool.completed()
-        await batch.process()
     }
 
     async getExistingPairs (from) {

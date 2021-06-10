@@ -32,11 +32,11 @@ if __name__ == "__main__":
     threads_to_run = [
         pull_new,
         pull_scanner,
-        poll_listings,
-        update_holders,
-        sweep_creator,
-        poll_verified,
-        sweep_verified,
+        # poll_listings,
+        # update_holders,
+        # sweep_creator,
+        # poll_verified,
+        # sweep_verified,
     ]
 
     for func in threads_to_run:
