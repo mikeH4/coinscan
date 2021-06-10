@@ -102,6 +102,9 @@ class TokenScanner {
     }
 
     async start () {
+        // Initialize stack that is used to let go of existing tokens
+        this.stack = new SectionedStack(60)
+
         const blockThread = new Threads(this.blockThreading,"Block Thread")
         // -1 Since we're starting from here, indicates, we left off before it
         this.processedUntil = this.startFrom-1
@@ -159,7 +162,6 @@ class TokenScanner {
             [...new Set(logs.map(log => Token.fAddress(log.address)))]
         )
 
-        const stack = new SectionedStack(300)
         const batch = new Batch(this.commitLiquidityBatch.bind(this),20)
         for (const log of logs) {
             log.blockHash = Token.fAddress(log.blockHash,true)
@@ -168,10 +170,10 @@ class TokenScanner {
 
             const { address, blockHash } = log
             const [parsed,standard] = Token.parseLog(log)
-            if (stack.exists(address) || standard !== "erc20") {
+            if (this.stack.exists(address) || standard !== "erc20") {
                 continue
             }
-            stack.add(blockHash,address)
+            this.stack.add(blockHash,address)
 
             const thread = await this.threadPool.checkout("Liquidity of " + address);
             ((async () => {
