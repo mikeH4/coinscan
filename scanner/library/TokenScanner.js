@@ -106,9 +106,16 @@ class TokenScanner {
             const thread = await this.threadPool.checkout(`getLogs ${from}-${to}`)
             const logs = await safeHandler(
                 () => thread.provider.getLogs(filters),{
-                    log: `Error pullings logs of chunk: ${chunkRange}`
+                    log: `Error pullings logs of chunk: ${from}-${to}`
                 }
             )
+            thread.release()
+            if (logs.length < 1) {
+                this.processedUntil = from-1
+                // This operates under the assumption that only whole blocks are committed
+                await sleep(1000)
+                continue
+            }
             for (const log of logs) {
                 log.address = Token.fAddress(log.address,false)
     
@@ -119,7 +126,6 @@ class TokenScanner {
 
                 this.batcher.update(log.address,log.address)
             }
-            thread.release()
         }
         await this.db.close()
     }
@@ -135,21 +141,35 @@ class TokenScanner {
             )
 
             const batch = new Batch(this.commitLiquidityBatch.bind(this),20)
+            
+            if (addresses.length === 0) {
+                await sleep(2000)
+            } else {
+                console.log("Processing Addresses",addresses.length)
+            }
 
             for (const address of addresses) {
-                const thread = await this.threadPool.checkout(`Processing batch ${i}`);
+                const thread = await safeHandler(
+                    async () => await this.threadPool.checkout(`Processing token ${address}`),{
+                        log: "Token thread already ongoing",
+                        logError: false
+                    }
+                );
+                if (thread === null) {
+                    continue
+                }
                 (async () => {
                     try {
                         const token = new Token(address,thread.provider)
-                        if (existingPairs[token.address]) {
-                            await safeHandler(() => token.getPair(existingPairs[token.address]),{
+                        if (existingPairs[address]) {
+                            await safeHandler(() => token.getPair(existingPairs[address]),{
                                 log: "Error getting Pair",
                             })
                         }
                         const liquidity = await safeHandler(() => token.getLiquidity(address),{
                             log: "Error getting liquidity",
                         })
-                        if (liquidity === null) {
+                        if (!liquidity) {
                             return
                         }
                         await batch.add(liquidity)
@@ -161,12 +181,15 @@ class TokenScanner {
                 .catch(console.error)
                 .finally(() => {
                     thread.release()
-                })    
+                })
             }
         }
     }
 
     async getExistingPairs (from) {
+        if (from.length < 1) {
+            return []
+        }
         const rows = await this.db.getall(
             `SELECT * FROM liquidity_pairs WHERE token IN (${this.db.placeholder(from.length)})`,
             from

@@ -43,7 +43,7 @@ class KeyedDelayedBatcher extends DelayedBatcher {
             if (now < timestamp) {
                 break
             }
-            for (const key in keys) {
+            for (const key of keys) {
                 const item = this.__keyItemStore[key]
                 // We're doing this because we don't want to miss an object
                 // In case of concurrrent threads

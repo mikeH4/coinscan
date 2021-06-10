@@ -1,6 +1,5 @@
 const { TokenScanner } = require("./library/TokenScanner");
 const { DB } = require('./library/DB');
-const { sleep } = require("./library/Thread");
 
 (async () => {
     while (true) {
@@ -9,19 +8,16 @@ const { sleep } = require("./library/Thread");
         const scanner = await (new TokenScanner({
             startFrom: -10,
             threading: 15,
-            chunks: 50,
+            chunks: 10,
             providers: [0,1,2,4],
             db
         })).setup();
-        
-        await (() => (new Promise((resolve) => {
-            scanner.start()
-            .catch(error => {
-                console.error(error)
-                console.log(`Error in main script`)
-            })
-            .finally(() => resolve())
-        })) )()
-        await sleep(5000)
+
+        try {
+            await Promise.all([scanner.pull(),scanner.process()])
+        } catch (error) {
+            console.error(error)
+        }
+        console.log("All ended")
     }
 })()
