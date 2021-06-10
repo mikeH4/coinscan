@@ -1,6 +1,6 @@
 class DelayedBatcher {
     // All times are in secs
-    constructor (func, delay = 5) {
+    constructor (func, delay = 60) {
         this.func = func
         this.delay = delay
     }
