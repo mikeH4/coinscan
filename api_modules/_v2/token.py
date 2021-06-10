@@ -1,4 +1,5 @@
 from time import time
+
 from core.misc.TokenRequest import TokenRequest
 from core.Holders.ViewableHolders import ViewableHolders
 from core.Holders.Holders import Holders
@@ -10,10 +11,19 @@ router = APIRouter(
 )
 
 @router.get("/latest")
-def all(only_contract_verified: bool = False):
+def all(only_contract_verified: bool = False,min_liquidity_500 = False):
+    with_liquidity = False
+    where = []
+    if only_contract_verified:
+        where.append("source_verified = TRUE")
+    if min_liquidity_500:
+        with_liquidity = True
+        where.append("liquidity.liquidity > 500")
+
     return ViewableToken.get_latest(
-        100,
-        "WHERE source_verified = TRUE" if only_contract_verified else ""
+        limit=100,
+        where_cond="" if len(where) < 1 else "WHERE " + (" AND ".join(where)),
+        with_liquidity=with_liquidity
     )
 
 @router.get("/search/{search}")

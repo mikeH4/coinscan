@@ -18,7 +18,7 @@ class ViewableToken(BaseModel):
         pass
 
     @staticmethod
-    def _build_query(where:str = ""):
+    def _build_query(where:str = "",with_liquidity = False):
         query = f"""
         SELECT
             tokens.address,
@@ -45,11 +45,22 @@ class ViewableToken(BaseModel):
             FROM address_labels
             GROUP BY address_labels.address
         ) as address_labels ON token_meta.creator = address_labels.address
+        {'' if not with_liquidity else '''
+        LEFT JOIN (
+            SELECT
+                token,
+                bnb_reserves * (
+                    SELECT token_reserves/bnb_reserves
+                    FROM liquidity_pairs
+                    WHERE token = '0xe9e7cea3dedca5984780bafc599bd69add087d56'
+                ) AS liquidity
+            FROM liquidity_pairs
+        ) as liquidity ON tokens.address = liquidity.token
+        '''}
         {where}
         """
         return query
 
-    
     @classmethod
     def get(cls,address:Address):
         address = str(Address(address))
@@ -72,10 +83,11 @@ class ViewableToken(BaseModel):
             rows = db.get_all(query,[keyword,*[f"%{lkey}%"] * 2])
             return [cls._from_row(row) for row in rows]
     
+
     @classmethod
-    def get_latest(cls,limit=100,where_cond = ""):
+    def get_latest(cls,limit=100,where_cond = "",with_liquidity=False):
         limit_cond = cls.limit_cond(limit)
-        query = cls._build_query(where_cond)
+        query = cls._build_query(where_cond,with_liquidity=with_liquidity)
         query += f"""
         ORDER BY created DESC NULLS LAST
         {limit_cond}

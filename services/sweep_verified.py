@@ -20,7 +20,6 @@ def main():
                     source_verified = (bscscan_api.source_code(
                         address=address
                     ) is not None)
-                    print(source_verified)
                     TokenMeta.update(
                         address=address,
                         db=db,
@@ -28,4 +27,4 @@ def main():
                     )
                     db.conn.commit()
 
-                    print(f"{i+1}/{addresses_len} Source Updated: {address}")
+                    print(f"{i+1}/{addresses_len} Source Updated: {address} => {str(source_verified)}")

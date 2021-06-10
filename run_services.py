@@ -5,11 +5,11 @@ from time import sleep
 
 from services.pull_new import main as pull_new
 from services.pull_scanner import main as pull_scanner
-from services.pull_creator import main as pull_creator
-from services.update_listings import main as update_listings
+from services.sweep_creator import main as sweep_creator
+from services.poll_listings import main as poll_listings
 from services.recently_verified import main as recently_verified
 from services.update_holders import main as update_holders
-from services.update_verified import main as update_verified
+from services.sweep_verified import main as sweep_verified
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -32,11 +32,11 @@ if __name__ == "__main__":
     threads_to_run = [
         pull_new,
         pull_scanner,
-        update_listings,
+        poll_listings,
         update_holders,
-        pull_creator,
+        sweep_creator,
         recently_verified,
-        update_verified,
+        sweep_verified,
     ]
 
     for func in threads_to_run:
