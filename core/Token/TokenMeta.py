@@ -56,6 +56,20 @@ class TokenMeta(BaseModel):
             )]
 
     @classmethod
+    def get_addresses(cls,limit=1000,where_cond=""):
+        limit_cond = cls.limit_cond(limit)
+        with DB("tokens") as db:
+            return [row[0] for row in db.get_all(
+                f"""
+                SELECT tokens.address FROM tokens
+                LEFT JOIN token_meta ON tokens.address = token_meta.address
+                {where_cond}
+                ORDER BY block_time DESC NULLS LAST
+                {limit_cond}
+                """
+            )]
+
+    @classmethod
     def update(
         cls,
         address:Address,

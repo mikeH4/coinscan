@@ -2,7 +2,6 @@ def main():
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
     from core.Token.TokenMeta import TokenMeta
-    from core.Token.ViewableToken import ViewableToken
     from library.postgres import DB
 
     with DB("tokens") as db:
@@ -23,5 +22,3 @@ def main():
                     db.conn.commit()
 
                     print(f"{i+1}/{addresses_len} has been verifed")
-
-                print("Ended loop, no timeout")

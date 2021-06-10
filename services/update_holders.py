@@ -38,5 +38,3 @@ def main():
 
                     if repeater.should_repeat():
                         break
-                
-                print("Ended loop, no timeout")

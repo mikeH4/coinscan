@@ -41,4 +41,3 @@ def main():
                     if repeater.should_repeat():
                         # Scan from TokenFomo again
                         break
-                print("Ended loop, no timeout")

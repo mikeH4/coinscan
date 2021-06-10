@@ -9,6 +9,7 @@ from services.pull_creator import main as pull_creator
 from services.update_listings import main as update_listings
 from services.recently_verified import main as recently_verified
 from services.update_holders import main as update_holders
+from services.update_verified import main as update_verified
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -35,6 +36,7 @@ if __name__ == "__main__":
         update_holders,
         pull_creator,
         recently_verified,
+        update_verified,
     ]
 
     for func in threads_to_run:

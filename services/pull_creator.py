@@ -30,5 +30,3 @@ def main():
                     db.conn.commit()
 
                     print(f"{i+1}/{addresses_len} Creator added for {address}")
-                
-                print("Ended loop, no timeout")
