@@ -24,17 +24,28 @@ class ViewableToken(BaseModel):
             tokens.address,
             tokens.name,
             tokens.symbol,
-            bool_or(token_meta.source_verified) AS source_verified,
-            min(token_meta.holders) AS holders,
-            min(token_meta.block_time) AS created,
-            string_agg(listings.platform, ',') AS listings,
-            string_agg(address_labels.label, ',') AS creator_labels
+            token_meta.source_verified AS source_verified,
+            token_meta.holders AS holders,
+            token_meta.block_time AS created,
+            listings.listings AS listings,
+            address_labels.labels AS labels
         FROM tokens
-        LEFT JOIN listings ON tokens.address = listings.token
+        LEFT JOIN (
+            SELECT
+                listings.token,
+                string_agg(listings.platform, ',') AS listings
+            FROM listings
+            GROUP BY listings.token
+        ) as listings ON tokens.address = listings.token
         LEFT JOIN token_meta ON tokens.address = token_meta.address
-        LEFT JOIN address_labels ON token_meta.creator = address_labels.address
+        LEFT JOIN (
+            SELECT
+                address_labels.address,
+                string_agg(address_labels.label, ',') AS labels
+            FROM address_labels
+            GROUP BY address_labels.address
+        ) as address_labels ON token_meta.creator = address_labels.address
         {where}
-        GROUP BY tokens.address
         """
         return query
 
