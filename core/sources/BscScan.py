@@ -73,6 +73,16 @@ class BscScan(BaseSource):
                 print("Error parsing holders from BscScan:")
                 sleep(3)
     
+    def recently_verified(self):
+        res = self.request("/contractsVerified")
+        soup = BeautifulSoup(res.text,"html.parser")
+        addresses = [
+            tag.get_text()
+            for tag
+            in soup.select("#transfers [title='Verified Code'] + a")
+        ]
+        return addresses
+
     def creation(self,address:Address):
         try:
             res = self.request(f"/address/{address}")

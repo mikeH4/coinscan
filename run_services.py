@@ -1,3 +1,4 @@
+import traceback
 from library.BaseSource import RequestPool
 from library.Thread import ThreadPool
 from time import sleep
@@ -6,7 +7,7 @@ from services.pull_new import main as pull_new
 from services.pull_scanner import main as pull_scanner
 from services.pull_creator import main as pull_creator
 from services.update_listings import main as update_listings
-from services.update_recent import main as update_recent
+from services.recently_verified import main as recently_verified
 from services.update_holders import main as update_holders
 
 def catching_wrapper(func):
@@ -16,6 +17,7 @@ def catching_wrapper(func):
                 return func(*args,**kwargs)
             except Exception as e:
                 print(e)
+                traceback.print_exc()
                 print("Thread Exception Caught, will restart in 10 sec")
                 sleep(10)
     return wrapper
@@ -30,9 +32,9 @@ if __name__ == "__main__":
         pull_new,
         pull_scanner,
         update_listings,
-        update_recent,
         update_holders,
         pull_creator,
+        recently_verified,
     ]
 
     for func in threads_to_run:
