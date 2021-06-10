@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 @router.get("/latest")
-def all(only_contract_verified: bool = False,min_liquidity_500 = False):
+def all(only_contract_verified:bool=False, min_liquidity_500:bool=False):
     with_liquidity = False
     where = []
     if only_contract_verified:
