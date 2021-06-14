@@ -72,14 +72,17 @@ class TokenScanner {
     }
 
     async commitLiquidityBatch (items) {
+        if (items.length < 1) {
+            return
+        }
         await this.db.commitBlock(client => {
+            const values_sql = []
             for (const liquidity of items) {
-                client.insert(
-                    "liquidity_pairs",
-                    liquidity,
-                    {commit: false, replace_on: ["token"]}
-                )
+                values_sql.push(`(${Object.values(liquidity).join(",")})`)
             }
+            const sql = `INSERT INTO liquidity_pairs (${Object.keys(items[0]).join(",")})
+            VALUES (${values_sql.join(',')}) ON CONFLICT (token) DO UPDATE SET`
+            console.log()
             console.log(`Commited ${items.length} token's liquidity`)
         })
     }
