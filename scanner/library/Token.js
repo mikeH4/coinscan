@@ -54,7 +54,7 @@ class Token {
         Token.store[token_address] = this;
         this.address = token_address;
         this.provider = provider;
-        this.contract = new ethers.Contract(this.address, standardABI, provider );
+        this.contract = new ethers.Contract(this.address, Token.standardABI, provider );
 
         this.getDecimals = (new LoadManager(this.getDecimalsActual.bind(this),10**10)).fetch
         this.getInfo = (new LoadManager(this.getInfoActual.bind(this),10**10)).fetch
