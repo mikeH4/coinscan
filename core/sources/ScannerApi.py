@@ -1,7 +1,7 @@
 from library.BaseSource import BaseSource
 
 class ScannerApi(BaseSource):
-    url = "https://coinscan.online/"
+    url = "https://api2.coinscan.finance/"
 
     limit_calls = 1
     limit_period = 1
