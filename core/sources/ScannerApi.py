@@ -6,8 +6,17 @@ class ScannerApi(BaseSource):
     limit_calls = 1
     limit_period = 1
 
+    auth_headers = {
+        "auth": "bON)Ihn(UB)B$#)TN$)UBOBNF)U$BNT)UB@$IJEHNU934NTU349B",
+        "X-Api-Auth": "5ad6c116cda6f75000ee2c943d406516a6332718e90c87833ffecfef2f58f34e"
+    }
+
     def newly_added(self):
-        res = self.request("/v1/private/new",headers=dict(
-            auth="bON)Ihn(UB)B$#)TN$)UBOBNF)U$BNT)UB@$IJEHNU934NTU349B"
+        res = self.request("/v1/private/new",headers=self.auth_headers)
+        return res.json()
+    
+    def get_addresses(self,addresses):
+        res = self.request(f"/v1/private/get",headers=self.auth_headers,json=dict(
+            addresses=list(map(str,addresses))
         ))
         return res.json()

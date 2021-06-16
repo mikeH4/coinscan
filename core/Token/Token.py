@@ -40,17 +40,19 @@ class Token(BaseModel):
         address:Address,
         name:str,
         symbol:str,
+        db=None,
         # Meta
         **kwds
     ):
         kwds["source_verified"] = bscscan_api.source_code(address=address) is not None
-        with DB("tokens") as db:
+        with cls.with_db(db,commit=True) as db:
             Token(
                 address=address,
                 name=name,
                 symbol=symbol
             ).insert_or_update(db=db,ignore=True)
             TokenMeta.update(address,**kwds,db=db)
+            print("CommiT")
     
     @classmethod
     def existing_from(cls,of:list=[],db:DB=None):

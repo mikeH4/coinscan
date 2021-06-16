@@ -56,6 +56,20 @@ class Listing(BaseModel):
             )]
             return addresses
 
+    @classmethod
+    def get_addresses_not_inserted(cls,limit=1000,db=None):
+        limit_cond = cls.limit_cond(limit)
+        with cls.with_db(db) as db:
+            addresses = [Address(row[0]) for row in db.get_all(
+                f"""
+                SELECT listings.token FROM listings
+                LEFT JOIN tokens ON tokens.address = listings.token
+                WHERE tokens.address IS NULL
+                {limit_cond}
+                """,
+                []
+            )]
+            return addresses
 
     @classmethod
     def get_listings(cls, token_address: Address):

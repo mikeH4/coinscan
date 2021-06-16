@@ -1,7 +1,7 @@
 import requests
 from urllib.parse import urlencode
 
-def get(url,proxy,params={},headers={},cookies={}):
+def get(url,proxy,params={},headers={},cookies={},json={}):
     headers["User-Agent"] = proxy.agent
 
     req_proxy = None
@@ -20,5 +20,6 @@ def get(url,proxy,params={},headers={},cookies={}):
         headers=headers,
         cookies=cookies,
         proxies=req_proxy,
+        json=json
     )
     return res

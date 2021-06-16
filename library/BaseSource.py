@@ -31,7 +31,7 @@ class BaseSource(metaclass=BaseSourceMetaClass):
         script_content = soup.select(selector)[0].string
         return json.loads(script_content)
 
-    def request(self,path,params={},headers={},cookies={}):
+    def request(self,path,params={},headers={},cookies={},json={}):
         # Sleep and retry
         while True:
             try:
@@ -41,7 +41,8 @@ class BaseSource(metaclass=BaseSourceMetaClass):
                     param_from_proxy=self.__class__.param_from_proxy,
                     params=params,
                     headers=headers,
-                    cookies=cookies
+                    cookies=cookies,
+                    json=json
                 )
             except NoProxyInPool as e:
                 print(f"Limit exhausted: Sleeping for {e.available_in}")

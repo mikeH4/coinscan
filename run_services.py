@@ -10,6 +10,7 @@ from services.poll_listings import main as poll_listings
 from services.poll_verified import main as poll_verified
 from services.update_holders import main as update_holders
 from services.sweep_verified import main as sweep_verified
+from services.pull_listing_tokens import main as pull_listing_tokens
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -37,6 +38,7 @@ if __name__ == "__main__":
         sweep_creator,
         poll_verified,
         sweep_verified,
+        pull_listing_tokens
     ]
 
     for func in threads_to_run:

@@ -115,9 +115,15 @@ class BaseModel(metaclass=BaseModelMetaClass):
 
     @staticmethod
     def limit_cond(limit):
+        """
+        Also does offset if tuple/list is passed in
+        """
         limit_cond = ""
         if limit is not None:
-            limit_cond = f"LIMIT {int(limit)}"
+            if isinstance(limit,(tuple,list)):
+                limit_cond = f"LIMIT {int(limit[0])} OFFSET {int(limit[1])}"
+            else:
+                limit_cond = f"LIMIT {int(limit)}"
         return limit_cond
     
     @staticmethod
@@ -146,8 +152,11 @@ class BaseModel(metaclass=BaseModelMetaClass):
 
     @staticmethod
     @contextmanager
-    def with_db(db=None):
+    def with_db(db=None,commit=False):
         _db = db if db is not None else DB("tokens")
         yield _db
         if db is None:
             _db.close()
+        elif commit:
+            print("commit")
+            _db.conn.commit()
