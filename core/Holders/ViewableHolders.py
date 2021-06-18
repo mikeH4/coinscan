@@ -9,7 +9,7 @@ class ViewableHolders(BaseModel):
 
     def __init__(self, 
         holder:str,
-        holding:float,
+        amount:float,
         is_contract:bool,
         holder_tag:str,
     ) -> None: pass    
