@@ -18,7 +18,7 @@ class AddressInfo(BaseModel):
     
     def insert(self,db:DB = None,replace = False):
         data = self.dict()
-        data["token"] = str(data["token"])
+        data["address"] = str(data["address"])
 
         with self.with_db(db) as db:
             db.insert(

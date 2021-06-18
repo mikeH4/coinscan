@@ -37,7 +37,7 @@ class Holders(BaseModel):
                 replace_insert_on=self.primary,
                 commit=False
             )
-            print("Inserted holder for ", self.contract, ":",self.holder )
+            print(f"Inserted holder for {self.contract}: {self.holder}")
     
     @classmethod
     def top(cls, address: Address, limit=10):

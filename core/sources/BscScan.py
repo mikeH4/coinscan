@@ -69,7 +69,7 @@ class BscScan(BaseSource):
                     
                     holder = Holders(**holder_args)
                     address_info = AddressInfo(
-                        address=Address(address),
+                        address=Address(holder.holder),
                         is_contract=is_contract,
                         bscscan_tag=bscscan_tag,
                         updated=time(),
