@@ -48,13 +48,26 @@ class Listing(BaseModel):
             return addresses
 
     @classmethod
-    def new_listings(cls):
-        with DB("tokens") as db:
-            addresses = [row[0] for row in db.get_all(
-                f"SELECT * FROM listings WHERE added > {time() - 60*60*24}",
-                []
-            )]
-            return addresses
+    def new_listings(cls,db:DB = None) -> dict:
+        with cls.with_db(db) as db:
+            token_listings = {}
+            results = db.get_all(
+                f"""
+                SELECT token,platform,added
+                FROM listings
+                WHERE added > {time() - 60*60*24}
+                ORDER BY added DESC
+                """
+            )
+            for row in results:
+                token,platform,added = row
+                if token not in token_listings:
+                    token_listings[token] = []
+                token_listings[token].append(dict(
+                    platform=platform,
+                    added=added
+                ))
+            return token_listings
 
     @classmethod
     def get_addresses_not_inserted(cls,limit=1000,db=None):

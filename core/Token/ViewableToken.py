@@ -116,3 +116,19 @@ class ViewableToken(BaseModel):
                 )
                 addresses += cond_addresses
         return list(set(addresses))
+
+    @classmethod
+    def get_addresses(cls,addresses:list=[],db:DB=None):
+        with cls.with_db(db) as db:
+            if len(addresses) < 1:
+                return []
+            addresses = list(map(str,addresses))
+            placeholder = db.placeholder(len(addresses))
+            sql = cls._build_query(f"""
+            WHERE tokens.address IN ({placeholder})
+            """)
+            ret = {}
+            for row in db.get_all(sql,addresses):
+                ret[row[0]] = cls._from_row(row)
+
+            return ret
