@@ -3,6 +3,8 @@ from library.BaseSource import RequestPool
 from library.Thread import ThreadPool
 from time import sleep
 
+import settings
+
 import services.pull_new
 import services.pull_scanner
 import services.poll_listings
@@ -41,6 +43,18 @@ if __name__ == "__main__":
         services.pull_listing_tokens,
         services.sweep_holder_info
     ]
+    if settings.sandbox == True:
+        threads_to_run = [
+            services.pull_new,
+            services.pull_scanner,
+            services.poll_listings,
+            services.update_holders,
+            services.sweep_creator,
+            services.poll_verified,
+            services.sweep_verified,
+            services.pull_listing_tokens,
+            services.sweep_holder_info
+        ]
 
     for module in threads_to_run:
         name = module.__name__.split(".")[-1]
