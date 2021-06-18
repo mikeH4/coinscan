@@ -5,12 +5,13 @@ from time import sleep
 
 import services.pull_new
 import services.pull_scanner
-import services.sweep_creator
 import services.poll_listings
 import services.poll_verified
 import services.update_holders
-import services.sweep_verified
 import services.pull_listing_tokens
+import services.sweep_creator
+import services.sweep_verified
+import services.sweep_holder_info
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -33,11 +34,12 @@ if __name__ == "__main__":
         # services.pull_new,
         # services.pull_scanner,
         # services.poll_listings,
-        services.update_holders,
+        # services.update_holders,
         # services.sweep_creator,
         # services.poll_verified,
         # services.sweep_verified,
-        # services.pull_listing_tokens
+        # services.pull_listing_tokens,
+        services.sweep_holder_info
     ]
 
     for module in threads_to_run:

@@ -28,3 +28,13 @@ class AddressInfo(BaseModel):
                 commit=False,
                 dont_update=["added"]
             )
+    
+    @classmethod
+    def unknown_contract(cls,db=None,limit=100):
+        limit_cond = cls.limit_cond(limit)
+        with cls.with_db(db) as db:
+            return [
+                cls._from_row(row)
+                for row in
+                db.get_all(f"SELECT * FROM address_info WHERE is_contract IS NULL {limit_cond}")
+            ]

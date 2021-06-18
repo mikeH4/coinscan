@@ -107,3 +107,25 @@ class BscScan(BaseSource):
         except Exception as e:
             print("Error parsing creator from BscScan:")
             sleep(3)
+    
+    def address_info(self,address:Address):
+        try:
+            res = self.request(f"/address/{address}")
+            soup = BeautifulSoup(res.text,"html.parser")
+            
+            contract_or_address = soup.select("#icon")[0].parent.get_text().strip().split(" ")[0]
+            is_contract = contract_or_address.lower() == "Contract"
+
+            spans = soup.select("[title='Public Name Tag (viewable by anyone)']")
+            bscscan_tag = ""
+            if len(spans) > 0:
+                bscscan_tag = spans[0].get_text()
+
+            return dict(
+                is_contract=is_contract,
+                bscscan_tag=bscscan_tag
+            )
+        except Exception as e:
+            print(e)
+            print("Error parsing is_contract from BscScan:")
+            sleep(3)
