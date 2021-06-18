@@ -10,7 +10,6 @@ class Holders(BaseModel):
     def __init__(self, 
         contract:Address,
         holder:Address,
-        holder_tag:str,
         holding:float,
         updated_time:int,
         source:str,

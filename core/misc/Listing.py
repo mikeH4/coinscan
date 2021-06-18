@@ -100,13 +100,11 @@ class Listing(BaseModel):
         data = self.dict()
         data["token"] = str(data["token"])
 
-        _db = DB("tokens") if db is None else db
-        _db.insert(
-            self.table,
-            data,
-            replace_insert_on=self.primary if replace else False,
-            commit=False,
-            dont_update=[] if update_added else ["added"]
-        )
-        if db is None:
-            _db.close()
+        with self.with_db(db) as db:
+            db.insert(
+                self.table,
+                data,
+                replace_insert_on=self.primary if replace else False,
+                commit=False,
+                dont_update=[] if update_added else ["added"]
+            )

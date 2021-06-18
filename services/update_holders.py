@@ -30,8 +30,9 @@ def main():
                         holders=total
                     )
                     Holders.delete_all(contract=address,db=db)
-                    for holder in top:
+                    for holder,address_info in top:
                         holder.insert_or_update(db=db)
+                        address_info.insert(db=db,replace=True)
 
                     db.conn.commit()
                     print(f"{i+1}/{addresses_len} Token Holders Updated")

@@ -1,3 +1,4 @@
+from core.Holders.AddressInfo import AddressInfo
 from core.Holders.Holders import Holders
 from time import sleep, time
 from core.types.Address import Address, BlockOrTransactionHash
@@ -44,19 +45,19 @@ class BscScan(BaseSource):
                     holder_args = dict(
                         contract=address,
                         holder=None,
-                        holder_tag="",
                         holding=None,
                         updated_time=time(),
                         source="bscscan"
                     )
+                    bscscan_tag = ""
+
                     span = address_col.select("span")[0]
                     if "title" in span.attrs:
-                        holder_args["holder_tag"] = span.get_text()
+                        bscscan_tag = span.get_text()
 
                     holder_args["holder"] = span.select("a")[0].attrs["href"].split("?a=")[-1]
                     if holder_args["holder"].lower() == "0x000000000000000000000000000000000000dead":
                         holder_args["holder"] = "0x0000000000000000000000000000000000000000"
-                        holder_args["holder_tag"] = "Dead"
 
                     holder_args["holding"] = float(quantity_col.get_text().replace(",",""))
                     if holder_args["holding"] == 0:
@@ -64,8 +65,18 @@ class BscScan(BaseSource):
                         print(row)
                         continue
 
+                    is_contract = len(address_col.select("i[title='Contract']")) > 0
+                    
                     holder = Holders(**holder_args)
-                    holders.append(holder)
+                    address_info = AddressInfo(
+                        address=Address(address),
+                        is_contract=is_contract,
+                        bscscan_tag=bscscan_tag,
+                        updated=time(),
+                        added=time(),
+                    )
+
+                    holders.append((holder,address_info))
 
                 return (total_holders,holders)
             

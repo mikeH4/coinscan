@@ -31,10 +31,8 @@ class TokenRequest(BaseModel):
             _db.close()
     
     def remove(self, db: DB = None):
-        _db = DB("tokens") if db is None else db
-        _db.query("DELETE FROM token_requests WHERE address = %s",[str(self.address)])
-        if db is None:
-            _db.close()
+        with self.with_db(db) as db:
+            db.query("DELETE FROM token_requests WHERE address = %s",[str(self.address)])
 
     @staticmethod
     def _get_ordered_in_rows(limit=1000):
