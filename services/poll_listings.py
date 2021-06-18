@@ -8,7 +8,7 @@ def main():
     from core.sources.CoinMarketCap import CoinMarketCap, CoinMarketCapInternalApi
 
 
-    repeater = Repeater(min=60*30,max=60*60)
+    repeater = Repeater(min=60*30)
 
     while True:
         with repeater.manager():
