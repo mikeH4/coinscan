@@ -45,6 +45,8 @@ def main():
                     "%Y-%m-%dT%H:%M:%S.%fZ"
                 ).timestamp()
 
+                print(f"Added {token['slug']}: {str(Address(address))} with {token['dateAdded']}")
+
                 Listing(
                     token=Address(address),
                     local_id=token["id"],

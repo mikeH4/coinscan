@@ -20,7 +20,7 @@ class ThreadPoolPrintIntercepter():
 
     @staticmethod
     def write(message:str):
-        if message != "\n":
+        if message != "\n" and message != " ":
             message = f"{current_thread().name} @> {message}"
         ThreadPoolPrintIntercepter.original(message)
 
