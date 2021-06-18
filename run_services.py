@@ -31,14 +31,14 @@ if __name__ == "__main__":
     ThreadPool.intercept_prints()
 
     threads_to_run = [
-        # services.pull_new,
-        # services.pull_scanner,
-        # services.poll_listings,
-        # services.update_holders,
-        # services.sweep_creator,
-        # services.poll_verified,
-        # services.sweep_verified,
-        # services.pull_listing_tokens,
+        services.pull_new,
+        services.pull_scanner,
+        services.poll_listings,
+        services.update_holders,
+        services.sweep_creator,
+        services.poll_verified,
+        services.sweep_verified,
+        services.pull_listing_tokens,
         services.sweep_holder_info
     ]
 
