@@ -107,11 +107,12 @@ class RequestPool:
                 kwargs["params"]
             )
             if params is None:
+                print("No Params")
+                print(proxy.bscscan_apikey)
                 continue
             kwargs["params"] = params
             
             available_in = cls._available_in(_class,proxy)
-            print(available_in)
             min_available_in = min(min_available_in,available_in)
             if available_in > 0:
                 if _class.__name__ == "BscScanApi":

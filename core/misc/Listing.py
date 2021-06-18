@@ -41,11 +41,11 @@ class Listing(BaseModel):
     @classmethod
     def get_by_platform(cls,platform):
         with DB("tokens") as db:
-            addresses = [cls._from_row(row) for row in db.get_all(
+            listings = [cls._from_row(row) for row in db.get_all(
                 f"SELECT * FROM listings WHERE platform = %s",
                 [platform]
             )]
-            return addresses
+            return listings
 
     @classmethod
     def new_listings(cls,db:DB = None) -> dict:

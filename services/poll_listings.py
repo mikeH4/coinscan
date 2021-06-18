@@ -14,37 +14,43 @@ def main():
         with repeater.manager():
             print("Listing Loop Start")
             existing_cmc = Listing.get_by_platform("coinmarketcap")
-            existing_slugs = [listing.local_slug for listing in existing_cmc]
+            # existing_slugs = [listing.local_slug for listing in existing_cmc]
 
             cmc = CoinMarketCap()
             cmc_api = CoinMarketCapInternalApi()
             listings = cmc.new()
             for listing in listings:
                 if not listing.get("platforms",False) or listing["platforms"][0]["id"] != 1839:
+                    print("Invalid Platform")
                     continue
-                if listing["slug"] in existing_slugs:
-                    continue
+                # if listing["slug"] in existing_slugs:
+                #     print("Slug Exist")
+                #     continue
                 token = cmc_api.single(slug=listing["slug"])
                 
                 platforms = token.get("platforms",[])
                 if not platforms:
+                    print("No Platform Field")
                     continue
                 address = None
                 for platform in platforms:
                     if platform["contractPlatform"] == "Binance Smart Chain":
                         address = platform["contractAddress"]
                 if address is None:
+                    print("Address is none")
                     continue
+
+                added = datetime.strptime(
+                    token["dateAdded"],
+                    "%Y-%m-%dT%H:%M:%S.%fZ"
+                ).timestamp()
 
                 Listing(
                     token=Address(address),
                     local_id=token["id"],
                     local_slug=token["slug"],
                     platform="coinmarketcap",
-                    added=datetime.strptime(
-                        token["dateAdded"],
-                        "%Y-%m-%dT%H:%M:%S.%fZ"
-                    ).timestamp(),
+                    added=added,
                     updated=time()
                 ).insert(replace=True)
                 

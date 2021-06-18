@@ -1,5 +1,4 @@
 import traceback
-from types import MethodDescriptorType
 from library.BaseSource import RequestPool
 from library.Thread import ThreadPool
 from time import sleep
