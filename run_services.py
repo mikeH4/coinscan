@@ -1,16 +1,17 @@
 import traceback
+from types import MethodDescriptorType
 from library.BaseSource import RequestPool
 from library.Thread import ThreadPool
 from time import sleep
 
-from services.pull_new import main as pull_new
-from services.pull_scanner import main as pull_scanner
-from services.sweep_creator import main as sweep_creator
-from services.poll_listings import main as poll_listings
-from services.poll_verified import main as poll_verified
-from services.update_holders import main as update_holders
-from services.sweep_verified import main as sweep_verified
-from services.pull_listing_tokens import main as pull_listing_tokens
+import services.pull_new
+import services.pull_scanner
+import services.sweep_creator
+import services.poll_listings
+import services.poll_verified
+import services.update_holders
+import services.sweep_verified
+import services.pull_listing_tokens
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -24,24 +25,24 @@ def catching_wrapper(func):
                 sleep(10)
     return wrapper
 
-
-
 if __name__ == "__main__":
     RequestPool._init_proxies()
     tp = ThreadPool()
+    ThreadPool.intercept_prints()
 
     threads_to_run = [
-        pull_new,
-        pull_scanner,
-        poll_listings,
-        update_holders,
-        sweep_creator,
-        poll_verified,
-        sweep_verified,
-        pull_listing_tokens
+        services.pull_new,
+        services.pull_scanner,
+        services.poll_listings,
+        services.update_holders,
+        services.sweep_creator,
+        services.poll_verified,
+        services.sweep_verified,
+        services.pull_listing_tokens
     ]
 
-    for func in threads_to_run:
-        t = tp.run(catching_wrapper(func))
+    for module in threads_to_run:
+        name = module.__name__.split(".")[-1]
+        t = tp.run(catching_wrapper(module.main),name=name)
 
     tp.collect()

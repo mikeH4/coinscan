@@ -1,9 +1,11 @@
-from threading import Thread as PythonThread
+import sys
+from threading import Thread as PythonThread, current_thread
 
 class Thread:
     def __init__(self,pool,thread:PythonThread,name:str) -> None:
         self.pool = pool
         self.thread = thread
+        self.thread.name = name
         self.name = name
     
     def wait(self):
@@ -13,7 +15,21 @@ class Thread:
     def start(self):
         self.thread.start()
 
+class ThreadPoolPrintIntercepter():
+    original = None
+
+    @staticmethod
+    def write(message:str):
+        if message != "\n":
+            message = f"{current_thread().name} @> {message}"
+        ThreadPoolPrintIntercepter.original(message)
+
 class ThreadPool:
+    @staticmethod
+    def intercept_prints():
+        ThreadPoolPrintIntercepter.original = sys.stdout.write
+        sys.stdout.write = ThreadPoolPrintIntercepter.write
+
     def __init__(self) -> None:
         self._active = {}
         self._threads_created = 0
