@@ -6,7 +6,6 @@ from library.postgres import DB
 from core.misc.TokenRequest import TokenRequest
 
 from core.Holders.ViewableHolders import ViewableHolders
-from core.Holders.Holders import Holders
 from core.Token.ViewableToken import ViewableToken
 from core.misc.Listing import Listing
 

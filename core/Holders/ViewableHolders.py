@@ -1,25 +1,34 @@
-from core.Holders.Holders import Holders
-from core.Token.TokenMeta import TokenMeta
+from library.BaseModel import BaseModel
+from core.types.Address import Address
+from library.postgres import DB
 
-class ViewableHolders(Holders):
+class ViewableHolders(BaseModel):
     keys_rename = dict(
-        holder=[None,str],
-        is_contract=[None,bool],
-        holding=["amount"],
-        holder_tag=["tag"],
     )
     added_attr = {}
 
-    def __init__(self, **attrs) -> None:
-        for key,new_key_tuple in self.keys_rename.items():
-            new_key = new_key_tuple[0]
-            new_key = key if new_key is None else new_key
-            val = attrs[key]
-            if len(new_key_tuple) > 1:
-                val = new_key_tuple[1](val)
-            setattr(self,new_key,val)
-        
-        attrs["token_meta"] = TokenMeta.get(attrs["contract"])
-        
-        for key,get_func in self.added_attr.items():
-            setattr(self,key,get_func(**attrs))
+    def __init__(self, 
+        holder:str,
+        holding:float,
+        is_contract:bool,
+        holder_tag:str,
+    ) -> None: pass    
+
+    @classmethod
+    def top(cls, address: Address, limit=10):
+        address = str(Address(address))
+        limit_cond = cls.limit_cond(limit)
+        with DB("tokens") as db:
+            query = f"""
+            SELECT
+                holders.holder,
+                holders.holding,
+                address_info.is_contract,
+                address_info.bscscan_tag
+            FROM holders
+            JOIN address_info ON address_info.address = holders.holder
+            WHERE contract = {db.placeholder(1)}
+            ORDER BY holding DESC {limit_cond}
+            """
+            tokens = db.get_all(query,[address])
+            return [cls._from_row(token) for token in tokens]
