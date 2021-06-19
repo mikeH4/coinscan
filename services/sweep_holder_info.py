@@ -17,7 +17,6 @@ def main():
                     in AddressInfo.unknown_contract(db=db,limit=30)
                 ]
                 addresses_len = len(addresses)
-                print(f"Addresses with unknown contracts {addresses_len}")
 
                 for i,address in enumerate(addresses):
                     data = bscscan.address_info(address)

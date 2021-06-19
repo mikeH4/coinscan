@@ -16,24 +16,32 @@ def main():
             with repeater.manager():
                 data = tokenfomo.get()
 
-                addresses = [row["addr"] for row in data]
+                addresses = [row[1] for row in data if row[0] == "BSC"]
                 existing_addrs = Token.existing_from(addresses,db)
 
                 data_len = len(data)
 
                 for i,token_data in enumerate(data):
-                    if token_data["chainId"] != "BSC":
+                    chain,address,name,symbol,block_time = token_data
+                    address = Address(address)
+                    
+                    if str(address) in existing_addrs:
                         continue
-                    if token_data["addr"] in existing_addrs:
-                        continue
-                    address = Address(token_data["addr"])
+
+                    print(dict(
+                        bscscan_api=bscscan_api,
+                        address=address,
+                        name=name,
+                        symbol=symbol,
+                        block_time=block_time,
+                    ))
 
                     Token.insert_with_source(
                         bscscan_api=bscscan_api,
                         address=address,
-                        name=token_data["name"],
-                        symbol=token_data["symbol"],
-                        block_time=token_data["blockTime"],
+                        name=name,
+                        symbol=symbol,
+                        block_time=block_time,
                     )
 
                     print(f"{i+1}/{data_len} Token Inserted")
