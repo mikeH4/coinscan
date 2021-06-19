@@ -20,19 +20,27 @@ class BscScanApi(BaseSource):
             module=module,
             action=action
         )
-        return self.request(
+        data = self.request(
             f"/api",
             params=parameters
         ).json()
+        if data["status"] == "0":
+            raise BscScanApiException(data["result"])
+        return data
 
     def source_code(self,address:Address):
         while True:
             try:
-                data = self.call("contract","getsourcecode",address=str(address))
-                if data["status"] == "0":
-                    raise BscScanApiException(data["result"])
-                
+                data = self.call("contract","getsourcecode",
+                    address=str(address)
+                )                
                 source = data["result"][0]["SourceCode"]
                 return None if source == "" else source
             except BscScanApiException:
                 sleep(3)
+    
+    def total_supply(self,address:Address):
+        data = self.call("stats","tokensupply",
+            contractaddress=str(address)
+        )
+        return float(data["result"])

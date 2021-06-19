@@ -64,3 +64,9 @@ class Token(BaseModel):
             sql = f"SELECT address FROM tokens WHERE address IN ({placeholder})"
             addrs = [row[0] for row in db.get_all(sql,of)]
             return addrs
+    
+    @classmethod
+    def permanent_delete(cls,address:Address,db:DB=None):
+        with cls.with_db(db) as db:
+            sql = f"DELETE FROM tokens WHERE address = {db.placeholder(1)}"
+            db.query(sql,[str(address)])

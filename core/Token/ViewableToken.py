@@ -1,3 +1,4 @@
+from time import time
 from core.types.Address import Address
 from library.postgres import DB
 from library.BaseModel import BaseModel
@@ -132,3 +133,14 @@ class ViewableToken(BaseModel):
                 ret[row[0]] = cls._from_row(row)
 
             return ret
+
+    @classmethod
+    def last_day(cls,db:DB=None):
+        hours24ago = time()-(60*60*24)
+        query = cls._build_query(f"WHERE token_meta.block_time > {hours24ago}")
+        query += f"""
+        ORDER BY created DESC
+        """
+        with cls.with_db(db) as db:
+            rows = db.get_all(query)
+            return [cls._from_row(row) for row in rows]
