@@ -24,6 +24,8 @@ def main():
                     if token_data["address"] in existing_addrs:
                         continue
                     address = Address(token_data["address"])
+                    if token_data["name"] == "Pancake LPs":
+                        continue
 
                     decimals = token_data["decimals"]
                     total_supply = token_data["total_supply"]/(10**decimals)

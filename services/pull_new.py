@@ -24,7 +24,6 @@ def main():
                 for i,token_data in enumerate(data):
                     chain,address,name,symbol,block_time = token_data
                     address = Address(address)
-                    
                     if chain != "BSC":
                         continue
 
