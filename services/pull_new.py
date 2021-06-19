@@ -25,16 +25,11 @@ def main():
                     chain,address,name,symbol,block_time = token_data
                     address = Address(address)
                     
-                    if str(address) in existing_addrs:
+                    if chain != "BSC":
                         continue
 
-                    print(dict(
-                        bscscan_api=bscscan_api,
-                        address=address,
-                        name=name,
-                        symbol=symbol,
-                        block_time=block_time,
-                    ))
+                    if str(address) in existing_addrs:
+                        continue
 
                     Token.insert_with_source(
                         bscscan_api=bscscan_api,
