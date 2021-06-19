@@ -158,5 +158,4 @@ class BaseModel(metaclass=BaseModelMetaClass):
         if db is None:
             _db.close()
         elif commit:
-            print("commit")
             _db.conn.commit()

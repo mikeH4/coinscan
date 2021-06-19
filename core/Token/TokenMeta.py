@@ -74,6 +74,7 @@ class TokenMeta(BaseModel):
         cls,
         address:Address,
         db = None,
+        dont_update=[],
         **kwds
     ):
         with cls.with_db(db) as db:
@@ -84,6 +85,7 @@ class TokenMeta(BaseModel):
             keyed_str = ", ".join([
                 f"{key} = excluded.{key}"
                 for key in cols
+                if key not in dont_update
             ])
             insert_sql = f"INSERT INTO token_meta (address,{col_string}) VALUES ({placeholder})"
 
@@ -93,4 +95,5 @@ class TokenMeta(BaseModel):
             ON CONFLICT (address)
             DO {update_sql}
             """
+            print(sql)
             db.query(sql,[str(address)] + list(kwds.values()))

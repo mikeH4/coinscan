@@ -33,7 +33,9 @@ def main():
                         name=token_data["name"],
                         symbol=token_data["symbol"],
                         decimals=decimals,
-                        total_supply=total_supply
+                        total_supply=total_supply,
+                        block_time=token_data["block_time"],
+                        dont_update_meta=["block_time"]
                     )
 
                     print(f"{i+1}/{data_len} Token Inserted")

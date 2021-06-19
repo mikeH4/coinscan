@@ -41,6 +41,7 @@ class Token(BaseModel):
         name:str,
         symbol:str,
         db=None,
+        dont_update_meta=[],
         # Meta
         **kwds
     ):
@@ -51,8 +52,7 @@ class Token(BaseModel):
                 name=name,
                 symbol=symbol
             ).insert_or_update(db=db,ignore=True)
-            TokenMeta.update(address,**kwds,db=db)
-            print("CommiT")
+            TokenMeta.update(address,**kwds,db=db,dont_update=dont_update_meta)
     
     @classmethod
     def existing_from(cls,of:list=[],db:DB=None):
