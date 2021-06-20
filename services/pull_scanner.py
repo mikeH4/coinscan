@@ -13,7 +13,7 @@ def main():
 
         while True:
             # 2.5 min max
-            with repeater.manager(min=20,max=150):
+            with repeater.manager(min=15,max=150):
                 data = scanner_api.newly_added()
 
                 addresses = [row["address"] for row in data]
