@@ -12,7 +12,8 @@ def main():
         scanner_api = ScannerApi()
 
         while True:
-            with repeater.manager():
+            # 2.5 min max
+            with repeater.manager(min=20,max=150):
                 data = scanner_api.newly_added()
 
                 addresses = [row["address"] for row in data]
@@ -43,5 +44,4 @@ def main():
                     print(f"{i+1}/{data_len} Token Inserted")
 
                     if repeater.should_repeat():
-                        # Scan from TokenFomo again
                         break
