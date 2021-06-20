@@ -7,13 +7,13 @@ def main():
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=60*1.5,max=60*5)
+        repeater = Repeater(min=15,max=60*2.5)
         bscscan_api = BscScanApi()
         scanner_api = ScannerApi()
 
         while True:
             # 2.5 min max
-            with repeater.manager(min=15,max=150):
+            with repeater.manager():
                 data = scanner_api.newly_added()
 
                 addresses = [row["address"] for row in data]
