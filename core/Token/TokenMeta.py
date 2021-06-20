@@ -95,5 +95,4 @@ class TokenMeta(BaseModel):
             ON CONFLICT (address)
             DO {update_sql}
             """
-            print(sql)
             db.query(sql,[str(address)] + list(kwds.values()))

@@ -27,6 +27,10 @@ def main():
                     address = Address(token_data["address"])
                     if token_data["name"] == "Pancake LPs":
                         continue
+                    if token_data["block"] is not None and token_data["block_time"] is None:
+                        # Still waiting to be processed, ignore for now
+                        print(f"Waiting for {address}")
+                        continue
 
                     decimals = token_data["decimals"]
                     total_supply = token_data["total_supply"]/(10**decimals)
