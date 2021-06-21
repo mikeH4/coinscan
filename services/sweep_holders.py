@@ -1,9 +1,10 @@
+
 def main():
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
     from core.Holders.Holders import Holders
+    from core.Holders.AddressInfo import AddressInfo
     from core.Token.TokenMeta import TokenMeta
-    from core.Token.ViewableToken import ViewableToken
     from library.postgres import DB
 
     with DB("tokens") as db:
@@ -12,11 +13,7 @@ def main():
 
         while True:
             with repeater.manager():
-                addresses = [
-                    token.address
-                    for token
-                    in ViewableToken.get_frequent_addresses()
-                ]
+                addresses = AddressInfo.unknown_holder_contracts(db=db,limit=50)
                 addresses_len = len(addresses)
 
                 for i,address in enumerate(addresses):
