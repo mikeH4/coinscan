@@ -16,8 +16,6 @@ class ViewableListings(BaseModel):
         self.link = self.listing_link(platform,local_slug)
         if hasattr(self,"local_slug"):
             del self.local_slug
-        if hasattr(self,"token"):
-            del self.token
 
     @classmethod
     def listing_link(cls,platform,local_slug):
@@ -54,3 +52,24 @@ class ViewableListings(BaseModel):
                 [token_address]
             )
             return [cls._from_row(row) for row in rows]
+    
+    @classmethod
+    def from_slug(cls,listings:list, db:DB = None):
+        conds = []
+        params = []
+        print(listings[0])
+        for platform,name in listings:
+            params.append(platform)
+            params.append(name)
+            conds.append(f"(platform = %s AND local_slug = %s)")
+        with cls.with_db(db) as db:
+            sql = f"""
+            SELECT
+                token,
+                platform,
+                added,
+                local_slug
+            FROM listings
+            WHERE ({' OR '.join(conds)})
+            """
+            return [cls._from_row(row) for row in db.get_all(sql,params)]

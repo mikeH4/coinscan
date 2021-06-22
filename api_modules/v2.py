@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from api_modules._v2 import token
+from api_modules._v2 import private
 
 app = APIRouter(
     prefix="/v2"
@@ -7,6 +8,7 @@ app = APIRouter(
 
 routers = [
     token.router,
+    private.router
 ]
 
 for router in routers:
