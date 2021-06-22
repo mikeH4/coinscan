@@ -35,6 +35,7 @@ async def new_tokens(
         params.append(name)
         conds.append(f"(platform = {DB.placeholder(1)} AND local_slug = {DB.placeholder(1)})")
 
+    items.addresses = [str(Address(address)) for address in items.addresses]
     params += items.addresses
     if len(items.addresses) > 0:
         conds.append(f"tokens.address IN ({DB.placeholder(len(items.addresses))})")
