@@ -16,8 +16,7 @@ class ViewableToken(BaseModel):
 
         listings:str,
         creator_labels:str,
-    ) -> None:
-        pass
+    ) -> None: pass
 
     @staticmethod
     def _build_query(where:str = "",with_liquidity = False):
@@ -68,7 +67,10 @@ class ViewableToken(BaseModel):
         address = str(Address(address))
         query = cls._build_query(f"WHERE tokens.address = {DB.placeholder(1)}")
         with DB("tokens") as db:
-            return cls._from_row(db.get(query,[address]))
+            row = db.get(query,[address])
+            if row is None:
+                return None
+            return cls._from_row(row)
 
     @classmethod
     def search(cls,keyword,limit=10):

@@ -95,6 +95,7 @@ class BaseModelMetaClass(type):
                 continue
             val = None if kwargs[key] is None else _class(kwargs[key])
             setattr(self,key,val)
+        cls.__init__(self,**kwargs)
         return self
 
 # abstract

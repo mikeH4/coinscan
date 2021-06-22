@@ -7,7 +7,7 @@ from core.misc.TokenRequest import TokenRequest
 
 from core.Holders.ViewableHolders import ViewableHolders
 from core.Token.ViewableToken import ViewableToken
-from core.misc.Listing import Listing
+from core.misc.ViewableListings import ViewableListings
 
 router = APIRouter(
     prefix="/token"
@@ -32,7 +32,7 @@ def latest(only_contract_verified:bool=False, min_liquidity_500:bool=False):
 @router.get("/listings")
 def listings():
     with DB("tokens") as db:
-        listings = Listing.new_listings(db=db)
+        listings = ViewableListings.new_listings(db=db)
         listing_keys = list(listings.keys())
         tokens = ViewableToken.get_addresses(
             listing_keys,
@@ -66,3 +66,7 @@ def token(address: str):
 @router.get("/get/{address}/holders")
 def holders(address: str):
     return {"holders": ViewableHolders.top(address)}
+
+@router.get("/get/{address}/listings")
+def listings(address: str):
+    return {"listings": ViewableListings.get_listings(address)}

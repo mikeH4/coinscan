@@ -16,28 +16,6 @@ class Listing(BaseModel):
         updated:int,
     ) -> None: pass
     
-    _listings_cache = {}
-    @classmethod
-    def cache_listings(cls,token_addresses):
-        notcached = set(token_addresses) - set(cls._listings_cache.keys())
-        token_addresses = notcached
-
-        if len(token_addresses) < 1:
-            return
-
-        with DB("tokens") as db:
-            rows = db.get_all(
-                f"SELECT * FROM listings WHERE token IN ({db.placeholder(len(token_addresses))})",
-                token_addresses
-            )
-            for row in rows:
-                listing = cls._from_row(row)
-                if str(listing.token) not in cls._listings_cache:
-                    cls._listings_cache[str(listing.token)] = []
-                cls._listings_cache[str(listing.token)].append(listing)
-            for notfound in set(token_addresses) - set(cls._listings_cache.keys()):
-                cls._listings_cache[notfound] = []
-
     @classmethod
     def get_by_platform(cls,platform):
         with DB("tokens") as db:
@@ -46,28 +24,6 @@ class Listing(BaseModel):
                 [platform]
             )]
             return listings
-
-    @classmethod
-    def new_listings(cls,db:DB = None) -> dict:
-        with cls.with_db(db) as db:
-            token_listings = {}
-            results = db.get_all(
-                f"""
-                SELECT token,platform,added
-                FROM listings
-                WHERE added > {time() - 60*60*24}
-                ORDER BY added DESC
-                """
-            )
-            for row in results:
-                token,platform,added = row
-                if token not in token_listings:
-                    token_listings[token] = []
-                token_listings[token].append(dict(
-                    platform=platform,
-                    added=added
-                ))
-            return token_listings
 
     @classmethod
     def get_addresses_not_inserted(cls,limit=1000,db=None):
@@ -87,8 +43,6 @@ class Listing(BaseModel):
     @classmethod
     def get_listings(cls, token_address: Address):
         token_address = str(Address(token_address))
-        if token_address in cls._listings_cache:
-            return cls._listings_cache[token_address]
         with DB("tokens") as db:
             rows = db.get_all(
                 f"SELECT * FROM listings WHERE token = {db.placeholder(1)}",

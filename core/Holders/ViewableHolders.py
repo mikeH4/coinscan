@@ -3,10 +3,6 @@ from core.types.Address import Address
 from library.postgres import DB
 
 class ViewableHolders(BaseModel):
-    keys_rename = dict(
-    )
-    added_attr = {}
-
     def __init__(self, 
         holder:str,
         amount:float,

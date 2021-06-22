@@ -52,8 +52,8 @@ if __name__ == "__main__":
             # services.sweep_creator,
             # services.poll_verified,
             # services.sweep_verified,
-            # services.pull_listing_tokens,
-            services.sweep_holders,
+            services.pull_listing_tokens,
+            # services.sweep_holders,
         ]
 
     for module in threads_to_run:
