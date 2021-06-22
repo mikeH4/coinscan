@@ -57,7 +57,6 @@ class ViewableListings(BaseModel):
     def from_slug(cls,listings:list, db:DB = None):
         conds = []
         params = []
-        print(listings[0])
         for platform,name in listings:
             params.append(platform)
             params.append(name)

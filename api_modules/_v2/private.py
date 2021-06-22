@@ -1,3 +1,6 @@
+from library.postgres import DB
+from api_modules._v2.token import listings
+from core.Token.ViewableToken import ViewableToken
 import settings
 from fastapi import APIRouter,HTTPException,Header
 from core.misc.ViewableListings import ViewableListings
@@ -15,17 +18,38 @@ def check_api_key(auth):
     if auth != "j23j90rhn)#@p23j09h)*IH#@)(H#@IRJT)I@#HT(FH@#N)TJ_(@IHNof j4900tjf0t34":
         raise HTTPException(status_code=404, detail="Not Found")
 
-class Listing(BaseModel):
-    platform: str
-    name: str
+class ItemsSections(BaseModel):
+    listings: List[List[str]]
+    addresses: List[str]
 
-@router.post("/from-listings")
+@router.post("/from-items")
 async def new_tokens(
-    listings:List[Listing],
+    items: ItemsSections,
     auth: Optional[str] = Header("")
-):
+) -> list:
     check_api_key(auth)
-    if len(listings) < 1:
+    conds = []
+    params = []
+    for platform,name in items.listings:
+        params.append(platform)
+        params.append(name)
+        conds.append(f"(platform = {DB.placeholder(1)} AND local_slug = {DB.placeholder(1)})")
+
+    params += items.addresses
+    if len(items.addresses) > 0:
+        conds.append(f"tokens.address IN ({DB.placeholder(len(items.addresses))})")
+
+    if len(conds) < 1:
         return []
-    listifyed = [[item.platform,item.name] for item in listings]
-    return ViewableListings.from_slug(listifyed)
+
+    sql = ViewableToken._build_query(f"""
+    LEFT JOIN
+        listings as listings_full
+    ON listings_full.token = tokens.address
+    WHERE
+        ({' OR '.join(conds)})
+    """)
+    print(sql)
+    print(params)
+    with DB("tokens") as db:
+        return [ViewableToken._from_row(row) for row in db.get_all(sql,params)]
