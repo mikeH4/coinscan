@@ -1,9 +1,9 @@
 from library.postgres import DB
 from api_modules._v2.token import listings
 from core.Token.ViewableToken import ViewableToken
+from core.types.Address import Address
 import settings
 from fastapi import APIRouter,HTTPException,Header
-from core.misc.ViewableListings import ViewableListings
 
 from typing import List,Optional
 from pydantic import BaseModel
@@ -49,7 +49,13 @@ async def new_tokens(
     WHERE
         ({' OR '.join(conds)})
     """)
-    print(sql)
-    print(params)
     with DB("tokens") as db:
-        return [ViewableToken._from_row(row) for row in db.get_all(sql,params)]
+        addresses = {}
+        tokens = []
+        for row in db.get_all(sql,params):
+            address = str(Address(row[0]))
+            if address in addresses:
+                continue
+            addresses[address] = True
+            tokens.append(ViewableToken._from_row(row))
+        return tokens
