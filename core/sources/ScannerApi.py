@@ -1,3 +1,4 @@
+from requests.api import head
 from library.BaseSource import BaseSource
 
 class ScannerApi(BaseSource):
@@ -19,4 +20,8 @@ class ScannerApi(BaseSource):
         res = self.request(f"/v1/private/get",headers=self.auth_headers,json=dict(
             addresses=list(map(str,addresses))
         ))
+        return res.json()
+    
+    def prices(self):
+        res = self.request("/v1/private/liquidity",headers=self.auth_headers)
         return res.json()

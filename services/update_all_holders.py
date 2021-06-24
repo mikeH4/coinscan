@@ -1,19 +1,17 @@
-
 def main():
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
     from core.Holders.Holders import Holders
-    from core.Holders.AddressInfo import AddressInfo
     from core.Token.TokenMeta import TokenMeta
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=60*1,max=60*4)
+        repeater = Repeater(min=60*2)
         bscscan = BscScan()
 
         while True:
             with repeater.manager():
-                addresses = AddressInfo.unknown_holder_contracts(db=db,limit=50)
+                addresses = Holders.not_updated_recently()
                 addresses_len = len(addresses)
 
                 for i,address in enumerate(addresses):

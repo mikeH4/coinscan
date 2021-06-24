@@ -13,7 +13,8 @@ import services.update_holders
 import services.pull_listing_tokens
 import services.sweep_creator
 import services.sweep_verified
-import services.sweep_holders
+import services.update_all_holders
+import services.pull_token_prices
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -41,7 +42,8 @@ if __name__ == "__main__":
         services.poll_verified,
         services.sweep_verified,
         services.pull_listing_tokens,
-        services.sweep_holders,
+        services.update_all_holders,
+        services.pull_token_prices
     ]
     if settings.sandbox == True:
         threads_to_run = [
@@ -52,8 +54,9 @@ if __name__ == "__main__":
             # services.sweep_creator,
             # services.poll_verified,
             # services.sweep_verified,
-            services.pull_listing_tokens,
-            # services.sweep_holders,
+            # services.pull_listing_tokens,
+            # services.update_all_holde/zrs,
+            services.pull_token_prices
         ]
 
     for module in threads_to_run:

@@ -10,9 +10,10 @@ class DB:
     def placeholder(l: int):
         return ",".join(['%s'] * l )
 
-    def __init__(self, database=None):
+    def __init__(self, database=None, auto_commit=True):
         self.conn = None
         self.cursor = None
+        self.auto_commit = auto_commit
 
         if database:
             self.open(database)
@@ -40,7 +41,7 @@ class DB:
         DB.__active.remove(self)
         
         if self.conn:
-            self.conn.commit()
+            if self.auto_commit: self.conn.commit()
             self.cursor.close()
             self.conn.close()
 

@@ -11,6 +11,7 @@ from library.Proxies import Proxies
 from core.misc.TokenRequest import TokenRequest
 from core.misc.Listing import Listing
 from core.misc.LiquidityPairs import LiquidityPairs
+from core.misc.TokenPrices import TokenPrices
 
 models = [
     cls
