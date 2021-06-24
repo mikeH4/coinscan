@@ -1,27 +1,19 @@
 from library.postgres import DB
-from library.BaseModel import BaseModel
+from commands.models import models,db_name
 
-# Models
-from core.Token.Token import Token
-from core.Token.TokenMeta import TokenMeta
-from core.Token.BSCheckRating import BSCheckRating
-from core.Token.TokenSnifferRating import TokenSnifferRating
+with DB(db_name) as db:
+    rows = db.get_all("""
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+    """)
+    tables = [row[0] for row in rows]
 
-from core.Holders.Holders import Holders
-from core.Holders.AddressLabels import AddressLabels
-from core.Holders.AddressInfo import AddressInfo
-from library.Proxies import Proxies
-from core.misc.TokenRequest import TokenRequest
-from core.misc.Listing import Listing
-from core.misc.LiquidityPairs import LiquidityPairs
-
-
-with DB("tokens") as db:
-    for _class in BaseModel.__subclasses__():
-        if _class.table is None:
+    for _class in models:
+        if _class.table in tables:
             continue
-        print(_class)
 
+        print(_class)
         if input(f"Create table '{_class.table}'?").lower() != "y":
             continue
 

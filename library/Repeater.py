@@ -16,7 +16,7 @@ class Repeater:
             # If requests are too less
             sleep_for = self.min - (time() - self.last_release)
             if sleep_for > 0:
-                print("Sleep for",sleep_for)
+                print(f"Sleep for {sleep_for}")
                 sleep(sleep_for)
             self.last_release = time()
             yield

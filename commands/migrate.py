@@ -1,25 +1,14 @@
 from library.postgres import DB
-from library.BaseModel import BaseModel
+from commands.models import models,db_name
 
-# Models
-from core.Token.Token import Token
-from core.Token.TokenMeta import TokenMeta
-from core.Token.BSCheckRating import BSCheckRating
-from core.Token.TokenSnifferRating import TokenSnifferRating
-
-from core.Holders.Holders import Holders
-from core.Holders.AddressLabels import AddressLabels
-from library.Proxies import Proxies
-from core.misc.TokenRequest import TokenRequest
-from core.misc.Listing import Listing
-from core.misc.LiquidityPairs import LiquidityPairs
-
-with DB("tokens") as db:
-    for _class in BaseModel.__subclasses__():
-        if _class.table is None:
+with DB(db_name) as db:
+    for _class in models:
+        new_cols = _class._db_new_cols()
+        if len(new_cols) < 1:
             continue
+
         print(_class)
-        print("New Columns:",_class._db_new_cols())
+        print("New Columns:",new_cols)
 
         if input("Sure you want to overwrite?").lower() != "y":
             continue
@@ -28,10 +17,6 @@ with DB("tokens") as db:
             db.query(_class._db_recreate())
             db.conn.commit()
         except Exception as e:
-            print("------ Error ------")
-            print("Error")
-            print(e)
-            print("------ END ------")
             if input("Delete old temp table?").lower() == "y":
                 db.rollback()
                 db.query(f"DROP TABLE {_class.table}_temp;")
