@@ -25,4 +25,5 @@ class TokenPrices(BaseModel):
             db.query("DELETE FROM token_prices")
             with open("temp.csv","r") as f:
                 db.cursor.copy_from(f, "token_prices", columns=("token","price_change","circulating","liquidity"), sep=",")
+            db.conn.commit()
         os.remove("temp.csv")
