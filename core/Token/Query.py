@@ -1,5 +1,7 @@
+from core.sources.ScannerApi import ScannerApi
 from core.Token.ViewableToken import ViewableToken
 from library.postgres import DB
+from core.Cache import Cache
 
 class Query(ViewableToken):
     @classmethod
@@ -13,9 +15,10 @@ class Query(ViewableToken):
             rows = db.get_all(query)
             return [cls._from_row(row) for row in rows]
 
+    @Cache.wrap(["busd_value"],cache_for=5*60)
     @classmethod
     def busd_to_wbnb(self,busd_value):
-        return 1.5
+        return busd_value*ScannerApi().busd()["wbnb_for_1_busd"]
 
     @classmethod
     def _build(

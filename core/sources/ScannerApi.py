@@ -25,3 +25,7 @@ class ScannerApi(BaseSource):
     def prices(self):
         res = self.request("/v1/private/liquidity",headers=self.auth_headers)
         return res.json()
+
+    def busd(self):
+        res = self.request(f"/v1/private/busd",headers=self.auth_headers)
+        return res.json()
