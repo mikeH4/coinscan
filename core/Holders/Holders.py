@@ -55,7 +55,8 @@ class Holders(BaseModel):
             hours24_ago = time() - (60*60*24)
             return [row[0] for row in db.get_all(f"""
             SELECT
-            DISTINCT contract,updated_time
+                DISTINCT contract,
+                updated_time
             FROM holders
             WHERE updated_time < {hours24_ago}
             ORDER BY updated_time ASC

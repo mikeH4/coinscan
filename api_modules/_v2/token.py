@@ -1,3 +1,4 @@
+from core.misc.TokenPrices import TokenPrices
 from core.Token.Query import Query
 from time import time
 from fastapi import APIRouter,HTTPException
@@ -40,6 +41,26 @@ def listings():
             sorted_tokens.append(tokens[address])
         return dict(
             listings=listings,
+            tokens=sorted_tokens
+        )
+
+@router.get("/rising")
+def rising():
+    with DB("tokens") as db:
+        rising = TokenPrices.rising(db=db)
+        rising_keys = list(rising.keys())
+        tokens = ViewableToken.get_addresses(
+            rising_keys,
+            db=db
+        )
+        sorted_tokens = []
+        for address in rising_keys:
+            if address not in tokens:
+                del rising[address]
+                continue
+            sorted_tokens.append(tokens[address])
+        return dict(
+            change=rising,
             tokens=sorted_tokens
         )
 

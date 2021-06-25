@@ -27,3 +27,19 @@ class TokenPrices(BaseModel):
                 db.cursor.copy_from(f, "token_prices", columns=("token","price_change","circulating","liquidity"), sep=",")
             db.conn.commit()
         os.remove("temp.csv")
+
+    @classmethod
+    def rising(cls, db:DB = None):
+        with cls.with_db(db) as db:
+            rows = db.get_all("""
+            SELECT
+                token, price_change
+            FROM token_prices
+            WHERE liquidity >= 0.5
+            ORDER BY price_change DESC
+            LIMIT 100
+            """)
+            rising_dict = {}
+            for token,price_change in rows:
+                rising_dict[token] = price_change
+            return rising_dict
