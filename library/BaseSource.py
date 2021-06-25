@@ -26,6 +26,9 @@ class BaseSource(metaclass=BaseSourceMetaClass):
     limit_period = 1
     param_from_proxy={}
 
+    # Only use in exceptional cases
+    limit_bypass = False
+
     @staticmethod
     def parse_soup_json(soup,selector):
         script_content = soup.select(selector)[0].string
@@ -34,19 +37,25 @@ class BaseSource(metaclass=BaseSourceMetaClass):
     def request(self,path,params={},headers={},cookies={},json={}):
         # Sleep and retry
         while True:
-            try:
-                return RequestPool.request(
-                    _class=self.__class__,
-                    url=urljoin(self.url,path),
-                    param_from_proxy=self.__class__.param_from_proxy,
-                    params=params,
-                    headers=headers,
-                    cookies=cookies,
-                    json=json
-                )
-            except NoProxyInPool as e:
-                print(f"Limit exhausted: Sleeping for {e.available_in}")
-                sleep(e.available_in)
+            kwds = dict(
+                url=urljoin(self.url,path),
+                params=params,
+                headers=headers,
+                cookies=cookies,
+                json=json,
+            )
+            if self.limit_bypass:
+                return get(**kwds,proxy=Proxies.get_all()[0])
+            else:
+                try:
+                    return RequestPool.request(
+                        **kwds,
+                        _class=self.__class__,
+                        param_from_proxy=self.__class__.param_from_proxy,
+                    )
+                except NoProxyInPool as e:
+                    print(f"Limit exhausted: Sleeping for {e.available_in}")
+                    sleep(e.available_in)
 
 class RequestPool:
     _proxies = []

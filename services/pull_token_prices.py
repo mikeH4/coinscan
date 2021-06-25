@@ -5,7 +5,7 @@ def main():
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=60*30)
+        repeater = Repeater(min=60*10)
         scanner_api = ScannerApi()
 
         while True:

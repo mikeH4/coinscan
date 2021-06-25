@@ -1,3 +1,5 @@
+from time import time
+
 class CacheItem():
     def __init__(self, data, cache_for:int=True) -> None:
         self._expiry = None if cache_for == True else time()+int(cache_for)

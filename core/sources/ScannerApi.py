@@ -1,4 +1,3 @@
-from requests.api import head
 from library.BaseSource import BaseSource
 
 class ScannerApi(BaseSource):
@@ -7,10 +6,14 @@ class ScannerApi(BaseSource):
     limit_calls = 1
     limit_period = 1
 
+    # Only use in exceptional cases
     auth_headers = {
         "auth": "bON)Ihn(UB)B$#)TN$)UBOBNF)U$BNT)UB@$IJEHNU934NTU349B",
         "X-Api-Auth": "5ad6c116cda6f75000ee2c943d406516a6332718e90c87833ffecfef2f58f34e"
     }
+
+    def __init__(self,limit_bypass=False) -> None:
+        self.limit_bypass = limit_bypass
 
     def newly_added(self):
         res = self.request("/v1/private/new",headers=self.auth_headers)

@@ -15,10 +15,10 @@ class Query(ViewableToken):
             rows = db.get_all(query)
             return [cls._from_row(row) for row in rows]
 
+    @staticmethod
     @Cache.wrap(["busd_value"],cache_for=5*60)
-    @classmethod
-    def busd_to_wbnb(self,busd_value):
-        return busd_value*ScannerApi().busd()["wbnb_for_1_busd"]
+    def busd_to_wbnb(busd_value):
+        return busd_value*ScannerApi(limit_bypass=True).busd()["wbnb_for_1_busd"]
 
     @classmethod
     def _build(
@@ -33,7 +33,7 @@ class Query(ViewableToken):
             conds.append("source_verified = TRUE")
         if min_liquidity_500:
             with_prices = True
-            conds.append(f"token_prices.liquidity >= {cls.busd_to_wbnb(500)}")
+            conds.append(f"token_prices.liquidity >= {Query.busd_to_wbnb(busd_value=500)}")
         cond_str = "" if len(conds) < 1 else f"WHERE {' AND '.join(conds)}"
 
         return cls._build_query(cond_str,with_prices=with_prices)
