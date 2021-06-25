@@ -1,3 +1,4 @@
+from core.Token.Query import Query
 from time import time
 from fastapi import APIRouter,HTTPException
 
@@ -9,25 +10,18 @@ from core.Holders.ViewableHolders import ViewableHolders
 from core.Token.ViewableToken import ViewableToken
 from core.misc.ViewableListings import ViewableListings
 
+from core.Cache import Cache,CacheItem
+
 router = APIRouter(
     prefix="/token"
 )
 
 @router.get("/latest")
 def latest(only_contract_verified:bool=False, min_liquidity_500:bool=False):
-    with_liquidity = False
-    where = []
-    if only_contract_verified:
-        where.append("source_verified = TRUE")
-    if min_liquidity_500:
-        with_liquidity = True
-        where.append("liquidity.liquidity > 500")
-
-    return ViewableToken.get_latest(
-        limit=100,
-        where_cond="" if len(where) < 1 else "WHERE " + (" AND ".join(where)),
-        with_liquidity=with_liquidity
-    )
+    return Query.get_filtered(dict(
+        only_source_verified=only_contract_verified,
+        min_liquidity_500=min_liquidity_500
+    ),limit=100)
 
 @router.get("/listings")
 def listings():

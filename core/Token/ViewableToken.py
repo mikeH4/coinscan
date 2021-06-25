@@ -19,7 +19,7 @@ class ViewableToken(BaseModel):
     ) -> None: pass
 
     @staticmethod
-    def _build_query(where:str = "",with_liquidity = False):
+    def _build_query(where:str = "",with_prices = False):
         query = f"""
         SELECT
             tokens.address,
@@ -46,17 +46,8 @@ class ViewableToken(BaseModel):
             FROM address_labels
             GROUP BY address_labels.address
         ) as address_labels ON token_meta.creator = address_labels.address
-        {'' if not with_liquidity else '''
-        LEFT JOIN (
-            SELECT
-                token,
-                bnb_reserves * (
-                    SELECT token_reserves/bnb_reserves
-                    FROM liquidity_pairs
-                    WHERE token = '0xe9e7cea3dedca5984780bafc599bd69add087d56'
-                ) AS liquidity
-            FROM liquidity_pairs
-        ) as liquidity ON tokens.address = liquidity.token
+        {'' if not with_prices else '''
+        LEFT JOIN token_prices ON token_prices.token = tokens.address
         '''}
         {where}
         """
