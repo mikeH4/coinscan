@@ -8,6 +8,7 @@ def main():
     from time import time
     from concurrent.futures import ThreadPoolExecutor
 
+
     def update_holder(address):
         total,top = bscscan.holders(
             address=address
@@ -22,7 +23,8 @@ def main():
             holder.insert_or_update(db=db)
             address_info.insert(db=db,replace=True)
 
-    with DB("tokens") as db:
+
+    with DB("tokens",auto_commit=False) as db:
         repeater = Repeater(min=60*5)
         bscscan = BscScan()
 

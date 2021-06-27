@@ -46,8 +46,8 @@ class Pairs(BaseModel):
                     SELECT
                         pairs.pair
                     FROM pairs
-                    LEFT JOIN holders ON holders.contract = pairs.pair
-                    WHERE holders.contract IS NULL
+                    LEFT JOIN token_meta ON token_meta.address = pairs.pair
+                    WHERE token_meta.holders IS NULL
                     {limit_cond}
                     """
                 )
