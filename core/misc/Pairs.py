@@ -19,11 +19,17 @@ class Pairs(BaseModel):
     ):
         data = self.dict()
         data["token"] = str(data["token"])
+        data["pair"] = str(data["pair"])
 
         with self.with_db(db) as db:
             db.insert(
                 self.table,
                 data,
-                ignore=True,
+                ignore_insert=True,
                 commit=False
             )
+    
+    @classmethod
+    def count(cls,db:DB = None):
+        with cls.with_db(db) as db:
+            return int(db.get("SELECT COUNT(*) FROM pairs")[0])
