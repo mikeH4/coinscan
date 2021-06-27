@@ -1,7 +1,5 @@
-from core.misc.Pairs import Pairs
-
-
 def main():
+    from core.misc.Pairs import Pairs
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
     from core.Holders.Holders import Holders
@@ -35,6 +33,3 @@ def main():
 
                     db.conn.commit()
                     print(f"{i+1}/{pairs_len} Pair Holders Updated")
-
-                    if repeater.should_repeat():
-                        break
