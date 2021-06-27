@@ -29,6 +29,8 @@ class ViewableHolders(BaseModel):
             LEFT JOIN holders AS pair_holders ON pairs.pair = pair_holders.contract
             WHERE holders.contract = {db.placeholder(1)}
 
+            AND pair_holders.holder != '0x0000000000000000000000000000000000000000'
+
             ORDER BY
                 pair_holders.holding DESC NULLS LAST,
                 holders.holding DESC NULLS LAST

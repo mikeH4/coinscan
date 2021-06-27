@@ -5,16 +5,20 @@ def main():
     from core.Holders.Holders import Holders
     from core.Token.TokenMeta import TokenMeta
     from library.postgres import DB
+    from time import time
 
     with DB("tokens") as db:
         repeater = Repeater(min=60*5)
         bscscan = BscScan()
 
         while repeater.loop():
+            start = time()
+            total_sweeped = 0
             while True:
                 pairs = Pairs.unknown_pairs(db=db,limit=100)
                 pairs_len = len(pairs)
                 if pairs_len < 1:
+                    print("Breaking")
                     break
 
                 for i,address in enumerate(pairs):
@@ -32,4 +36,5 @@ def main():
                         address_info.insert(db=db,replace=True)
 
                     db.conn.commit()
-                    print(f"{i+1}/{pairs_len} Pair Holders Updated")
+                    total_sweeped += 1
+                    print(f"{total_sweeped} of all Pair Holders Sweeped, Avg {total_sweeped/(time() - start)*60} per min")
