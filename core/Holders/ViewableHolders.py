@@ -24,7 +24,7 @@ class ViewableHolders(BaseModel):
                 address_info.bscscan_tag
             FROM holders
             JOIN address_info ON address_info.address = holders.holder
-            JOIN pairs ON pairs.token = holders.contract
+            LEFT JOIN pairs ON pairs.token = holders.contract
 
             LEFT JOIN holders AS pair_holders ON pairs.pair = pair_holders.contract
             WHERE holders.contract = {db.placeholder(1)}
