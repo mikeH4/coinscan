@@ -3,38 +3,37 @@ def main():
     from core.sources.BscScan import BscScan
     from core.Holders.Holders import Holders
     from core.Token.TokenMeta import TokenMeta
-    from core.Token.ViewableToken import ViewableToken
+    from core.Token.Query import Query
     from library.postgres import DB
 
     with DB("tokens") as db:
         repeater = Repeater(min=60*6,max=60*10)
         bscscan = BscScan()
 
-        while True:
-            with repeater.manager():
-                addresses = [
-                    token.address
-                    for token
-                    in ViewableToken.get_frequent_addresses()
-                ]
-                addresses_len = len(addresses)
+        while repeater.loop():
+            addresses = [
+                token.address
+                for token
+                in Query.get_frequent_addresses()
+            ]
+            addresses_len = len(addresses)
 
-                for i,address in enumerate(addresses):
-                    total,top = bscscan.holders(
-                        address=address
-                    )
-                    TokenMeta.update(
-                        address=address,
-                        db=db,
-                        holders=total
-                    )
-                    Holders.delete_all(contract=address,db=db)
-                    for holder,address_info in top:
-                        holder.insert_or_update(db=db)
-                        address_info.insert(db=db,replace=True)
+            for i,address in enumerate(addresses):
+                total,top = bscscan.holders(
+                    address=address
+                )
+                TokenMeta.update(
+                    address=address,
+                    db=db,
+                    holders=total
+                )
+                Holders.delete_all(contract=address,db=db)
+                for holder,address_info in top:
+                    holder.insert_or_update(db=db)
+                    address_info.insert(db=db,replace=True)
 
-                    db.conn.commit()
-                    print(f"{i+1}/{addresses_len} Token Holders Updated")
+                db.conn.commit()
+                print(f"{i+1}/{addresses_len} Token Holders Updated")
 
-                    if repeater.should_repeat():
-                        break
+                if repeater.should_repeat():
+                    break

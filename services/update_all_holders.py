@@ -9,27 +9,26 @@ def main():
         repeater = Repeater(min=60*2)
         bscscan = BscScan()
 
-        while True:
-            with repeater.manager():
-                addresses = Holders.not_updated_recently()
-                addresses_len = len(addresses)
+        while repeater.loop():
+            addresses = Holders.not_updated_recently()
+            addresses_len = len(addresses)
 
-                for i,address in enumerate(addresses):
-                    total,top = bscscan.holders(
-                        address=address
-                    )
-                    TokenMeta.update(
-                        address=address,
-                        db=db,
-                        holders=total
-                    )
-                    Holders.delete_all(contract=address,db=db)
-                    for holder,address_info in top:
-                        holder.insert_or_update(db=db)
-                        address_info.insert(db=db,replace=True)
+            for i,address in enumerate(addresses):
+                total,top = bscscan.holders(
+                    address=address
+                )
+                TokenMeta.update(
+                    address=address,
+                    db=db,
+                    holders=total
+                )
+                Holders.delete_all(contract=address,db=db)
+                for holder,address_info in top:
+                    holder.insert_or_update(db=db)
+                    address_info.insert(db=db,replace=True)
 
-                    db.conn.commit()
-                    print(f"{i+1}/{addresses_len} Token Holders Updated")
+                db.conn.commit()
+                print(f"{i+1}/{addresses_len} Token Holders Updated")
 
-                    if repeater.should_repeat():
-                        break
+                if repeater.should_repeat():
+                    break

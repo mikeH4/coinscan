@@ -10,42 +10,40 @@ def main():
         repeater = Repeater(min=15,max=60*2.5)
         bscscan_api = BscScanApi()
         scanner_api = ScannerApi()
+        # 2.5 min max
+        while repeater.loop():
+            data = scanner_api.newly_added()
 
-        while True:
-            # 2.5 min max
-            with repeater.manager():
-                data = scanner_api.newly_added()
+            addresses = [row["address"] for row in data]
+            existing_addrs = Token.existing_from(addresses,db)
 
-                addresses = [row["address"] for row in data]
-                existing_addrs = Token.existing_from(addresses,db)
+            data_len = len(data)
 
-                data_len = len(data)
+            for i,token_data in enumerate(data):
+                if token_data["address"] in existing_addrs:
+                    continue
+                address = Address(token_data["address"])
+                if token_data["name"] == "Pancake LPs":
+                    continue
+                if token_data["block"] is not None and token_data["block_time"] is None:
+                    # Still waiting to be processed, ignore for now
+                    print(f"Waiting for {address}")
+                    continue
 
-                for i,token_data in enumerate(data):
-                    if token_data["address"] in existing_addrs:
-                        continue
-                    address = Address(token_data["address"])
-                    if token_data["name"] == "Pancake LPs":
-                        continue
-                    if token_data["block"] is not None and token_data["block_time"] is None:
-                        # Still waiting to be processed, ignore for now
-                        print(f"Waiting for {address}")
-                        continue
+                decimals = token_data["decimals"]
+                total_supply = token_data["total_supply"]/(10**decimals)
+                Token.insert_with_source(
+                    bscscan_api=bscscan_api,
+                    address=address,
+                    name=token_data["name"],
+                    symbol=token_data["symbol"],
+                    decimals=decimals,
+                    total_supply=total_supply,
+                    block_time=token_data["block_time"],
+                    dont_update_meta=["block_time"]
+                )
 
-                    decimals = token_data["decimals"]
-                    total_supply = token_data["total_supply"]/(10**decimals)
-                    Token.insert_with_source(
-                        bscscan_api=bscscan_api,
-                        address=address,
-                        name=token_data["name"],
-                        symbol=token_data["symbol"],
-                        decimals=decimals,
-                        total_supply=total_supply,
-                        block_time=token_data["block_time"],
-                        dont_update_meta=["block_time"]
-                    )
+                print(f"{i+1}/{data_len} Token Inserted")
 
-                    print(f"{i+1}/{data_len} Token Inserted")
-
-                    if repeater.should_repeat():
-                        break
+                if repeater.should_repeat():
+                    break

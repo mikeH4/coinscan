@@ -12,34 +12,33 @@ def main():
         bscscan_api = BscScanApi()
         tokenfomo = TokenFomo()
 
-        while True:
-            with repeater.manager():
-                data = tokenfomo.get()
+        while repeater.loop():
+            data = tokenfomo.get()
 
-                addresses = [row[1] for row in data if row[0] == "BSC"]
-                existing_addrs = Token.existing_from(addresses,db)
+            addresses = [row[1] for row in data if row[0] == "BSC"]
+            existing_addrs = Token.existing_from(addresses,db)
 
-                data_len = len(data)
+            data_len = len(data)
 
-                for i,token_data in enumerate(data):
-                    chain,address,name,symbol,block_time = token_data
-                    address = Address(address)
-                    if chain != "BSC":
-                        continue
+            for i,token_data in enumerate(data):
+                chain,address,name,symbol,block_time = token_data
+                address = Address(address)
+                if chain != "BSC":
+                    continue
 
-                    if str(address) in existing_addrs:
-                        continue
+                if str(address) in existing_addrs:
+                    continue
 
-                    Token.insert_with_source(
-                        bscscan_api=bscscan_api,
-                        address=address,
-                        name=name,
-                        symbol=symbol,
-                        block_time=block_time,
-                    )
+                Token.insert_with_source(
+                    bscscan_api=bscscan_api,
+                    address=address,
+                    name=name,
+                    symbol=symbol,
+                    block_time=block_time,
+                )
 
-                    print(f"{i+1}/{data_len} Token Inserted")
+                print(f"{i+1}/{data_len} Token Inserted")
 
-                    if repeater.should_repeat():
-                        # Scan from TokenFomo again
-                        break
+                if repeater.should_repeat():
+                    # Scan from TokenFomo again
+                    break

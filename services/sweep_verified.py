@@ -8,23 +8,22 @@ def main():
         repeater = Repeater(min=0,max=60*10)
         bscscan_api = BscScanApi()
 
-        while True:
-            with repeater.manager():
-                addresses = TokenMeta.get_addresses(
-                    limit=None,
-                    where_cond="WHERE token_meta.source_verified IS NOT TRUE"
+        while repeater.loop():
+            addresses = TokenMeta.get_addresses(
+                limit=None,
+                where_cond="WHERE token_meta.source_verified IS NOT TRUE"
+            )
+            addresses_len = len(addresses)
+
+            for i,address in enumerate(addresses):
+                source_verified = (bscscan_api.source_code(
+                    address=address
+                ) is not None)
+                TokenMeta.update(
+                    address=address,
+                    db=db,
+                    source_verified=source_verified
                 )
-                addresses_len = len(addresses)
+                db.conn.commit()
 
-                for i,address in enumerate(addresses):
-                    source_verified = (bscscan_api.source_code(
-                        address=address
-                    ) is not None)
-                    TokenMeta.update(
-                        address=address,
-                        db=db,
-                        source_verified=source_verified
-                    )
-                    db.conn.commit()
-
-                    print(f"{i+1}/{addresses_len} Source Updated: {address} => {str(source_verified)}")
+                print(f"{i+1}/{addresses_len} Source Updated: {address} => {str(source_verified)}")

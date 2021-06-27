@@ -38,10 +38,12 @@ class Proxies(BaseModel):
     def test_proxy(proxy):
         try:
             get(
-                "https://example.com",
+                "https://google.com",
                 proxy=proxy
             )
-        except ProxyError: return False
+        except ProxyError as e:
+            print(e)
+            return False
         return True
 
     def test(self):

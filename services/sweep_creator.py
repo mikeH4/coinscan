@@ -8,25 +8,24 @@ def main():
         repeater = Repeater(min=0,max=60*5)
         bscscan = BscScan()
 
-        while True:
-            with repeater.manager():
-                addresses = [
-                    token_meta.address
-                    for token_meta
-                    in TokenMeta.where_is_none("creator",limit=30)
-                ]
-                addresses_len = len(addresses)
+        while repeater.loop():
+            addresses = [
+                token_meta.address
+                for token_meta
+                in TokenMeta.where_is_none("creator",limit=30)
+            ]
+            addresses_len = len(addresses)
 
-                for i,address in enumerate(addresses):
-                    creator,creation_tx = bscscan.creation(
-                        address=address
-                    )
-                    TokenMeta.update(
-                        address=address,
-                        db=db,
-                        creator=str(creator),
-                        creation_tx=str(creation_tx)
-                    )
-                    db.conn.commit()
+            for i,address in enumerate(addresses):
+                creator,creation_tx = bscscan.creation(
+                    address=address
+                )
+                TokenMeta.update(
+                    address=address,
+                    db=db,
+                    creator=str(creator),
+                    creation_tx=str(creation_tx)
+                )
+                db.conn.commit()
 
-                    print(f"{i+1}/{addresses_len} Creator added for {address}")
+                print(f"{i+1}/{addresses_len} Creator added for {address}")

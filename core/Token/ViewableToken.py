@@ -91,27 +91,6 @@ class ViewableToken(BaseModel):
             return [cls._from_row(row) for row in rows]
 
     @classmethod
-    def get_frequent_addresses(cls):
-        wheres = (
-            "source_verified = TRUE",
-            "liquidity.liquidity > 500"
-        )
-        addresses = []
-        for l in range(len(wheres)+1):
-            for posb in combinations(wheres,l):
-                cond = ""
-                if len(posb) > 0:
-                    joined = " AND ".join(posb)
-                    cond = f"WHERE {joined}"
-                cond_addresses = cls.get_latest(
-                    limit=100,
-                    where_cond=cond,
-                    with_liquidity=True
-                )
-                addresses += cond_addresses
-        return list(set(addresses))
-
-    @classmethod
     def get_addresses(cls,addresses:list=[],db:DB=None):
         with cls.with_db(db) as db:
             if len(addresses) < 1:

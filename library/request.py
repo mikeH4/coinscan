@@ -14,6 +14,7 @@ def get(url,proxy,params={},headers={},cookies={},json={}):
 
     print(f"Request from {proxy}: {url}?{urlencode(params)}",)
 
+    print(req_proxy)
     res = requests.get(
         url,
         params=params,

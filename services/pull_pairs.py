@@ -1,29 +1,28 @@
 def main():
     from core.sources.ScannerApi import ScannerApi
-    from core.sources.BscScanApi import BscScanApi
     from library.Repeater import Repeater
     from core.Token.Token import Token
-    from core.misc.Listing import Listing
     from core.types.Address import Address
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=60*2)
-        bscscan_api = BscScanApi()
+        repeater = Repeater(min=5)
         scanner_api = ScannerApi()
 
+        # 2.5 min max
         while repeater.loop():
-            addresses = Listing.get_addresses_not_inserted(db=db)
-            addresses_len = len(addresses)
-            print(f"Search for {addresses_len} addresses")
-
-            data = scanner_api.get_addresses(addresses)
-            data_len = len(data)
-
-            print(addresses_len-data_len,"tokens not in response")
+            data = scanner_api.token_pairs()
 
             for i,token_data in enumerate(data):
+                if token_data["address"] in existing_addrs:
+                    continue
                 address = Address(token_data["address"])
+                if token_data["name"] == "Pancake LPs":
+                    continue
+                if token_data["block"] is not None and token_data["block_time"] is None:
+                    # Still waiting to be processed, ignore for now
+                    print(f"Waiting for {address}")
+                    continue
 
                 decimals = token_data["decimals"]
                 total_supply = token_data["total_supply"]/(10**decimals)
@@ -34,7 +33,8 @@ def main():
                     symbol=token_data["symbol"],
                     decimals=decimals,
                     total_supply=total_supply,
-                    db=db
+                    block_time=token_data["block_time"],
+                    dont_update_meta=["block_time"]
                 )
 
                 print(f"{i+1}/{data_len} Token Inserted")

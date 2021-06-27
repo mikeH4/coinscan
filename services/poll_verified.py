@@ -8,17 +8,16 @@ def main():
         repeater = Repeater(min=5,max=60*2)
         bscscan = BscScan()
 
-        while True:
-            with repeater.manager():
-                addresses = bscscan.recently_verified()
-                addresses_len = len(addresses)
+        while repeater.loop():
+            addresses = bscscan.recently_verified()
+            addresses_len = len(addresses)
 
-                for i,address in enumerate(addresses):
-                    TokenMeta.update(
-                        address=address,
-                        db=db,
-                        source_verified=True
-                    )
-                    db.conn.commit()
+            for i,address in enumerate(addresses):
+                TokenMeta.update(
+                    address=address,
+                    db=db,
+                    source_verified=True
+                )
+                db.conn.commit()
 
-                    print(f"{i+1}/{addresses_len} has been verifed")
+                print(f"{i+1}/{addresses_len} has been verifed")

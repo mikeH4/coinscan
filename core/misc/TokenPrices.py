@@ -33,7 +33,8 @@ class TokenPrices(BaseModel):
         with cls.with_db(db) as db:
             rows = db.get_all("""
             SELECT
-                token, price_change
+                token,
+                price_change
             FROM token_prices
             WHERE liquidity >= 0.5
             ORDER BY price_change DESC
@@ -43,3 +44,4 @@ class TokenPrices(BaseModel):
             for token,price_change in rows:
                 rising_dict[token] = price_change
             return rising_dict
+

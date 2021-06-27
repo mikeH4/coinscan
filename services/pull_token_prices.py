@@ -8,10 +8,9 @@ def main():
         repeater = Repeater(min=60*10)
         scanner_api = ScannerApi()
 
-        while True:
-            with repeater.manager():
-                data = scanner_api.prices()
+        while repeater.loop():
+            data = scanner_api.prices()
 
-                TokenPrices.completely_absolutely_replace(data)
-                
-                print("Replaced all data")
+            TokenPrices.completely_absolutely_replace(data)
+            
+            print("Replaced all data")
