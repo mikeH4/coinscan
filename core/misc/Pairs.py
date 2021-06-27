@@ -39,7 +39,7 @@ class Pairs(BaseModel):
         limit_cond = cls.limit_cond(limit)
         with cls.with_db(db) as db:
             return [
-                row[0]
+                Address(row[0])
                 for row in
                 db.get_all(
                     f"""
