@@ -8,7 +8,7 @@ def main():
     from time import time
     from concurrent.futures import ThreadPoolExecutor
 
-    def update_holder(address,db:DB):
+    def update_holder(address):
         total,top = bscscan.holders(
             address=address
         )
@@ -21,8 +21,6 @@ def main():
         for holder,address_info in top:
             holder.insert_or_update(db=db)
             address_info.insert(db=db,replace=True)
-
-        db.conn.commit()
 
     with DB("tokens") as db:
         repeater = Repeater(min=60*5)
@@ -40,8 +38,9 @@ def main():
 
                 with ThreadPoolExecutor(max_workers=3) as exec:
                     for i,address in enumerate(pairs):
-                        exec.submit(update_holder,address=address, db=db)
+                        exec.submit(update_holder,address=address)
                 
+                db.conn.commit()
                 total_sweeped += pairs_len
                 print(f"{total_sweeped} of all Pair Holders Sweeped, Avg {total_sweeped/(time() - start)*60} per min")
                     

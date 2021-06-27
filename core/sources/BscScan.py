@@ -9,7 +9,7 @@ class BscScan(BaseSource):
     url = "https://bscscan.com/"
 
     limit_calls = 1
-    limit_period = 2
+    limit_period = 1.5
 
     def holders(self,address:Address):
         while True:
