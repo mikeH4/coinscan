@@ -32,7 +32,11 @@ class ScannerApi(BaseSource):
     def busd(self):
         res = self.request(f"/v1/private/busd",headers=self.auth_headers)
         return res.json()
-    
+
+    def token_pairs_count(self):
+        res = self.request(f"/v1/private/token-pairs",headers=self.auth_headers)
+        return res["count"]
+
     def token_pairs(self, limit=100, offset=0):
         res = self.request(f"/v1/private/token-pairs?limit={limit}&offset={offset}",headers=self.auth_headers)
         return res

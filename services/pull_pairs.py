@@ -1,7 +1,9 @@
 def main():
+    from time import time
+    
     from core.sources.ScannerApi import ScannerApi
     from library.Repeater import Repeater
-    from core.Token.Token import Token
+    from core.misc.Pairs import Pairs
     from core.types.Address import Address
     from library.postgres import DB
 
@@ -11,30 +13,16 @@ def main():
 
         # 2.5 min max
         while repeater.loop():
-            data = scanner_api.token_pairs()
+            pairs_to_add = scanner_api.token_pairs_count() - Pairs.count()
+            for offset in range(0,pairs_to_add,100):
+                data = scanner_api.token_pairs(limit=100,offset=offset)
+                data_len = len(data)
 
-            for i,token_data in enumerate(data):
-                if token_data["address"] in existing_addrs:
-                    continue
-                address = Address(token_data["address"])
-                if token_data["name"] == "Pancake LPs":
-                    continue
-                if token_data["block"] is not None and token_data["block_time"] is None:
-                    # Still waiting to be processed, ignore for now
-                    print(f"Waiting for {address}")
-                    continue
+                for i,token_pair in enumerate(data):
+                    token,pair = token_pair
+                    token = Address(token)
+                    pair = Address(pair)
 
-                decimals = token_data["decimals"]
-                total_supply = token_data["total_supply"]/(10**decimals)
-                Token.insert_with_source(
-                    bscscan_api=bscscan_api,
-                    address=address,
-                    name=token_data["name"],
-                    symbol=token_data["symbol"],
-                    decimals=decimals,
-                    total_supply=total_supply,
-                    block_time=token_data["block_time"],
-                    dont_update_meta=["block_time"]
-                )
+                    Pairs(token=token, pair=pair, updated=time()).insert_or_ignore()
 
-                print(f"{i+1}/{data_len} Token Inserted")
+                    print(f"{i+1}/{data_len} Pair Inserted/Ignored")
