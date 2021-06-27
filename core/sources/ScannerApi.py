@@ -34,9 +34,9 @@ class ScannerApi(BaseSource):
         return res.json()
 
     def token_pairs_count(self):
-        res = self.request(f"/v1/private/token-pairs",headers=self.auth_headers)
-        return res["count"]
+        res = self.request(f"/v1/private/token-pairs-count",headers=self.auth_headers)
+        return res.json()["count"]
 
     def token_pairs(self, limit=100, offset=0):
         res = self.request(f"/v1/private/token-pairs?limit={limit}&offset={offset}",headers=self.auth_headers)
-        return res
+        return res.json()
