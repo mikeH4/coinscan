@@ -49,17 +49,17 @@ if __name__ == "__main__":
     ]
     if settings.sandbox == True:
         threads_to_run = [
-            # services.pull_new,
-            # services.pull_scanner,
-            # services.poll_listings,
-            # services.update_holders,
-            # services.sweep_creator,
-            # services.poll_verified,
-            # services.sweep_verified,
-            # services.pull_listing_tokens,
-            # services.update_all_holders,
-            # services.pull_token_prices,
-            services.pull_pairs,
+            services.pull_new,
+            services.pull_scanner,
+            services.poll_listings,
+            services.update_holders,
+            services.sweep_creator,
+            services.poll_verified,
+            services.sweep_verified,
+            services.pull_listing_tokens,
+            services.update_all_holders,
+            services.pull_token_prices,
+            # services.pull_pairs,
         ]
 
     for module in threads_to_run:

@@ -1,7 +1,7 @@
 from library.BaseModel import BaseModel
 from library.postgres import DB
 from core.types.Address import Address
-from core.types.db_types import numeric
+from core.types.db_types import bigint, numeric
 import csv
 import os
 
@@ -11,7 +11,7 @@ class TokenPrices(BaseModel):
 
     def __init__(self,
         token: Address,
-        price_change: int,
+        price_change: bigint,
         circulating: numeric,
         liquidity: numeric
     ) -> None: pass
