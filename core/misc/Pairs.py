@@ -33,3 +33,22 @@ class Pairs(BaseModel):
     def count(cls,db:DB = None):
         with cls.with_db(db) as db:
             return int(db.get("SELECT COUNT(*) FROM pairs")[0])
+
+    @classmethod
+    def unknown_pairs(cls, db=None, limit=100):
+        limit_cond = cls.limit_cond(limit)
+        with cls.with_db(db) as db:
+            return [
+                row[0]
+                for row in
+                db.get_all(
+                    f"""
+                    SELECT
+                        pairs.pair
+                    FROM pairs
+                    LEFT JOIN holders ON holders.contract = pairs.pair
+                    WHERE holders.contract IS NULL
+                    {limit_cond}
+                    """
+                )
+            ]

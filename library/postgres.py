@@ -75,11 +75,13 @@ class DB:
                 for key in cols
                 if key not in replace_insert_on and key not in dont_update
             ])
-            do_conflict = "NOTHING" if ignore_insert else f"UPDATE SET {update_str}"
+            do_conflict = f"UPDATE SET {update_str}"
             sql += f"""
             ON CONFLICT ({', '.join(replace_insert_on)}) DO
             {do_conflict};
             """
+        elif ignore_insert:
+            sql += "ON CONFLICT DO NOTHING"
     
         self.query(sql,data.values())
         

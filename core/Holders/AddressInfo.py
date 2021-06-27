@@ -46,21 +46,3 @@ class AddressInfo(BaseModel):
                     """
                 )
             ]
-
-    @classmethod
-    def unknown_holder_contracts(cls,db=None,limit=100):
-        limit_cond = cls.limit_cond(limit)
-        with cls.with_db(db) as db:
-            return [
-                row[0]
-                for row in
-                db.get_all(
-                    f"""
-                    SELECT
-                        DISTINCT holders.contract
-                    FROM address_info
-                    JOIN holders ON address_info.address = holders.holder
-                    WHERE address_info.is_contract IS NULL {limit_cond}
-                    """
-                )
-            ]
