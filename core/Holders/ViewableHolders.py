@@ -47,8 +47,8 @@ class ViewableHolders(BaseModel):
                 END
             )
             ORDER BY
-                holding DESC NULLS LAST,
-                liquidity DESC NULLS LAST
+                liquidity DESC NULLS LAST,
+                holding DESC NULLS LAST
 
             {limit_cond}
             """
