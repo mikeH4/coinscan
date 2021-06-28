@@ -53,18 +53,25 @@ class ViewableHolders(BaseModel):
             rows = db.get_all(query,[address]*2)
             max_liquidity = 0
             max_holding = 0
-            partially_filtered = 
 
             for row in rows:
-                holding,liquidity = row[1:2]
-                # Check here to ensure less loops in second for
-                if max_holding/100 > holding: continue
-                if max_liquidity/100 > liquidity: continue
-
+                holding,liquidity = [
+                    row[1] or 0,
+                    row[2] or 0,
+                ]
                 max_liquidity = liquidity if liquidity > max_liquidity else max_liquidity
                 max_holding = holding if holding > max_holding else max_holding
 
+            max_keep_holding = max_holding/100
+            max_keep_liquidity = max_liquidity/100
 
+            tokens = []
+            for row in rows:
+                # == would work the same
+                if limit is not None and len(tokens) >= limit:
+                    break
+                if (row[1] or 0) < max_keep_holding and (row[2] or 0) < max_keep_liquidity:
+                    continue
+                tokens.append(cls._from_row(row))
 
-
-            return [cls._from_row(token) for token in tokens]
+            return tokens

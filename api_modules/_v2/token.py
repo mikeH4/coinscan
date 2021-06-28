@@ -80,7 +80,7 @@ def token(address: str):
 
 @router.get("/get/{address}/holders")
 def holders(address: str):
-    return {"holders": ViewableHolders.top(address)}
+    return {"holders": ViewableHolders.top(address,limit=15)}
 
 @router.get("/get/{address}/listings")
 def listings(address: str):
