@@ -17,28 +17,40 @@ class ViewableHolders(BaseModel):
         limit_cond = cls.limit_cond(limit)
         with DB("tokens") as db:
             query = f"""
-            SELECT holders.holder,
-                holders.holding,
-                pair_holders.holding AS liquidity,
+            SELECT 
+                CASE WHEN holders.holder IS NOT NULL
+                    THEN holders.holder ELSE pair_holders.holder
+                END AS holder,
+                holding,
+                liquidity,
                 address_info.is_contract,
                 address_info.bscscan_tag
-            FROM holders
-            JOIN address_info ON address_info.address = holders.holder
-            LEFT JOIN pairs ON pairs.token = holders.contract
-
-            LEFT JOIN holders AS pair_holders ON pairs.pair = pair_holders.contract
-            WHERE holders.contract = {db.placeholder(1)}
-
-            AND (
-                pair_holders.holder IS NULL
-                OR pair_holders.holder != '0x0000000000000000000000000000000000000000'
+            FROM (
+                SELECT
+                    holders.holder,
+                    holding
+                FROM holders
+                WHERE holders.contract = {db.placeholder(1)}
+            ) AS holders
+            FULL OUTER JOIN (
+                SELECT
+                    holder,
+                    holding AS liquidity
+                FROM holders
+                JOIN pairs ON pairs.pair = holders.contract
+                WHERE pairs.token = {db.placeholder(1)}
+                AND holders.holder != '0x0000000000000000000000000000000000000000'
+            ) AS pair_holders ON pair_holders.holder = holders.holder
+            JOIN address_info ON address_info.address = (
+                CASE WHEN holders.holder IS NOT NULL
+                    THEN holders.holder ELSE pair_holders.holder
+                END
             )
-
             ORDER BY
-                pair_holders.holding DESC NULLS LAST,
-                holders.holding DESC NULLS LAST
+                holding DESC NULLS LAST,
+                liquidity DESC NULLS LAST
 
             {limit_cond}
             """
-            tokens = db.get_all(query,[address])
+            tokens = db.get_all(query,[address]*2)
             return [cls._from_row(token) for token in tokens]
