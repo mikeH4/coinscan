@@ -14,7 +14,6 @@ class ViewableHolders(BaseModel):
     @classmethod
     def top(cls, address: Address, limit=10):
         address = str(Address(address))
-        limit_cond = cls.limit_cond(limit)
         with DB("tokens") as db:
             query = f"""
             SELECT 
@@ -46,11 +45,26 @@ class ViewableHolders(BaseModel):
                     THEN holders.holder ELSE pair_holders.holder
                 END
             )
+            
             ORDER BY
                 liquidity DESC NULLS LAST,
                 holding DESC NULLS LAST
-
-            {limit_cond}
             """
-            tokens = db.get_all(query,[address]*2)
+            rows = db.get_all(query,[address]*2)
+            max_liquidity = 0
+            max_holding = 0
+            partially_filtered = 
+
+            for row in rows:
+                holding,liquidity = row[1:2]
+                # Check here to ensure less loops in second for
+                if max_holding/100 > holding: continue
+                if max_liquidity/100 > liquidity: continue
+
+                max_liquidity = liquidity if liquidity > max_liquidity else max_liquidity
+                max_holding = holding if holding > max_holding else max_holding
+
+
+
+
             return [cls._from_row(token) for token in tokens]
