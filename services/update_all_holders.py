@@ -6,7 +6,7 @@ def main():
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=60*2)
+        repeater = Repeater(min=60*3)
         bscscan = BscScan()
 
         while repeater.loop():
@@ -29,6 +29,3 @@ def main():
 
                 db.conn.commit()
                 print(f"{i+1}/{addresses_len} Token Holders Updated")
-
-                if repeater.should_repeat():
-                    break
