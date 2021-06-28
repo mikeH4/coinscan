@@ -38,7 +38,6 @@ class ViewableHolders(BaseModel):
                 FROM holders
                 JOIN pairs ON pairs.pair = holders.contract
                 WHERE pairs.token = {db.placeholder(1)}
-                AND holders.holder != '0x0000000000000000000000000000000000000000'
             ) AS pair_holders ON pair_holders.holder = holders.holder
             JOIN address_info ON address_info.address = (
                 CASE WHEN holders.holder IS NOT NULL
