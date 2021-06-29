@@ -2,30 +2,26 @@ def main():
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
     from core.Holders.Holders import Holders
-    from core.Token.TokenMeta import TokenMeta
     from library.postgres import DB
+    from library.timer import timer
+    from concurrent.futures import ThreadPoolExecutor
 
-    with DB("tokens") as db:
+    with DB("tokens",auto_commit=False) as db:
         repeater = Repeater(min=60*3)
         bscscan = BscScan()
-
+        
         while repeater.loop():
-            addresses = Holders.not_updated_recently()
-            addresses_len = len(addresses)
+            with timer("Update Holders") as increment:
+                while True:
+                    addresses = Holders.not_updated_recently(limit=100)
+                    addresses_len = len(addresses)
+                    if addresses_len < 1:
+                        print("Breaking")
+                        break
 
-            for i,address in enumerate(addresses):
-                total,top = bscscan.holders(
-                    address=address
-                )
-                TokenMeta.update(
-                    address=address,
-                    db=db,
-                    holders=total
-                )
-                Holders.delete_all(contract=address,db=db)
-                for holder,address_info in top:
-                    holder.insert_or_update(db=db)
-                    address_info.insert(db=db,replace=True)
+                    with ThreadPoolExecutor(max_workers=3) as exec:
+                        for i,address in enumerate(addresses):
+                            exec.submit(Holders.update_with_pull,address=address,bscscan=bscscan,db=db)
 
-                db.conn.commit()
-                print(f"{i+1}/{addresses_len} Token Holders Updated")
+                    db.conn.commit()
+                    increment(addresses_len)

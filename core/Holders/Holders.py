@@ -1,8 +1,8 @@
 from library.postgres import DB
-
 from time import time
 from core.types.Address import Address
 from library.BaseModel import BaseModel
+from core.Token.TokenMeta import TokenMeta
 
 class Holders(BaseModel):
     table = "holders"
@@ -50,7 +50,7 @@ class Holders(BaseModel):
             return [cls._from_row(token) for token in tokens]
     
     @classmethod
-    def not_updated_recently(cls,db:DB = None):
+    def not_updated_recently(cls,db:DB = None,limit=1000):
         with cls.with_db(db) as db:
             hours12_ago = time() - (60*60*24)
             return [row[0] for row in db.get_all(f"""
@@ -60,5 +60,24 @@ class Holders(BaseModel):
             FROM holders
             WHERE updated_time < {hours12_ago}
             ORDER BY updated_time ASC
-            LIMIT 1000
+            {cls.limit_cond(limit)}
             """)]
+    
+    @classmethod
+    def update_with_pull(
+        cls,
+        address: Address,
+        bscscan,
+        db: DB = None
+    ):
+        with cls.with_db(db) as db:
+            total,top = bscscan.holders(address=address)
+            TokenMeta.update(
+                address=address,
+                db=db,
+                holders=total
+            )
+            Holders.delete_all(contract=address,db=db)
+            for holder,address_info in top:
+                holder.insert_or_update(db=db)
+                address_info.insert(db=db,replace=True)
