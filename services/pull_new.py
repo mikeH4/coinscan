@@ -35,6 +35,7 @@ def main():
                     name=name,
                     symbol=symbol,
                     block_time=block_time,
+                    db=db
                 )
 
                 print(f"{i+1}/{data_len} Token Inserted")

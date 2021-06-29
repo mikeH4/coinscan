@@ -10,7 +10,6 @@ def main():
         repeater = Repeater(min=15,max=60*2.5)
         bscscan_api = BscScanApi()
         scanner_api = ScannerApi()
-        # 2.5 min max
         while repeater.loop():
             data = scanner_api.newly_added()
 
@@ -40,7 +39,8 @@ def main():
                     decimals=decimals,
                     total_supply=total_supply,
                     block_time=token_data["block_time"],
-                    dont_update_meta=["block_time"]
+                    dont_update_meta=["block_time"],
+                    db=db
                 )
 
                 print(f"{i+1}/{data_len} Token Inserted")

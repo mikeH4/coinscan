@@ -17,6 +17,7 @@ import services.update_all_holders
 import services.pull_token_prices
 import services.pull_pairs
 import services.sweep_pair_holders
+import services.copy_non_existent
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -48,6 +49,7 @@ if __name__ == "__main__":
         services.pull_token_prices,
         services.pull_pairs,
         services.sweep_pair_holders,
+        services.copy_non_existent,
     ]
     if settings.sandbox == True:
         threads_to_run = [
@@ -62,7 +64,8 @@ if __name__ == "__main__":
             # services.update_all_holders,
             # services.pull_token_prices,
             # services.pull_pairs,
-            services.sweep_pair_holders,
+            # services.sweep_pair_holders,
+            services.copy_non_existent,
         ]
 
     for module in threads_to_run:
