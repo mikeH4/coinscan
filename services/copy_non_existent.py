@@ -35,7 +35,7 @@ def main():
         with timer("Update Holders") as increment:
             for p in range(0,len(tokens),100):
                 subset = tokens[p:p+100]
-                with ThreadPoolExecutor(max_workers=3) as exec:
+                with ThreadPoolExecutor(max_workers=4) as exec:
                     for data in subset:
                         exec.submit(insert_token,data=data,db=db)
                 
