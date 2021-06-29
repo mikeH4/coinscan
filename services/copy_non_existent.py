@@ -21,7 +21,7 @@ def main():
             if name == "Pancake LPs":
                 continue
 
-            total_supply = total_supply/(10**decimals)
+            total_supply = float(total_supply)/(10**decimals)
             Token.insert_with_source(
                 bscscan_api=bscscan_api,
                 address=address,
