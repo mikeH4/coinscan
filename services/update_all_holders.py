@@ -20,7 +20,7 @@ def main():
                         break
 
                     with ThreadPoolExecutor(max_workers=3) as exec:
-                        for i,address in enumerate(addresses):
+                        for address in addresses:
                             exec.submit(Holders.update_with_pull,address=address,bscscan=bscscan,db=db)
 
                     db.conn.commit()
