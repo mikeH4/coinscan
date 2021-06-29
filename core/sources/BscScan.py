@@ -95,9 +95,9 @@ class BscScan(BaseSource):
         return addresses
 
     def creation(self,address:Address):
+        res = self.request(f"/address/{address}")
+        soup = BeautifulSoup(res.text,"html.parser")
         try:
-            res = self.request(f"/address/{address}")
-            soup = BeautifulSoup(res.text,"html.parser")
             creator_address, creation_tx = soup.select(
                 "#ContentPlaceHolder1_trContract > div > div:nth-child(2)"
             )[0].get_text().split(" at txn ")
@@ -105,8 +105,11 @@ class BscScan(BaseSource):
             creation_tx = BlockOrTransactionHash(creation_tx.strip())
             return (creator,creation_tx)
         except Exception as e:
-            print("Error parsing creator from BscScan:")
-            sleep(3)
+            print(f"Error parsing creator from BscScan: {address}")
+            print(soup.select(
+                "#ContentPlaceHolder1_cardright"
+            ))
+            return None
     
     def address_info(self,address:Address):
         try:

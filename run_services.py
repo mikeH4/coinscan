@@ -57,7 +57,7 @@ if __name__ == "__main__":
             # services.pull_scanner,
             # services.poll_listings,
             # services.update_recent_holders,
-            # services.sweep_creator,
+            services.sweep_creator,
             # services.poll_verified,
             # services.sweep_verified,
             # services.pull_listing_tokens,
@@ -65,7 +65,7 @@ if __name__ == "__main__":
             # services.pull_token_prices,
             # services.pull_pairs,
             # services.sweep_pair_holders,
-            services.copy_non_existent,
+            # services.copy_non_existent,
         ]
 
     for module in threads_to_run:

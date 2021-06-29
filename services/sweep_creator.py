@@ -17,9 +17,12 @@ def main():
             addresses_len = len(addresses)
 
             for i,address in enumerate(addresses):
-                creator,creation_tx = bscscan.creation(
+                c = bscscan.creation(
                     address=address
                 )
+                if c is None:
+                    continue
+                creator,creation_tx = c
                 TokenMeta.update(
                     address=address,
                     db=db,
