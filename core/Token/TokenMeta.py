@@ -77,6 +77,7 @@ class TokenMeta(BaseModel):
         dont_update=[],
         **kwds
     ):
+        address = str(Address(address))
         with cls.with_db(db) as db:
             cols = kwds.keys()
             col_string = ','.join(cols)
@@ -95,4 +96,4 @@ class TokenMeta(BaseModel):
             ON CONFLICT (address)
             DO {update_sql}
             """
-            db.query(sql,[str(Address(address))] + list(kwds.values()))
+            db.query(sql,[address] + list(kwds.values()))
