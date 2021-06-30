@@ -3,6 +3,12 @@ warnings = []
 # All are just to alert us, since as of the time of this script being written, since they should be bug-free
 
 # token_meta has a row for non existent address
+# This is happening still, best guess is autocommit on restart service,
+# coincides with low (1-2) count
+# Will monitor to see if happens without restarting often
+
+# FIX: Wrap in delete query and delete all
+# DELETE FROM token_meta WHERE address IN (...query...)
 warnings += ["""
 SELECT token_meta.address FROM token_meta
 LEFT JOIN tokens ON LOWER(tokens.address) = LOWER(token_meta.address)
@@ -14,6 +20,10 @@ AND pb.token IS NULL
 """]
 
 # Duplicates with different casing
+# Fix: Wrap in brackets and delete all
+# DELETE FROM token_meta WHERE address IN (...query...)
+# Purposely not filled in query in comment, to prevent regular use
+# without checking
 warnings += ["""
 SELECT
     CASE WHEN tm_a.address = LOWER(tm_b.address)
@@ -24,6 +34,9 @@ JOIN token_meta as tm_b ON LOWER(tm_a.address) = LOWER(tm_b.address) AND tm_a.ad
 """]
 
 # Invalid casing, yet no duplicates in token_meta
+# FIX: RUN ONLY IF previous have been run, to weed out duplicates
+# Force all to lowercase
+# UPDATE {table} SET {col} = LOWER(col) WHERE LOWER({col}) != {col};
 table_cols = [
     ["token_meta","address"],
     ["tokens","address"],
