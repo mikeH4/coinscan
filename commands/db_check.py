@@ -44,7 +44,7 @@ class Status:
     _RESET = '\033[0m'
 
 def p(msg,status):
-    print(status,msg,Status._RESET)
+    print(status + msg + Status._RESET)
 
 print("")
 
@@ -52,7 +52,7 @@ with DB("tokens") as db:
     for sql in warnings:
         rows = db.get_all(sql)
         if len(rows) > 0:
-            p("ALERT: Query returns more than 1 row for:",Status.ALERT)
+            p(f"ALERT: Query returns {len(rows)} rows for:",Status.ALERT)
             p(sql,Status.WARNING)
 
 print("")
