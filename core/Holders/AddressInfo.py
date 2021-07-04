@@ -16,7 +16,7 @@ class AddressInfo(BaseModel):
         added:int
     ) -> None: pass
     
-    def insert(self,db:DB = None,replace = False):
+    def insert(self,db:DB = None):
         data = self.dict()
         data["address"] = str(data["address"])
 
@@ -24,9 +24,8 @@ class AddressInfo(BaseModel):
             db.insert(
                 self.table,
                 data,
-                replace_insert_on=self.primary if replace else False,
-                commit=False,
-                dont_update=["added"]
+                ignore_insert=True,
+                commit=False
             )
     
     @classmethod

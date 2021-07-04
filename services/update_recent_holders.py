@@ -22,27 +22,14 @@ def main():
             addresses_len = len(addresses)
 
             for i,address in enumerate(addresses):
-                total,top = bscscan.holders(
-                    address=address
+                Holders.update_with_pull(
+                    address=address,
+                    bscscan=bscscan,
+                    db=db
                 )
-                with timer("Update TokenMeta"):
-                    TokenMeta.update(
-                        address=address,
-                        db=db,
-                        holders=total
-                    )
-                with timer("Delete Holders"):
-                    Holders.delete_all(contract=address,db=db)
-                
-                for holder,address_info in top:
-                    with timer(f"Insert or Update Holders {holder.holder}"):
-                        holder.insert_or_update(db=db)
-                    with timer(f"Insert or Update AddressInfo {holder.holder}"):
-                        if holder.holder != "0x0000000000000000000000000000000000000000":
-                            address_info.insert(db=db,replace=True)
-
                 with timer("Commit Holders"):
                     db.conn.commit()
+
                 print(f"{i+1}/{addresses_len} Token Holders Updated")
 
                 if repeater.should_repeat():

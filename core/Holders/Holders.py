@@ -1,3 +1,4 @@
+from library.timer import timer
 from library.postgres import DB
 from time import time
 from core.types.Address import Address
@@ -78,6 +79,8 @@ class Holders(BaseModel):
                 holders=total
             )
             Holders.delete_all(contract=address,db=db)
+            
             for holder,address_info in top:
                 holder.insert_or_update(db=db)
-                address_info.insert(db=db,replace=True)
+                if holder.holder != "0x0000000000000000000000000000000000000000":
+                    address_info.insert(db=db)
