@@ -1,3 +1,6 @@
+from library.timer import timer
+
+
 def main():
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
@@ -32,7 +35,8 @@ def main():
                     holder.insert_or_update(db=db)
                     address_info.insert(db=db,replace=True)
 
-                db.conn.commit()
+                with timer("Commit Holders"):
+                    db.conn.commit()
                 print(f"{i+1}/{addresses_len} Token Holders Updated")
 
                 if repeater.should_repeat():

@@ -20,7 +20,7 @@ def main():
             data = scanner_api.get_addresses(addresses)
             data_len = len(data)
 
-            print(addresses_len-data_len,"tokens not in response")
+            print(f"{addresses_len-data_len} tokens not in response")
 
             for i,token_data in enumerate(data):
                 address = Address(token_data["address"])
