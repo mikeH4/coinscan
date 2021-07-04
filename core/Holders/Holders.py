@@ -27,7 +27,7 @@ class Holders(BaseModel):
             )
 
     def insert_or_update(self,db:DB = None):
-        with Holders.with_db(db) as db:
+        with self.with_db(db) as db:
             _dict = self.dict()
             for attr in ["contract","holder"]:
                 _dict[attr] = str(_dict[attr])
