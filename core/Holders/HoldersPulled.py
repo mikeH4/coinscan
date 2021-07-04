@@ -30,6 +30,7 @@ class HoldersPulled(BaseModel):
     @classmethod
     def not_updated_recently(cls, db:DB = None, limit=1000):
         with cls.with_db(db) as db:
+            print(cls.limit_cond(limit=limit))
             # 24 hours ago
             before = time()-(24*60*60)
             rows = db.get_all(f"""
@@ -43,9 +44,10 @@ class HoldersPulled(BaseModel):
     @classmethod
     def not_updated_at_all(cls, db:DB=None, limit=1000):
         with cls.with_db(db) as db:
-            rows = db.get_all("""
+            rows = db.get_all(f"""
             SELECT tokens.address FROM tokens
             LEFT JOIN holders_pulled ON holders_pulled.token = tokens.address
             WHERE holders_pulled.token IS NULL
+            {cls.limit_cond(limit=limit)}
             """)
             return [row[0] for row in rows]
