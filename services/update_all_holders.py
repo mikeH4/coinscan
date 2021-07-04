@@ -19,10 +19,12 @@ def main():
                         addresses = HoldersPulled.not_updated_recently(limit=100)
                     
                     addresses_len = len(addresses)
+                    print(f"Execution Holders {addresses_len}")
                     if addresses_len < 1:
                         print("Breaking")
                         break
 
+                    print("Execution Holders Starts")
                     with ThreadPoolExecutor(max_workers=3) as exec:
                         for address in addresses:
                             exec.submit(Holders.update_with_pull,address=address,bscscan=bscscan,db=db)
