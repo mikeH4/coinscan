@@ -25,15 +25,17 @@ def main():
                 total,top = bscscan.holders(
                     address=address
                 )
-                TokenMeta.update(
-                    address=address,
-                    db=db,
-                    holders=total
-                )
-                Holders.delete_all(contract=address,db=db)
-                for holder,address_info in top:
-                    holder.insert_or_update(db=db)
-                    address_info.insert(db=db,replace=True)
+                with timer("Update TokenMeta"):
+                    TokenMeta.update(
+                        address=address,
+                        db=db,
+                        holders=total
+                    )
+                with timer("Replace Holders"):
+                    Holders.delete_all(contract=address,db=db)
+                    for holder,address_info in top:
+                        holder.insert_or_update(db=db)
+                        address_info.insert(db=db,replace=True)
 
                 with timer("Commit Holders"):
                     db.conn.commit()
