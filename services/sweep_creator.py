@@ -28,7 +28,7 @@ def main():
                         creation_tx=""
                     )
                     print(f"{i+1}/{addresses_len} Empty Creator added for {address}")
-                    return
+                    continue
                 
                 creator,creation_tx = c
                 TokenMeta.update(
