@@ -23,7 +23,7 @@ def main():
                         print("Breaking")
                         break
 
-                    with ThreadPoolExecutor(max_workers=5) as exec:
+                    with ThreadPoolExecutor(max_workers=4) as exec:
                         for address in addresses:
                             exec.submit(Holders.update_with_pull,address=address,bscscan=bscscan,db=db)
 
