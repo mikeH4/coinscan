@@ -9,7 +9,6 @@ import services.pull_new
 import services.pull_scanner
 import services.poll_listings
 import services.poll_verified
-import services.update_recent_holders
 import services.pull_listing_tokens
 import services.sweep_creator
 import services.sweep_verified
@@ -40,7 +39,6 @@ if __name__ == "__main__":
         services.pull_new,
         services.pull_scanner,
         services.poll_listings,
-        services.update_recent_holders,
         services.sweep_creator,
         services.poll_verified,
         services.sweep_verified,
