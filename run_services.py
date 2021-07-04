@@ -59,9 +59,9 @@ if __name__ == "__main__":
             # services.poll_verified,
             # services.sweep_verified,
             # services.pull_listing_tokens,
-            services.update_all_holders,
+            # services.update_all_holders,
             # services.pull_token_prices,
-            # services.pull_pairs,
+            services.pull_pairs,
             # services.sweep_pair_holders,
             # services.copy_non_existent,
         ]

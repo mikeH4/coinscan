@@ -16,11 +16,12 @@ def main():
         # 2.5 min max
         while repeater.loop():
             existing_pairs = Pairs.count(db=db)
-            pairs_to_add = scanner_api.token_pairs_count() - existing_pairs
+            all_pairs = scanner_api.token_pairs_count()
 
-            print("Pairs to add:",pairs_to_add)
+            print("Pairs to add:",all_pairs - existing_pairs)
 
-            for offset in range(existing_pairs,pairs_to_add,limit):
+            for offset in range(existing_pairs,all_pairs,limit):
+                print("From:",offset)
                 data = scanner_api.token_pairs(limit=limit,offset=offset)
                 data_len = len(data)
 
