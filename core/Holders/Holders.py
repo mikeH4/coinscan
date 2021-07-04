@@ -1,3 +1,4 @@
+from core.Holders.HoldersPulled import HoldersPulled
 from library.timer import timer
 from library.postgres import DB
 from time import time
@@ -78,8 +79,10 @@ class Holders(BaseModel):
                 db=db,
                 holders=total
             )
+            t = int(time())
+            HoldersPulled(token=address,added=t,updated=t).insert_or_update(db=db)
+
             Holders.delete_all(contract=address,db=db)
-            
             for holder,address_info in top:
                 holder.insert_or_update(db=db)
                 if holder.holder != "0x0000000000000000000000000000000000000000":
