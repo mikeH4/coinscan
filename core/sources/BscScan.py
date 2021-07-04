@@ -28,7 +28,7 @@ class BscScan(BaseSource):
                         .split("a total of ")
                     )[1].split(" ")[0].replace(",",""))
                 except IndexError as e:
-                    print("Error getting total holders:")
+                    print(soup.select("#maintable"))
                     raise Exception("Error parsing total holders")
 
                 holders = []

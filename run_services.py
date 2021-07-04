@@ -51,7 +51,7 @@ if __name__ == "__main__":
     ]
     if settings.sandbox == True:
         threads_to_run = [
-            # services.pull_new,
+            services.pull_new,
             # services.pull_scanner,
             # services.poll_listings,
             # services.update_recent_holders,
@@ -61,7 +61,7 @@ if __name__ == "__main__":
             # services.pull_listing_tokens,
             # services.update_all_holders,
             # services.pull_token_prices,
-            services.pull_pairs,
+            # services.pull_pairs,
             # services.sweep_pair_holders,
             # services.copy_non_existent,
         ]
