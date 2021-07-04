@@ -46,8 +46,6 @@ class BscScan(BaseSource):
                         contract=address,
                         holder=None,
                         holding=None,
-                        updated_time=time(),
-                        source="bscscan"
                     )
                     bscscan_tag = ""
 

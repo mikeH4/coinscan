@@ -13,9 +13,7 @@ class Holders(BaseModel):
     def __init__(self, 
         contract:Address,
         holder:Address,
-        holding:float,
-        updated_time:int,
-        source:str,
+        holding:float
     ) -> None: pass
 
     @staticmethod
@@ -50,20 +48,6 @@ class Holders(BaseModel):
             query = f"SELECT * FROM holders WHERE contract = {db.placeholder(1)} ORDER BY holding DESC {limit_cond}"
             tokens = db.get_all(query,[address])
             return [cls._from_row(token) for token in tokens]
-    
-    @classmethod
-    def not_updated_recently(cls,db:DB = None,limit=1000):
-        with cls.with_db(db) as db:
-            hours12_ago = time() - (60*60*24)
-            return [row[0] for row in db.get_all(f"""
-            SELECT
-                DISTINCT contract,
-                updated_time
-            FROM holders
-            WHERE updated_time < {hours12_ago}
-            ORDER BY updated_time ASC
-            {cls.limit_cond(limit)}
-            """)]
     
     @classmethod
     def update_with_pull(

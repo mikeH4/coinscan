@@ -2,6 +2,7 @@ def main():
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
     from core.Holders.Holders import Holders
+    from core.Holders.HoldersPulled import HoldersPulled
     from library.postgres import DB
     from library.timer import timer
     from concurrent.futures import ThreadPoolExecutor
@@ -13,7 +14,7 @@ def main():
         while repeater.loop():
             with timer("Update Holders") as increment:
                 while True:
-                    addresses = Holders.not_updated_recently(limit=100)
+                    addresses = HoldersPulled.not_updated_recently(limit=100)
                     addresses_len = len(addresses)
                     if addresses_len < 1:
                         print("Breaking")
