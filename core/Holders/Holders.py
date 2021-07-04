@@ -53,7 +53,7 @@ class Holders(BaseModel):
     @classmethod
     def not_updated_recently(cls,db:DB = None,limit=1000):
         with cls.with_db(db) as db:
-            hours12_ago = time() - (60*60*24)
+            hours12_ago = time() - (60*60*72)
             return [row[0] for row in db.get_all(f"""
             SELECT
                 DISTINCT contract,
