@@ -27,7 +27,7 @@ class HoldersPulled(BaseModel):
                 commit=False
             )
 
-    @staticmethod
+    @classmethod
     def not_updated_recently(cls, db:DB = None, limit=1000):
         with cls.with_db(db) as db:
             # 24 hours ago
@@ -40,7 +40,7 @@ class HoldersPulled(BaseModel):
             """)
             return [row[0] for row in rows]
     
-    @staticmethod
+    @classmethod
     def not_updated_at_all(cls, db:DB=None, limit=1000):
         with cls.with_db(db) as db:
             rows = db.get_all("""
