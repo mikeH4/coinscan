@@ -64,10 +64,19 @@ class Holders(BaseModel):
                 holders=total
             )
             t = int(time())
+            print(f"HoldersDelete {address}")
             HoldersPulled(token=address,added=t,updated=t).insert_or_update(db=db)
+            print(f"HoldersDelete {address} End")
 
+            print(f"HoldersDelete {address}")
             Holders.delete_all(contract=address,db=db)
+            print(f"HoldersDelete {address} End")
             for holder,address_info in top:
+                print(f"Holders Insert Start {address} {holder.holder}")
                 holder.insert_or_update(db=db)
+                print(f"Holders Insert End {address} {holder.holder}")
+                # XX $ XX $ XX $ XX $ XX $ XX $ XX $ XX $ XX
+                print(f"AddressInfo Insert Start {address} {holder.holder}")
                 if holder.holder != "0x0000000000000000000000000000000000000000":
                     address_info.insert(db=db)
+                print(f"AddressInfo Insert End {address} {holder.holder}")

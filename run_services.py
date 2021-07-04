@@ -56,7 +56,7 @@ if __name__ == "__main__":
             # services.pull_new,
             # services.pull_scanner,
             # services.poll_listings,
-            services.update_recent_holders,
+            # services.update_recent_holders,
             # services.sweep_creator,
             # services.poll_verified,
             # services.sweep_verified,

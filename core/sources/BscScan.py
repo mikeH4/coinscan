@@ -17,6 +17,7 @@ class BscScan(BaseSource):
                 res = self.request("/token/generic-tokenholders2",params=dict(
                     a=str(address)
                 ))
+                print("RESSES")
 
                 soup = BeautifulSoup(res.text,"html.parser")
 
