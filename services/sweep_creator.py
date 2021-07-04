@@ -29,6 +29,7 @@ def main():
                     creator=str(creator),
                     creation_tx=str(creation_tx)
                 )
-                db.conn.commit()
-
                 print(f"{i+1}/{addresses_len} Creator added for {address}")
+        
+            print("Commit Creators")
+            db.conn.commit()
