@@ -10,14 +10,14 @@ def main():
     from library.postgres import DB
 
     with DB("tokens") as db:
-        repeater = Repeater(min=60*6,max=60*10)
+        repeater = Repeater(min=60*8,max=60*10)
         bscscan = BscScan()
 
         while repeater.loop():
             addresses = [
                 token.address
                 for token
-                in Query.get_frequent_addresses()
+                in Query.get_frequent_addresses(limit=50)
             ]
             addresses_len = len(addresses)
 

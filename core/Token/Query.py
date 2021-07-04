@@ -40,7 +40,7 @@ class Query(ViewableToken):
         return cls._build_query(cond_str,with_prices=with_prices)
 
     @classmethod
-    def get_frequent_addresses(cls):
+    def get_frequent_addresses(cls,limit=100):
         filters = (
             "only_source_verified",
             "min_liquidity_500"
@@ -50,5 +50,5 @@ class Query(ViewableToken):
             for posb in combinations(filters,l):
                 f = {filter:True for filter in posb}
                 print(f)
-                addresses += cls.get_filtered(f,limit=100)
+                addresses += cls.get_filtered(f,limit=limit)
         return list(set(addresses))
