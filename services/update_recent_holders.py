@@ -35,9 +35,9 @@ def main():
                     Holders.delete_all(contract=address,db=db)
                 
                 for holder,address_info in top:
-                    with timer(f"Insert Or update holder {holder}"):
+                    with timer(f"Insert Or update holder {holder.holder}"):
                         holder.insert_or_update(db=db)
-                    with timer(f"Insert Or update address info {holder}"):
+                    with timer(f"Insert Or update address info {holder.holder}"):
                         address_info.insert(db=db,replace=True)
 
                 with timer("Commit Holders"):
