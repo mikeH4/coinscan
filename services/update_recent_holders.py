@@ -35,10 +35,11 @@ def main():
                     Holders.delete_all(contract=address,db=db)
                 
                 for holder,address_info in top:
-                    with timer(f"Insert Or update holder {holder.holder}"):
+                    with timer(f"Insert or Update Holders {holder.holder}"):
                         holder.insert_or_update(db=db)
-                    with timer(f"Insert Or update address info {holder.holder}"):
-                        address_info.insert(db=db,replace=True)
+                    with timer(f"Insert or Update AddressInfo {holder.holder}"):
+                        if holder.holder != "0x0000000000000000000000000000000000000000":
+                            address_info.insert(db=db,replace=True)
 
                 with timer("Commit Holders"):
                     db.conn.commit()
