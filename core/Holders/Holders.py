@@ -57,14 +57,20 @@ class Holders(BaseModel):
         db: DB = None
     ):
         with cls.with_db(db) as db:
-            total,top = bscscan.holders(address=address)
+            ret = bscscan.holders(address=address)
+            
+            t = int(time())
+            HoldersPulled(token=address,added=t,updated=t).insert_or_update(db=db)
+            
+            if ret is None:
+                return
+            
+            total,top = ret
             TokenMeta.update(
                 address=address,
                 db=db,
                 holders=total
             )
-            t = int(time())
-            HoldersPulled(token=address,added=t,updated=t).insert_or_update(db=db)
 
             Holders.delete_all(contract=address,db=db)
             for holder,address_info in top:

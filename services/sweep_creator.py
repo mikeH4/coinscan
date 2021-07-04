@@ -21,7 +21,15 @@ def main():
                     address=address
                 )
                 if c is None:
-                    continue
+                    TokenMeta.update(
+                        address=address,
+                        db=db,
+                        creator="",
+                        creation_tx=""
+                    )
+                    print(f"{i+1}/{addresses_len} Empty Creator added for {address}")
+                    return
+                
                 creator,creation_tx = c
                 TokenMeta.update(
                     address=address,
