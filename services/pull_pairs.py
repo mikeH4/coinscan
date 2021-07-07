@@ -17,6 +17,7 @@ def main():
         while repeater.loop():
             existing_pairs = Pairs.count(db=db)
             all_pairs = scanner_api.token_pairs_count()
+            print("All Pairs",all_pairs)
 
             print("Pairs to add:",all_pairs - existing_pairs)
 
