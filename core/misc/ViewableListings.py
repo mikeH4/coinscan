@@ -32,6 +32,7 @@ class ViewableListings(BaseModel):
                 f"""
                 SELECT token,platform,added,local_slug
                 FROM listings
+                WHERE added > {time() - 60*60*24}
                 ORDER BY added DESC
                 """
             )
