@@ -7,7 +7,7 @@ from core.misc.TokenPrices import TokenPrices
 from core.Token.Query import Query
 
 router = APIRouter(
-    prefix="/token"
+    prefix="/feed"
 )
 
 @router.get("/latest")

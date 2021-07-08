@@ -10,7 +10,7 @@ router = APIRouter(
     prefix="/token"
 )
 
-@router.get("/get/{address}")
+@router.get("/{address}")
 def token(address: str):
     try: address = Address(address)
     except: raise HTTPException(404)
@@ -20,14 +20,14 @@ def token(address: str):
 
     return token
 
-@router.get("/get/{address}/wallets")
+@router.get("/{address}/wallets")
 def wallets(address: str):
     try: address = Address(address)
     except: return []
 
     return ViewableHolders.top(address,limit=15)
 
-@router.get("/get/{address}/listings")
+@router.get("/{address}/listings")
 def listings(address: str):
     try: address = Address(address)
     except: return []
