@@ -46,6 +46,7 @@ class DB:
     def open(self):
         DB.__active.append(self)
 	
+        print(self._connsettings)
         self.conn = psycopg2.connect(**self._connsettings)
         self.cursor = self.conn.cursor()
 
