@@ -18,7 +18,7 @@ class DB:
             database=database,
         )
         if settings.sandbox != True:
-            cls._connsettings = dict(
+            cls._connsettings.update(
                 user="coinscan",
                 password="root"
             )
