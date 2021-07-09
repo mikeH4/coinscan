@@ -28,7 +28,7 @@ class DB:
         if usepool:
             cls._pool = ThreadedConnectionPool(
                 minconn=1,
-                maxconn=15,
+                maxconn=120,
                 **cls._connsettings
             )
 
