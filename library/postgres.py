@@ -50,10 +50,10 @@ class DB:
         DB.__active.append(self)
 	
         if usepool:
-            print("Using Pool-")
+            print("Using Pool",f"Active: {len(DB.__active)}")
             self.conn = self._pool.getconn()
         else:
-            print("Using Single Conn")
+            print("Using Single Conn",f"Active: {len(DB.__active)}")
             self.conn = psycopg2.connect(**self._connsettings)
         
         self.cursor = self.conn.cursor()
