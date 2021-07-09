@@ -3,8 +3,10 @@ from psycopg2.pool import ThreadedConnectionPool
 import settings
 from signal import *
 
+usepool = False
+
 class DB:
-    _pool = None
+    _pool: ThreadedConnectionPool = None
     _database = None
     _connsettings = None
 
@@ -23,11 +25,12 @@ class DB:
                 password="root"
             )
         
-        # cls._pool = ThreadedConnectionPool(
-        #     minconn=1,
-        #     maxconn=15,
-        #     **cls._connsettings
-        # )
+        if usepool:
+            cls._pool = ThreadedConnectionPool(
+                minconn=1,
+                maxconn=15,
+                **cls._connsettings
+            )
 
     # To keep track of open clients, and shut them down
     __active = []
@@ -46,8 +49,13 @@ class DB:
     def open(self):
         DB.__active.append(self)
 	
-        print(self._connsettings)
-        self.conn = psycopg2.connect(**self._connsettings)
+        if usepool:
+            print("Using Pool-")
+            self.conn = self._pool.getconn()
+        else:
+            print("Using Single Conn")
+            self.conn = psycopg2.connect(**self._connsettings)
+        
         self.cursor = self.conn.cursor()
 
     def close(self):
