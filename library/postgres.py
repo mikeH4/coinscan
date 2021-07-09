@@ -31,6 +31,7 @@ class DB:
                 maxconn=120,
                 **cls._connsettings
             )
+        # DB._register_cleanup()
 
     # To keep track of open clients, and shut them down
     __active = []
@@ -125,15 +126,16 @@ class DB:
     def rollback(self):
         self.query("ROLLBACK;")
 
-    @atexit.register
     @staticmethod
     def _register_cleanup():
         def clean(*args):
             for db in DB.__active:
                 db.close()
-            DB._pool.closeall()
+            if DB._pool is not None:
+                DB._pool.closeall()
             raise SystemExit(0)
 
+        atexit.register(clean)
         for sig in (SIGABRT, SIGILL, SIGINT, SIGTERM):
             signal(sig, clean)
 
