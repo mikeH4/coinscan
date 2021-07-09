@@ -2,7 +2,6 @@ from time import time
 from core.types.Address import Address
 from library.postgres import DB
 from library.BaseModel import BaseModel
-from itertools import combinations
 
 class ViewableToken(BaseModel):
     def __init__(self,
@@ -57,7 +56,7 @@ class ViewableToken(BaseModel):
     def get(cls,address:Address):
         address = str(Address(address))
         query = cls._build_query(f"WHERE tokens.address = {DB.placeholder(1)}")
-        with DB("tokens") as db:
+        with DB() as db:
             row = db.get(query,[address])
             if row is None:
                 return None
@@ -72,9 +71,10 @@ class ViewableToken(BaseModel):
         WHERE tokens.address = {placeholder}
         OR LOWER(tokens.symbol) LIKE {placeholder}
         OR LOWER(tokens.name) LIKE {placeholder}
-        """)
+        ORDER BY token_prices.liquidity DESC NULLS LAST
+        """,with_prices=True)
         query += limit_cond
-        with DB("tokens") as db:
+        with DB() as db:
             rows = db.get_all(query,[keyword,*[f"%{lkey}%"] * 2])
             return [cls._from_row(row) for row in rows]
     
@@ -86,7 +86,7 @@ class ViewableToken(BaseModel):
         ORDER BY created DESC NULLS LAST
         {limit_cond}
         """
-        with DB("tokens") as db:
+        with DB() as db:
             rows = db.get_all(query)
             return [cls._from_row(row) for row in rows]
 

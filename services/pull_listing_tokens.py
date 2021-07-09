@@ -7,7 +7,7 @@ def main():
     from core.types.Address import Address
     from library.postgres import DB
 
-    with DB("tokens") as db:
+    with DB() as db:
         repeater = Repeater(min=60*2)
         bscscan_api = BscScanApi()
         scanner_api = ScannerApi()

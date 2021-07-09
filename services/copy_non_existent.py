@@ -24,7 +24,7 @@ def main():
         )
         
 
-    with DB("tokens") as db:
+    with DB() as db:
         bscscan_api = BscScanApi()
         tokens = db.get_all("""
         SELECT temp_tokens_external.* FROM temp_tokens_external

@@ -12,7 +12,7 @@ class Query(ViewableToken):
         ORDER BY created DESC NULLS LAST
         {cls.limit_cond(limit)}
         """
-        with DB("tokens") as db:
+        with DB() as db:
             rows = db.get_all(query)
             return [cls._from_row(row) for row in rows]
 

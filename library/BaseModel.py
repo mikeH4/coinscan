@@ -32,7 +32,7 @@ class ModelOperator:
         self.cols = dict(self.cls.__init__.__annotations__)
         del self.cols["return"]
 
-        with DB("tokens") as db:
+        with DB() as db:
             # New Cols
             sql = f"""
             SELECT column_name
@@ -156,7 +156,7 @@ class BaseModel(metaclass=BaseModelMetaClass):
     @staticmethod
     @contextmanager
     def with_db(db=None,commit=False):
-        _db = db if db is not None else DB("tokens")
+        _db = db if db is not None else DB()
         yield _db
         if db is None:
             _db.close()

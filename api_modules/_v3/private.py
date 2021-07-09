@@ -49,7 +49,7 @@ def new_tokens(
     WHERE
         ({' OR '.join(conds)})
     """)
-    with DB("tokens") as db:
+    with DB() as db:
         addresses = {}
         tokens = []
         for row in db.get_all(sql,params):

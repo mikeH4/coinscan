@@ -12,7 +12,7 @@ class TokenRequest(BaseModel):
     ) -> None: pass
 
     def insert_or_ignore(self,db:DB = None):
-        _db = db if db is not None else DB("tokens")
+        _db = db if db is not None else DB()
 
         _dict = self.dict()
         for attr in ["address"]:
@@ -38,7 +38,7 @@ class TokenRequest(BaseModel):
     def _get_ordered_in_rows(limit=1000):
         limit_cond = TokenRequest.limit_cond(limit)
 
-        with DB("tokens") as db:
+        with DB() as db:
             return db.get_all(f"SELECT * FROM token_requests ORDER BY request_time ASC {limit_cond}")
 
     @classmethod

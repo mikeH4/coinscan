@@ -22,7 +22,7 @@ def latest(
 
 @router.get("/listings")
 def listings():
-    with DB("tokens") as db:
+    with DB() as db:
         listings = ViewableListings.new_listings(db=db)
         listing_keys = list(listings.keys())
         tokens = ViewableToken.get_addresses(
@@ -42,7 +42,7 @@ def listings():
 
 @router.get("/rising")
 def rising():
-    with DB("tokens") as db:
+    with DB() as db:
         rising = TokenPrices.rising(db=db)
         rising_keys = list(rising.keys())
         tokens = ViewableToken.get_addresses(

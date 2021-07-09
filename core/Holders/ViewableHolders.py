@@ -14,7 +14,7 @@ class ViewableHolders(BaseModel):
     @classmethod
     def top(cls, address: Address, limit=10):
         address = str(Address(address))
-        with DB("tokens") as db:
+        with DB() as db:
             query = f"""
             SELECT 
                 CASE WHEN holders.holder IS NOT NULL

@@ -21,7 +21,7 @@ class TokenPrices(BaseModel):
         with open("temp.csv", "w+", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(data)
-        with DB("tokens",auto_commit=False) as db:
+        with DB(auto_commit=False) as db:
             db.query("DELETE FROM token_prices")
             with open("temp.csv","r") as f:
                 db.cursor.copy_from(f, "token_prices", columns=("token","price_change","circulating","liquidity"), sep=",")

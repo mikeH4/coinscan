@@ -33,7 +33,7 @@ class TokenMeta(BaseModel):
     
     @classmethod
     def get(cls,address):
-        with DB("tokens") as db:
+        with DB() as db:
             return cls._from_row(db.get(
                 f"SELECT * FROM token_meta WHERE address = {db.placeholder(1)}",
                 [address]
@@ -44,7 +44,7 @@ class TokenMeta(BaseModel):
         limit_cond = cls.limit_cond(limit)
         if key not in cls.keys:
             raise KeyError(f"TokenMeta doesn't have the attribute {key}")
-        with DB("tokens") as db:
+        with DB() as db:
             return [cls._from_row(row) for row in db.get_all(
                 f"""
                 SELECT * FROM token_meta
@@ -58,7 +58,7 @@ class TokenMeta(BaseModel):
     @classmethod
     def get_addresses(cls,limit=1000,where_cond=""):
         limit_cond = cls.limit_cond(limit)
-        with DB("tokens") as db:
+        with DB() as db:
             return [row[0] for row in db.get_all(
                 f"""
                 SELECT tokens.address FROM tokens

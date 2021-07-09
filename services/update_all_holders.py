@@ -7,7 +7,7 @@ def main():
     from library.timer import timer
     from concurrent.futures import ThreadPoolExecutor
 
-    with DB("tokens",auto_commit=False) as db:
+    with DB(auto_commit=False) as db:
         repeater = Repeater(min=60*3)
         bscscan = BscScan()
         

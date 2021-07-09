@@ -46,7 +46,7 @@ class ViewableListings(BaseModel):
     @classmethod
     def get_listings(cls, token_address: Address):
         token_address = str(Address(token_address))
-        with DB("tokens") as db:
+        with DB() as db:
             rows = db.get_all(
                 f"SELECT token,platform,added,local_slug FROM listings WHERE token = {db.placeholder(1)}",
                 [token_address]

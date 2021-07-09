@@ -7,7 +7,7 @@ def main():
     from library.postgres import DB
     from core.sources.TokenFomo import TokenFomo
 
-    with DB("tokens") as db:
+    with DB() as db:
         repeater = Repeater(min=45,max=60*1.5)
         bscscan_api = BscScanApi()
         tokenfomo = TokenFomo()

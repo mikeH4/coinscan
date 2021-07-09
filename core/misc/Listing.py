@@ -18,7 +18,7 @@ class Listing(BaseModel):
     
     @classmethod
     def get_by_platform(cls,platform):
-        with DB("tokens") as db:
+        with DB() as db:
             listings = [cls._from_row(row) for row in db.get_all(
                 f"SELECT * FROM listings WHERE platform = %s",
                 [platform]
@@ -43,7 +43,7 @@ class Listing(BaseModel):
     @classmethod
     def get_listings(cls, token_address: Address):
         token_address = str(Address(token_address))
-        with DB("tokens") as db:
+        with DB() as db:
             rows = db.get_all(
                 f"SELECT * FROM listings WHERE token = {db.placeholder(1)}",
                 [token_address]

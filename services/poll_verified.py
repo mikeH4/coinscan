@@ -4,7 +4,7 @@ def main():
     from core.Token.TokenMeta import TokenMeta
     from library.postgres import DB
 
-    with DB("tokens") as db:
+    with DB() as db:
         repeater = Repeater(min=12,max=60*2)
         bscscan = BscScan()
 

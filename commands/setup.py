@@ -1,7 +1,7 @@
 from library.postgres import DB
 from commands.models import models,db_name
 
-with DB(db_name) as db:
+with DB() as db:
     rows = db.get_all("""
     SELECT table_name
     FROM information_schema.tables

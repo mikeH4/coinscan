@@ -1,27 +1,15 @@
-import psycopg2
+from psycopg2.pool import ThreadedConnectionPool
 import settings
 from signal import *
 
 class DB:
-    # To keep track of open clients, and shut them down
-    __active = []
+    _pool = None
+    _database = None
 
-    @staticmethod
-    def placeholder(l: int):
-        return ",".join(['%s'] * l )
-
-    def __init__(self, database=None, auto_commit=True):
-        self.conn = None
-        self.cursor = None
-        self.auto_commit = auto_commit
-
-        if database:
-            self.open(database)
-    
-    def open(self,database):
-        DB.__active.append(self)
-	
-        self.database = database
+    @classmethod
+    def initialize(cls, database: str):
+        if cls._database is not None: raise Exception("Initialize Called")
+        cls._database = database
         
         additional_args = {}
         if settings.sandbox != True:
@@ -29,12 +17,32 @@ class DB:
                 user="coinscan",
                 password="root"
             )
-        self.conn = psycopg2.connect(
+        cls._pool = ThreadedConnectionPool(
+            minconn=1,
+            maxconn=15,
             host="localhost",
-            database = database,
+            database=database,
             **additional_args
         )
 
+    # To keep track of open clients, and shut them down
+    __active = []
+
+    @staticmethod
+    def placeholder(l: int):
+        return ",".join(['%s'] * l )
+
+    def __init__(self, auto_commit=True):
+        self.conn = None
+        self.cursor = None
+        self.auto_commit = auto_commit
+
+        self.open()
+    
+    def open(self):
+        DB.__active.append(self)
+	
+        self.conn = self._pool.getconn()
         self.cursor = self.conn.cursor()
 
     def close(self):
@@ -46,7 +54,6 @@ class DB:
             self.conn.close()
 
     def __enter__(self):
-        
         return self
 
     def __exit__(self,exc_type,exc_value,traceback):
@@ -117,20 +124,4 @@ class DB:
         for sig in (SIGABRT, SIGILL, SIGINT, SIGTERM):
             signal(sig, clean)
 
-
-class CreateSQLTables:
-
-    def __init__(self, name):
-        self.cmds = []
-        self.name = name
-    
-    def __add__(self,to_add):
-        self.cmds.append(to_add)
-        return self
-    
-    def execute(self):
-        db = DB(self.name)
-        for cmd in self.cmds:
-            db.query(cmd)
-        db.close()
-        return True
+DB.initialize("tokens")

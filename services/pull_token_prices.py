@@ -4,7 +4,7 @@ def main():
     from core.misc.TokenPrices import TokenPrices
     from library.postgres import DB
 
-    with DB("tokens") as db:
+    with DB() as db:
         repeater = Repeater(min=60*10)
         scanner_api = ScannerApi()
 

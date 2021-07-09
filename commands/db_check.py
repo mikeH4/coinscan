@@ -61,7 +61,7 @@ def p(msg,status):
 
 print("")
 
-with DB("tokens") as db:
+with DB() as db:
     for sql in warnings:
         rows = db.get_all(sql)
         if len(rows) > 0:

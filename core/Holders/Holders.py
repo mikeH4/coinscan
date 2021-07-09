@@ -44,7 +44,7 @@ class Holders(BaseModel):
     def top(cls, address: Address, limit=10):
         address = str(Address(address))
         limit_cond = cls.limit_cond(limit)
-        with DB("tokens") as db:
+        with DB() as db:
             query = f"SELECT * FROM holders WHERE contract = {db.placeholder(1)} ORDER BY holding DESC {limit_cond}"
             tokens = db.get_all(query,[address])
             return [cls._from_row(token) for token in tokens]

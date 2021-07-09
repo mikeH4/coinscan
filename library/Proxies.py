@@ -29,7 +29,7 @@ class Proxies(BaseModel):
 
     @classmethod
     def get_all(cls):
-        with DB("tokens") as db:
+        with DB() as db:
             return [cls._from_row(row) for row in db.get_all(
                 f"SELECT * FROM proxies ORDER BY ip ASC"
             )]

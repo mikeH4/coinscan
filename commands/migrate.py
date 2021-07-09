@@ -1,7 +1,7 @@
 from library.postgres import DB
 from commands.models import models,db_name
 
-with DB(db_name) as db:
+with DB() as db:
     for _class in models:
         new_cols = _class._db_new_cols()
         if len(new_cols) < 1:
