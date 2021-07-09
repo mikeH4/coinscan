@@ -1,3 +1,4 @@
+import psycopg2
 from psycopg2.pool import ThreadedConnectionPool
 import settings
 from signal import *
@@ -5,25 +6,28 @@ from signal import *
 class DB:
     _pool = None
     _database = None
+    _connsettings = None
 
     @classmethod
     def initialize(cls, database: str):
         if cls._database is not None: raise Exception("Initialize Called")
         cls._database = database
-        
-        additional_args = {}
+
+        cls._connsettings = dict(
+            host="localhost",
+            database=database,
+        )
         if settings.sandbox != True:
-            additional_args = dict(
+            cls._connsettings = dict(
                 user="coinscan",
                 password="root"
             )
-        cls._pool = ThreadedConnectionPool(
-            minconn=1,
-            maxconn=15,
-            host="localhost",
-            database=database,
-            **additional_args
-        )
+        
+        # cls._pool = ThreadedConnectionPool(
+        #     minconn=1,
+        #     maxconn=15,
+        #     **cls._connsettings
+        # )
 
     # To keep track of open clients, and shut them down
     __active = []
@@ -42,7 +46,7 @@ class DB:
     def open(self):
         DB.__active.append(self)
 	
-        self.conn = self._pool.getconn()
+        self.conn = psycopg2.connect(**self._connsettings)
         self.cursor = self.conn.cursor()
 
     def close(self):
