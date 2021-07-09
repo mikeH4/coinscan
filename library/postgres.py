@@ -2,8 +2,7 @@ import psycopg2
 from psycopg2.pool import ThreadedConnectionPool
 import settings
 from signal import *
-
-usepool = False
+import atexit
 
 class DB:
     _pool: ThreadedConnectionPool = None
@@ -11,7 +10,7 @@ class DB:
     _connsettings = None
 
     @classmethod
-    def initialize(cls, database: str):
+    def initialize(cls, database: str, usepool:bool = True):
         if cls._database is not None: raise Exception("Initialize Called")
         cls._database = database
 
@@ -19,6 +18,7 @@ class DB:
             host="localhost",
             database=database,
         )
+        
         if settings.sandbox != True:
             cls._connsettings.update(
                 user="coinscan",
@@ -41,14 +41,12 @@ class DB:
 
     def __init__(self, auto_commit=True):
         self.auto_commit = auto_commit
-        # self.conn
-        # self.commit
         self.open()
     
     def open(self):
         DB.__active.append(self)
 	
-        if usepool:
+        if self._pool is not None:
             print("Using Pool",f"Active: {len(DB.__active)}")
             self.conn = self._pool.getconn()
         else:
@@ -63,7 +61,7 @@ class DB:
         if self.auto_commit: self.conn.commit()
         self.cursor.close()
         self.conn.close()
-        if usepool:
+        if self._pool is not None:
             self._pool.putconn(self.conn)
 
     def __enter__(self):
@@ -127,11 +125,13 @@ class DB:
     def rollback(self):
         self.query("ROLLBACK;")
 
+    @atexit.register
     @staticmethod
     def _register_cleanup():
         def clean(*args):
             for db in DB.__active:
                 db.close()
+            DB._pool.closeall()
             raise SystemExit(0)
 
         for sig in (SIGABRT, SIGILL, SIGINT, SIGTERM):
