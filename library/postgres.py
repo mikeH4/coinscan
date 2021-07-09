@@ -40,10 +40,9 @@ class DB:
         return ",".join(['%s'] * l )
 
     def __init__(self, auto_commit=True):
-        self.conn = None
-        self.cursor = None
         self.auto_commit = auto_commit
-
+        # self.conn
+        # self.commit
         self.open()
     
     def open(self):
@@ -61,10 +60,11 @@ class DB:
     def close(self):
         DB.__active.remove(self)
         
-        if self.conn:
-            if self.auto_commit: self.conn.commit()
-            self.cursor.close()
-            self.conn.close()
+        if self.auto_commit: self.conn.commit()
+        self.cursor.close()
+        self.conn.close()
+        if usepool:
+            self._pool.putconn(self.conn)
 
     def __enter__(self):
         return self
