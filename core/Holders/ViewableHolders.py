@@ -74,3 +74,53 @@ class ViewableHolders(BaseModel):
                 tokens.append(cls._from_row(row))
 
             return tokens
+
+    def get_tokens(wallet: Address):
+        wallet = str(Address(wallet))
+        sql = f"""
+        SELECT
+            holders.holding,
+            token_info.address as token_address,
+            token_info.name as token_name,
+            token_info.symbol as token_symbol,
+            pair_of_info.address as pair_of_address,
+            pair_of_info.name as pair_of_name,
+            pair_of_info.symbol as pair_of_symbol
+        FROM holders
+        LEFT JOIN pairs ON pairs.pair = holders.contract
+        LEFT JOIN tokens AS token_info ON token_info.address = holders.contract
+        LEFT JOIN tokens AS pair_of_info ON pair_of_info.address = pairs.token
+        WHERE holders.holder = {DB.placeholder(1)}
+        ORDER BY holders.holding DESC
+        LIMIT 50
+        """
+        with DB() as db:
+            res = db.get_all(sql,[wallet])
+            ret = {}
+            for row in res:
+                holding = row[0]
+                
+                if row[4] is None:
+                    is_liquidity = False
+                    token,name,symbol = row[1:4]
+                else:
+                    is_liquidity = True
+                    token,name,symbol = row[4:]
+
+                if token is None:
+                    continue
+                if token not in ret:
+                    ret[token] = dict(
+                        address=token,
+                        name=name,
+                        symbol=symbol,
+                        amount=None,
+                        liquidity=None
+                    )
+                
+                if is_liquidity:
+                    ret[token]["liquidity"] = holding
+                else:
+                    ret[token]["amount"] = holding
+        
+            return list(ret.values())

@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from api_modules._v3 import token
 from api_modules._v3 import feed
 from api_modules._v3 import private
+from api_modules._v3 import wallet
 
 app = APIRouter(
     prefix="/v3"
@@ -11,6 +12,7 @@ routers = [
     token.router,
     private.router,
     feed.router,
+    wallet.router
 ]
 
 for router in routers:

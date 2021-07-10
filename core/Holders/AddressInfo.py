@@ -27,7 +27,7 @@ class AddressInfo(BaseModel):
                 ignore_insert=True,
                 commit=False
             )
-    
+
     @classmethod
     def unknown_holder_contracts(cls,db=None,limit=100):
         limit_cond = cls.limit_cond(limit)
