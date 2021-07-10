@@ -4,8 +4,6 @@ from fastapi import APIRouter,HTTPException
 from core.types.Address import Address
 
 from core.Holders.ViewableHolders import ViewableHolders
-from core.Token.ViewableToken import ViewableToken
-from core.misc.ViewableListings import ViewableListings
 
 router = APIRouter(
     prefix="/wallet"

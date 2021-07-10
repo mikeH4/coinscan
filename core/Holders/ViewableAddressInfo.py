@@ -4,9 +4,9 @@ from library.postgres import DB
 
 class ViewableAddressInfo(BaseModel):
     def __init__(self, 
-        address:str,
+        holder:str,
         is_contract:bool,
-        bscscan_tag:str
+        holder_tag:str
     ) -> None: pass    
 
     @classmethod
