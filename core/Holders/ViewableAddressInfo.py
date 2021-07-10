@@ -13,6 +13,11 @@ class ViewableAddressInfo(BaseModel):
     def get(cls, address: Address):
         address = str(Address(address))
         with DB() as db:
-            row = db.get("SELECT * FROM address_info WHERE address = %s",[address])
+            row = db.get("""
+            SELECT
+                address,is_contract,bscscan_tag
+            FROM address_info
+            WHERE address = %s""",
+            [address])
             if row is None: return None
             return cls._from_row(row)
