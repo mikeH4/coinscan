@@ -92,7 +92,7 @@ class ViewableHolders(BaseModel):
         LEFT JOIN tokens AS pair_of_info ON pair_of_info.address = pairs.token
         WHERE holders.holder = {DB.placeholder(1)}
         ORDER BY holders.holding DESC
-        LIMIT 50
+        LIMIT 70
         """
         with DB() as db:
             res = db.get_all(sql,[wallet])
@@ -109,6 +109,9 @@ class ViewableHolders(BaseModel):
 
                 if token is None:
                     continue
+                if name == "" or symbol == "":
+                    continue
+
                 if token not in ret:
                     ret[token] = dict(
                         address=token,
@@ -123,4 +126,4 @@ class ViewableHolders(BaseModel):
                 else:
                     ret[token]["amount"] = holding
         
-            return list(ret.values())
+            return list(ret.values())[:50]
