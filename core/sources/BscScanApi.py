@@ -33,7 +33,7 @@ class BscScanApi(BaseSource):
             try:
                 data = self.call("contract","getsourcecode",
                     address=str(address)
-                )                
+                )
                 source = data["result"][0]["SourceCode"]
                 return None if source == "" else source
             except BscScanApiException:
