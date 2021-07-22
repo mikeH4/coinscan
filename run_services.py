@@ -6,16 +6,13 @@ from time import sleep
 import settings
 
 # From Api2
+import services.poll_new
 import services.copy_token_prices
 import services.poll_pairs
-import services.poll_scanner
 import services.sync_listing_tokens
 
 # From Listing Sites
 import services.poll_listings
-
-# From TokenFomo
-import services.poll_new
 
 # From BscScan
 import services.poll_verified
@@ -46,7 +43,6 @@ if __name__ == "__main__":
         services.poll_listings,
         services.poll_new,
         services.poll_pairs,
-        services.poll_scanner,
         services.poll_verified,
         services.sync_listing_tokens,
         services.sync_verified,
@@ -58,7 +54,6 @@ if __name__ == "__main__":
             # services.poll_listings,
             services.poll_new,
             # services.poll_pairs,
-            # services.poll_scanner,
             # services.poll_verified,
             # services.sync_listing_tokens,
             # services.sync_verified,

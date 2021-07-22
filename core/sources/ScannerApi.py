@@ -15,7 +15,7 @@ class ScannerApi(BaseSource):
     def __init__(self,limit_bypass=False) -> None:
         self.limit_bypass = limit_bypass
 
-    def newly_added(self):
+    def new(self):
         res = self.request("/v1/private/new",headers=self.auth_headers)
         return res.json()
     
