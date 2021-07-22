@@ -2,11 +2,13 @@ from core.Holders.AddressInfo import AddressInfo
 from core.Holders.Holders import Holders
 from time import sleep, time
 from core.types.Address import Address, BlockOrTransactionHash
-from library.BaseSource import BaseSource
+from library.BaseSource import BaseSource, TorRequestPool
 from bs4 import BeautifulSoup
 
 class BscScan(BaseSource):
     url = "https://bscscan.com/"
+
+    request_manager = TorRequestPool
 
     limit_calls = 1
     limit_period = 2
