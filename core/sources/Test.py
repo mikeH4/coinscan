@@ -1,9 +1,7 @@
-from library.BaseSource import BaseSource, TorRequestPool
+from library.BaseSource import BaseSource
 
 class IfConfig(BaseSource):
     url = "https://ifconfig.me/"
-
-    request_manager = TorRequestPool
 
     def get(self):
         res = self.request("/ip")
