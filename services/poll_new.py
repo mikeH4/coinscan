@@ -6,21 +6,31 @@ def main():
     from core.types.Address import Address
     from library.postgres import DB
 
+    
     with DB() as db:
         repeater = Repeater(min=15,max=60*2.5)
         bscscan_api = BscScanApi()
         scanner_api = ScannerApi()
+
+        existing_addrs = []
+
         while repeater.loop():
             data = scanner_api.new()
             data_len = len(data)
 
             addresses = [row["address"] for row in data]
-            existing_addrs = Token.existing_from(addresses,db)
+            
+            if len(existing_addrs) == 0:
+                print("Fetched Existing From")
+                existing_addrs = Token.existing_from(addresses,db)
+            elif len(existing_addrs) > 5000:
+                # Just so memory doesn't escape
+                existing_addrs = existing_addrs[5000:]
 
             for i,token_data in enumerate(data):
-                print(existing_addrs)
                 if token_data["address"] in existing_addrs:
                     continue
+                existing_addrs.append(token_data["address"])
 
                 address = Address(token_data["address"])
 
