@@ -12,7 +12,7 @@ g.request_manager = TorRequestPool
 test_size = 100
 
 with timer("Tor Pool") as increment:
-    with ThreadPoolExecutor(max_workers=25) as exec:
+    with ThreadPoolExecutor(max_workers=50) as exec:
         for i in range(test_size):
             exec.submit(ip.get)
             exec.submit(g.get)
@@ -22,7 +22,7 @@ ip.request_manager = RequestPool
 g.request_manager = RequestPool
 
 with timer("Proxy Pool") as increment:
-    with ThreadPoolExecutor(max_workers=25) as exec:
+    with ThreadPoolExecutor(max_workers=50) as exec:
         for i in range(test_size):
             exec.submit(ip.get)
             exec.submit(g.get)
