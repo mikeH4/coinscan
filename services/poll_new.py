@@ -14,7 +14,14 @@ def main():
             data = scanner_api.new()
             data_len = len(data)
 
+            addresses = [row["address"] for row in data]
+            existing_addrs = Token.existing_from(addresses,db)
+
             for i,token_data in enumerate(data):
+                print(existing_addrs)
+                if token_data["address"] in existing_addrs:
+                    continue
+
                 address = Address(token_data["address"])
 
                 decimals = token_data["decimals"]
