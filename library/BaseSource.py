@@ -19,43 +19,6 @@ class NoProxyInPool(Exception):
         self.available_in = available_in
         super(NoProxyInPool, self).__init__("No proxy in pool")
 
-# Abstract Class
-class BaseSource(metaclass=BaseSourceMetaClass):
-    url = None
-    limit_calls = 1
-    limit_period = 1
-    param_from_proxy={}
-
-    # Only use in exceptional cases
-    limit_bypass = False
-
-    @staticmethod
-    def parse_soup_json(soup,selector):
-        script_content = soup.select(selector)[0].string
-        return json.loads(script_content)
-
-    def request(self,path,params={},headers={},cookies={},json={}):
-        # Sleep and retry
-        while True:
-            kwds = dict(
-                url=urljoin(self.url,path),
-                params=params,
-                headers=headers,
-                cookies=cookies,
-                json=json,
-            )
-            if self.limit_bypass:
-                return get(**kwds,proxy=Proxies.get_all()[0])
-            else:
-                try:
-                    return RequestPool.request(
-                        **kwds,
-                        _class=self.__class__,
-                        param_from_proxy=self.__class__.param_from_proxy,
-                    )
-                except NoProxyInPool as e:
-                    print(f"Limit exhausted: Sleeping for {e.available_in}")
-                    sleep(e.available_in)
 
 class RequestPool:
     _proxies = []
@@ -71,8 +34,7 @@ class RequestPool:
     
     @staticmethod
     def _class_valid(_class):
-        if not issubclass(_class,BaseSource):
-            raise TypeError(f"{_class.__name__} does not inherit from BaseSource")
+        BaseSource.inherits(_class)
 
     @classmethod
     def _prepare_slot(cls,_class,proxy):
@@ -144,7 +106,7 @@ class TorRequestPool:
         bscscan_apikey="",
         cmc_apikey=""
     )
-    _tor_limit_calls = 10
+    _tor_limit_calls = 25
     _tor_limit_period = 1
 
     @classmethod
@@ -179,3 +141,49 @@ class TorRequestPool:
         cls._tor_proxy.agent = Proxies.random_agent()
 
         return get(url,cls._tor_proxy,**kwargs)
+
+
+# Abstract Class
+class BaseSource(metaclass=BaseSourceMetaClass):
+    url = None
+    limit_calls = 1
+    limit_period = 1
+    param_from_proxy={}
+
+    # Only use in exceptional cases
+    limit_bypass = False
+
+    request_manager = RequestPool
+
+    @staticmethod
+    def inherits(_class):
+        if not issubclass(_class,BaseSource):
+            raise TypeError(f"{_class.__name__} does not inherit from BaseSource")
+
+    @staticmethod
+    def parse_soup_json(soup,selector):
+        script_content = soup.select(selector)[0].string
+        return json.loads(script_content)
+
+    def request(self,path,params={},headers={},cookies={},json={}):
+        # Sleep and retry
+        while True:
+            kwds = dict(
+                url=urljoin(self.url,path),
+                params=params,
+                headers=headers,
+                cookies=cookies,
+                json=json,
+            )
+            if self.limit_bypass:
+                return get(**kwds,proxy=Proxies.get_all()[0])
+            else:
+                try:
+                    return self.request_manager.request(
+                        **kwds,
+                        _class=self.__class__,
+                        param_from_proxy=self.__class__.param_from_proxy,
+                    )
+                except NoProxyInPool as e:
+                    print(f"Limit exhausted: Sleeping for {e.available_in}")
+                    sleep(e.available_in)

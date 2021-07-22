@@ -20,6 +20,6 @@ def get(url,proxy,params={},headers={},cookies={},json={}):
         headers=headers,
         cookies=cookies,
         proxies=req_proxy,
-        json=json
+        json=None if json == {} else json
     )
     return res
