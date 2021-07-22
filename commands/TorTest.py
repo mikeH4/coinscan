@@ -9,7 +9,7 @@ ip.request_manager = TorRequestPool
 g = Google()
 g.request_manager = TorRequestPool
 
-test_size = 5
+test_size = 100
 
 with timer("Tor Pool") as increment:
     with ThreadPoolExecutor(max_workers=25) as exec:
