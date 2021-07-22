@@ -16,7 +16,7 @@ with timer("Tor Pool") as increment:
         for i in range(test_size):
             exec.submit(ip.get)
             exec.submit(g.get)
-    increment(test_size)
+    increment(test_size*2)
 
 ip.request_manager = RequestPool
 g.request_manager = RequestPool
@@ -26,4 +26,4 @@ with timer("Proxy Pool") as increment:
         for i in range(test_size):
             exec.submit(ip.get)
             exec.submit(g.get)
-    increment(test_size)
+    increment(test_size*2)
