@@ -1,3 +1,6 @@
+from core.misc.Pairs import Pairs
+
+
 def main():
     from library.Repeater import Repeater
     from core.sources.BscScan import BscScan
@@ -14,10 +17,13 @@ def main():
         while repeater.loop():
             with timer("Update Holders") as increment:
                 while True:
-                    addresses = HoldersPulled.not_updated_at_all(limit=100)
-                    if len(addresses) < 1:
-                        addresses = HoldersPulled.not_updated_recently(limit=100)
-                    
+                    addresses = (
+                        HoldersPulled.not_updated_at_all(db=db,limit=100) +
+                        Pairs.unknown_pairs(db=db,limit=100)
+                    )
+                    if len(addresses) < 50:
+                        addresses += HoldersPulled.not_updated_recently(db=db,limit=100)
+
                     addresses_len = len(addresses)
                     if addresses_len < 1:
                         print("Breaking")

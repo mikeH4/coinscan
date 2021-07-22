@@ -46,8 +46,8 @@ class Pairs(BaseModel):
                     SELECT
                         pairs.pair
                     FROM pairs
-                    LEFT JOIN token_meta ON token_meta.address = pairs.pair
-                    WHERE token_meta.holders IS NULL
+                    LEFT JOIN holders_pulled ON holders_pulled.token = pairs.pair
+                    WHERE holders_pulled.token IS NULL
                     {limit_cond}
                     """
                 )

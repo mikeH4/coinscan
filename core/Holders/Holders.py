@@ -1,5 +1,4 @@
 from core.Holders.HoldersPulled import HoldersPulled
-from library.timer import timer
 from library.postgres import DB
 from time import time
 from core.types.Address import Address

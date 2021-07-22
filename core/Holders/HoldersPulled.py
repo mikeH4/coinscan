@@ -42,7 +42,7 @@ class HoldersPulled(BaseModel):
             return [row[0] for row in rows]
     
     @classmethod
-    def not_updated_at_all(cls, db:DB=None, limit=1000):
+    def not_updated_at_all(cls, db: DB=None, limit=1000):
         with cls.with_db(db) as db:
             rows = db.get_all(f"""
             SELECT tokens.address FROM tokens

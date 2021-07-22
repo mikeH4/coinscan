@@ -5,18 +5,15 @@ from time import sleep
 
 import settings
 
-import services.pull_new
-import services.pull_scanner
+import services.copy_token_prices
 import services.poll_listings
+import services.poll_new
+import services.poll_pairs
+import services.poll_scanner
 import services.poll_verified
-import services.pull_listing_tokens
-import services.sweep_creator
-import services.sweep_verified
-import services.update_all_holders
-import services.pull_token_prices
-import services.pull_pairs
-import services.sweep_pair_holders
-import services.copy_non_existent
+import services.sync_listing_tokens
+import services.sync_verified
+import services.update_holders
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
@@ -36,33 +33,27 @@ if __name__ == "__main__":
     tp = ThreadPool()
 
     threads_to_run = [
-        services.pull_new,
-        services.pull_scanner,
+        services.copy_token_prices,
         services.poll_listings,
-        services.sweep_creator,
+        services.poll_new,
+        services.poll_pairs,
+        services.poll_scanner,
         services.poll_verified,
-        services.sweep_verified,
-        services.pull_listing_tokens,
-        services.update_all_holders,
-        services.pull_token_prices,
-        services.pull_pairs,
-        services.sweep_pair_holders,
-        services.copy_non_existent,
+        services.sync_listing_tokens,
+        services.sync_verified,
+        services.update_holders,
     ]
     if settings.sandbox == True:
         threads_to_run = [
-            services.pull_new,
-            services.pull_scanner,
+            services.copy_token_prices,
             services.poll_listings,
-            services.sweep_creator,
+            services.poll_new,
+            services.poll_pairs,
+            services.poll_scanner,
             services.poll_verified,
-            services.sweep_verified,
-            services.pull_listing_tokens,
-            services.update_all_holders,
-            services.pull_token_prices,
-            services.pull_pairs,
-            services.sweep_pair_holders,
-            services.copy_non_existent,
+            services.sync_listing_tokens,
+            services.sync_verified,
+            services.update_holders,
         ]
 
     for module in threads_to_run:
