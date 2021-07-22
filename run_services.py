@@ -5,15 +5,24 @@ from time import sleep
 
 import settings
 
+# From Api2
 import services.copy_token_prices
-import services.poll_listings
-import services.poll_new
 import services.poll_pairs
 import services.poll_scanner
-import services.poll_verified
 import services.sync_listing_tokens
-import services.sync_verified
+
+# From Listing Sites
+import services.poll_listings
+
+# From TokenFomo
+import services.poll_new
+
+# From BscScan
+import services.poll_verified
 import services.update_holders
+
+# From BscscanApi
+import services.sync_verified
 
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
