@@ -36,7 +36,7 @@ class TokenPrices(BaseModel):
                 token,
                 price_change
             FROM token_prices
-            WHERE liquidity >= 0.5
+            WHERE liquidity >= 2
             ORDER BY price_change DESC
             LIMIT 100
             """)
