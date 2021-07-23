@@ -8,7 +8,7 @@ def main():
 
     
     with DB() as db:
-        repeater = Repeater(min=15,max=60*2.5)
+        repeater = Repeater(min=10,max=60*2.5)
         bscscan_api = BscScanApi()
         scanner_api = ScannerApi()
 

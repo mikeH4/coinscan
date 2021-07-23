@@ -8,8 +8,6 @@ from bs4 import BeautifulSoup
 class BscScan(BaseSource):
     url = "https://bscscan.com/"
 
-    request_manager = TorRequestPool
-
     limit_calls = 1
     limit_period = 2
 
