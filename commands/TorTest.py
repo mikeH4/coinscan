@@ -1,7 +1,8 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 from core.sources.Test import Google, IfConfig
 from library.timer import timer
-from library.BaseSource import RequestPool,TorRequestPool
+from library.RequestManager.RequestPool import RequestPool
+from library.RequestManager.TorRequestPool import TorRequestPool
 RequestPool._init_proxies()
 
 ip = IfConfig()

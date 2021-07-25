@@ -1,9 +1,8 @@
-from requests.models import Response
+from library.RequestManager.RequestPool import RequestPool
 from library.request import get
 from library.Proxies import Proxies
 import json
 from urllib.parse import urljoin
-from time import sleep, time
 
 class BaseSourceMetaClass(type):
     def __init__(cls, name, bases, namespace, **kwargs) -> None:
@@ -14,173 +13,6 @@ class BaseSourceMetaClass(type):
 
         if cls.url is None:
             raise NotImplementedError("Class is invalid, url must be present")
-        
-class NoProxyInPool(Exception):
-    def __init__(self, available_in:int) -> None:
-        self.available_in = available_in
-        super(NoProxyInPool, self).__init__("No proxy in pool")
-
-class RequestPool:
-    _proxies = []
-    _track = {}
-    _total = {}
-
-    @classmethod
-    def _init_proxies(cls):
-        proxies = Proxies.get_all()
-        for proxy in proxies:
-            if proxy.test():
-                cls._proxies.append(proxy)
-    
-    @staticmethod
-    def _class_valid(_class):
-        BaseSource.inherits(_class)
-
-    @classmethod
-    def _prepare_slot(cls,_class,proxy):
-        for _dict in [cls._track,cls._total]:
-            if _class not in _dict:
-                _dict[_class] = {}
-            if proxy not in _dict[_class]:
-                _dict[_class][proxy] = [0,time()]
-
-    @classmethod
-    def _available_in(cls,_class,proxy):
-        cls._prepare_slot(_class,proxy)
-        num,last_reset = cls._track[_class][proxy]
-        t = time()
-        # Reset if exceeded period
-        # time since last reset > limit_period
-        if (t - last_reset) > _class.limit_period:
-            cls._track[_class][proxy] = [0,t]
-
-        num,last_reset = cls._track[_class][proxy]
-        if _class.__name__ == "BscScanApi":
-            print(f"{_class.__name__}: {num} => {time()-last_reset} [{proxy.ip}] # [{proxy.bscscan_apikey}]")
-        if num < _class.limit_calls:
-            return 0
-
-        return (last_reset+_class.limit_period)-t
-
-    @classmethod
-    def _increment(cls,_class,proxy):
-        cls._prepare_slot(_class,proxy)
-        cls._track[_class][proxy][0] += 1
-        cls._total[_class][proxy][0] += 1
-
-    @classmethod
-    def request(cls,_class,url,param_from_proxy={},**kwargs):
-        cls._class_valid(_class)
-        min_available_in = float("inf")
-        for proxy in cls._proxies:
-            params = proxy.update_params(
-                param_from_proxy,
-                kwargs["params"]
-            )
-            if params is None:
-                print("No Params")
-                print(proxy.bscscan_apikey)
-                continue
-            kwargs["params"] = params
-            
-            available_in = cls._available_in(_class,proxy)
-            min_available_in = min(min_available_in,available_in)
-            if available_in > 0:
-                if _class.__name__ == "BscScanApi":
-                    print("Available In:",available_in)
-                continue
-            
-            cls._increment(_class,proxy)
-            return get(url,proxy,**kwargs)
-        
-        raise NoProxyInPool(min_available_in)
-
-class TorRequestPool:
-    _track = [0,time()]
-
-    _tor_proxy = Proxies(
-        ip="147.182.139.229",
-        port="5566",
-        agent=Proxies.random_agent(),
-        added=time(),
-        bscscan_apikey="",
-        cmc_apikey=""
-    )
-    _tor_limit_calls = 25
-    _tor_limit_period = 1
-
-    @classmethod
-    def _increment(cls):
-        cls._track[0] += 1
-
-    @classmethod
-    def _available_in(cls):
-        num,last_reset = cls._track
-        t = time()
-        # Reset if exceeded period
-        # time since last reset > limit_period
-        if (t - last_reset) > cls._tor_limit_period:
-            cls._track = [0,t]
-
-        num,last_reset = cls._track
-        if num < cls._tor_limit_calls:
-            return 0
-
-        return (last_reset+cls._tor_limit_period)-t
-
-    @classmethod
-    def request(cls,_class,url,param_from_proxy={},**kwargs):
-        RequestPool._class_valid(_class)
-
-        available_in = cls._available_in()
-        if available_in > 0:
-            raise NoProxyInPool(available_in)
-        
-        cls._increment()
-
-        cls._tor_proxy.agent = Proxies.random_agent()
-
-        return get(url,cls._tor_proxy,**kwargs)
-
-class CentralProxy:
-    # keyed by class, each item containing till value
-    _track = {}
-
-    _central_proxy = Proxies(
-        ip="147.182.139.229",
-        port="5566",
-        agent="",
-        added=time(),
-        bscscan_apikey="",
-        cmc_apikey=""
-    )
-
-    @classmethod
-    def hold_fire(cls,_class):
-        if _class not in cls._track: return
-        if cls._track[_class] <= time(): return
-
-        sleep(cls._track[_class])
-        
-    
-    @classmethod
-    def with_trip(cls,_class, res: Response, kwargs: dict):
-        if res.status_code == 429:
-            available_in = int(res.headers["available-in"])
-            cls._track[_class] = time()+available_in
-            sleep(available_in)
-            return cls.request(_class,url=res.url,**kwargs)
-        return res
-
-
-    @classmethod
-    def request(cls, _class, url, **kwargs):
-        RequestPool._class_valid(_class)
-        cls.hold_fire(_class)
-
-        res = get(url,cls._central_proxy,**kwargs)
-        return cls.with_trip(_class,res,kwargs)
-
 
 # Abstract Class
 class BaseSource(metaclass=BaseSourceMetaClass):
@@ -217,12 +49,8 @@ class BaseSource(metaclass=BaseSourceMetaClass):
             if self.limit_bypass:
                 return get(**kwds,proxy=Proxies.get_all()[0])
             else:
-                try:
-                    return self.request_manager.request(
-                        **kwds,
-                        _class=self.__class__,
-                        param_from_proxy=self.__class__.param_from_proxy,
-                    )
-                except NoProxyInPool as e:
-                    print(f"Limit exhausted: Sleeping for {e.available_in}")
-                    sleep(e.available_in)
+                return self.request_manager.request(
+                    **kwds,
+                    _class=self.__class__,
+                    param_from_proxy=self.__class__.param_from_proxy,
+                )
