@@ -19,7 +19,6 @@ class CentralProxy:
 
     @classmethod
     def hold_fire(cls,_class):
-        if _class not in cls._track: return
         if cls._track[_class] <= time(): return
 
         sleep(cls._track[_class])
@@ -28,17 +27,19 @@ class CentralProxy:
     @classmethod
     def with_trip(cls,_class, res: Response, kwargs: dict):
         if res.status_code == 429:
-
-            # available_in = int(res.headers["available-in"])
-            # cls._track[_class] = time()+available_in
-            available_in = 5
+            available_in = int(res.headers["Retry-After"])
+            cls._track[_class] = time()+available_in
             print(f"429: Sleeping for {available_in}")
             return cls.request(_class,url=res.url,**kwargs)
         return res
 
+    @classmethod
+    def init_slot(cls, _class):
+        cls._track[_class] = time()
 
     @classmethod
     def request(cls, _class, url, **kwargs):
+        cls.init_slot(_class)
         cls.hold_fire(_class)
 
         if "param_from_proxy" in kwargs:

@@ -35,7 +35,7 @@ def catching_wrapper(func):
 
 if __name__ == "__main__":
     RequestPool._init_proxies()
-    ThreadPool.intercept_prints()
+    # ThreadPool.intercept_prints()
     tp = ThreadPool()
 
     threads_to_run = [
