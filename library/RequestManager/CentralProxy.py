@@ -28,7 +28,7 @@ class CentralProxy:
     @classmethod
     def with_trip(cls,_class, res: Response, kwargs: dict):
         if res.status_code == 429:
-            
+
             # available_in = int(res.headers["available-in"])
             # cls._track[_class] = time()+available_in
             available_in = 5
@@ -41,7 +41,8 @@ class CentralProxy:
     def request(cls, _class, url, **kwargs):
         cls.hold_fire(_class)
 
-        del kwargs["param_from_proxy"]
+        if "param_from_proxy" in kwargs:
+            del kwargs["param_from_proxy"]
         res = forward_get(url,**kwargs)
         return cls.with_trip(_class,res,kwargs)
     
