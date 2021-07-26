@@ -1,15 +1,16 @@
 from time import sleep, time
-from library.request import get
+from urllib.parse import urlencode
 from requests.models import Response
 from library.Proxies import Proxies
+import requests
 
 class CentralProxy:
     # keyed by class, each item containing till value
     _track = {}
 
     _central_proxy = Proxies(
-        ip="147.182.139.229",
-        port="5566",
+        ip="147.182.192.210",
+        port="8080",
         agent="",
         added=time(),
         bscscan_apikey="",
@@ -27,9 +28,9 @@ class CentralProxy:
     @classmethod
     def with_trip(cls,_class, res: Response, kwargs: dict):
         if res.status_code == 429:
-            available_in = int(res.headers["available-in"])
-            cls._track[_class] = time()+available_in
-            sleep(available_in)
+            # available_in = int(res.headers["available-in"])
+            # cls._track[_class] = time()+available_in
+            sleep(10)
             return cls.request(_class,url=res.url,**kwargs)
         return res
 
@@ -38,5 +39,24 @@ class CentralProxy:
     def request(cls, _class, url, **kwargs):
         cls.hold_fire(_class)
 
-        res = get(url,cls._central_proxy,**kwargs)
+        del kwargs["param_from_proxy"]
+        res = forward_get(url,**kwargs)
         return cls.with_trip(_class,res,kwargs)
+    
+def forward_get(url,params={},headers={},cookies={},json={}):
+    encoded_params = urlencode(params)
+    encoded_params = ("" if encoded_params == "" else "?") + encoded_params
+    
+    full_url = url + encoded_params
+
+    print(f"Request from rotating-proxy: {full_url}")
+    headers["Forward-To"] = full_url
+
+    res = requests.get(
+        "http://147.182.192.210:8080",
+        params=params,
+        headers=headers,
+        cookies=cookies,
+        json=None if json == {} else json
+    )
+    return res

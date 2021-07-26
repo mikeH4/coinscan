@@ -1,3 +1,4 @@
+from library.RequestManager.CentralProxy import CentralProxy
 from core.Holders.AddressInfo import AddressInfo
 from core.Holders.Holders import Holders
 from time import sleep, time
@@ -8,10 +9,12 @@ from bs4 import BeautifulSoup
 class BscScan(BaseSource):
     url = "https://bscscan.com/"
 
+    request_manager = CentralProxy
+
     limit_calls = 1
     limit_period = 2
 
-    def holders(self,address:Address):
+    def holders(self,address: Address):
         try:
             res = self.request("/token/generic-tokenholders2",params=dict(
                 a=str(address)
@@ -28,7 +31,7 @@ class BscScan(BaseSource):
                 )[1].split(" ")[0].replace(",",""))
             except IndexError as e:
                 print(soup.select("#maintable"))
-                raise Exception("Error parsing total holders")
+                raise Exception(f"Error parsing total holders: {address}")
 
             holders = []
             for row in soup.select("table > tbody > tr"):
@@ -78,7 +81,7 @@ class BscScan(BaseSource):
             return (total_holders,holders)
         except Exception as e:
             print(e)
-            print("Error parsing holders from BscScan:")
+            print(f"Error parsing holders from BscScan: {address}")
             return None
     
     def recently_verified(self):
