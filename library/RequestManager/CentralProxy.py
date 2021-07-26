@@ -28,8 +28,9 @@ class CentralProxy:
     @classmethod
     def with_trip(cls,_class, res: Response, kwargs: dict):
         if res.status_code == 429:
-            available_in = int(res.headers["available-in"])
-            cls._track[_class] = time()+available_in
+            
+            # available_in = int(res.headers["available-in"])
+            # cls._track[_class] = time()+available_in
             available_in = 5
             print(f"429: Sleeping for {available_in}")
             return cls.request(_class,url=res.url,**kwargs)
