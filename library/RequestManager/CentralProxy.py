@@ -58,7 +58,6 @@ def forward_get(url,params={},headers={},cookies={},json={}):
 
     res = requests.get(
         "http://147.182.192.210:8080",
-        params=params,
         headers=headers,
         cookies=cookies,
         json=None if json == {} else json
