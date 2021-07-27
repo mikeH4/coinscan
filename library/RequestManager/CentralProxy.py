@@ -21,6 +21,7 @@ class CentralProxy:
             available_in = int(res.headers["Retry-After"])
             cls._track[_class] = time()+available_in
             print(f"429: Sleeping for {available_in}")
+            sleep(available_in)
             parsed_url = urlparse(res.request.headers["Forward-To"])._replace(query="")
             url = urlunparse(parsed_url)
             return cls.request(_class,url,**kwargs)
