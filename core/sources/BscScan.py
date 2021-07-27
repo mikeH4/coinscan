@@ -19,6 +19,8 @@ class BscScan(BaseSource):
             res = self.request("/token/generic-tokenholders2",params=dict(
                 a=str(address)
             ))
+            if res.status_code == 500:
+                raise Exception(f"Internal Server Error with {res.status_code}")
 
             soup = BeautifulSoup(res.text,"html.parser")
 
@@ -30,7 +32,8 @@ class BscScan(BaseSource):
                     .split("a total of ")
                 )[1].split(" ")[0].replace(",",""))
             except IndexError as e:
-                print(soup.select("#maintable"))
+                maintain = soup.select("#maintable")
+                print(maintain)
                 raise Exception(f"Error parsing total holders: {address}")
 
             holders = []

@@ -1,21 +1,12 @@
 from time import sleep, time
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse, urlunparse
 from requests.models import Response
 from library.Proxies import Proxies
 import requests
 
 class CentralProxy:
-    # keyed by class, each item containing till value
+    # keyed by class, each item containing available time
     _track = {}
-
-    _central_proxy = Proxies(
-        ip="147.182.192.210",
-        port="8080",
-        agent="",
-        added=time(),
-        bscscan_apikey="",
-        cmc_apikey=""
-    )
 
     @classmethod
     def hold_fire(cls,_class):
@@ -30,7 +21,9 @@ class CentralProxy:
             available_in = int(res.headers["Retry-After"])
             cls._track[_class] = time()+available_in
             print(f"429: Sleeping for {available_in}")
-            return cls.request(_class,url=res.url,**kwargs)
+            parsed_url = urlparse(res.request.headers["Forward-To"])._replace(query="")
+            url = urlunparse(parsed_url)
+            return cls.request(_class,url,**kwargs)
         return res
 
     @classmethod
@@ -45,7 +38,7 @@ class CentralProxy:
         if "param_from_proxy" in kwargs:
             del kwargs["param_from_proxy"]
         res = forward_get(url,**kwargs)
-        return cls.with_trip(_class,res,kwargs)
+        return cls.with_trip(_class, res, kwargs)
     
 def forward_get(url,params={},headers={},cookies={},json={}):
     encoded_params = urlencode(params)
