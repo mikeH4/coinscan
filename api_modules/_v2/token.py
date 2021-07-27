@@ -5,8 +5,6 @@ from fastapi import APIRouter,HTTPException
 
 from library.postgres import DB
 
-from core.misc.TokenRequest import TokenRequest
-
 from core.Holders.ViewableHolders import ViewableHolders
 from core.Token.ViewableToken import ViewableToken
 from core.misc.ViewableListings import ViewableListings
@@ -73,7 +71,6 @@ def search(search: str):
 def token(address: str):
     token = ViewableToken.get(address)
     if token is None:
-        TokenRequest(address=address,request_time=time()).insert_or_ignore()
         raise HTTPException(status_code=404, detail="Not found")
 
     return {"token": token}
