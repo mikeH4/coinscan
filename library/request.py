@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 def get(url,proxy,params={},headers={},cookies={},json={}):
     headers["User-Agent"] = proxy.agent
 
+    print("PS",proxy)
     req_proxy = None
     # Empty Proxy means self
     if proxy.ip != "":
@@ -12,7 +13,7 @@ def get(url,proxy,params={},headers={},cookies={},json={}):
             "https" : f"http://{proxy.ip}:{proxy.port}",
         }
 
-    print(f"Request from {proxy}: {url}?{urlencode(params)}",)
+    print(f"Request from {proxy}: {url}?{urlencode(params)}")
 
     res = requests.get(
         url,

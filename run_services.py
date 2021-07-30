@@ -1,5 +1,4 @@
 import traceback
-from library.BaseSource import RequestPool
 from library.Thread import ThreadPool
 from time import sleep
 
@@ -34,7 +33,6 @@ def catching_wrapper(func):
     return wrapper
 
 if __name__ == "__main__":
-    RequestPool._init_proxies()
     # ThreadPool.intercept_prints()
     tp = ThreadPool()
 
@@ -56,8 +54,8 @@ if __name__ == "__main__":
             # services.poll_pairs,
             # services.poll_verified,
             # services.sync_listing_tokens,
-            # services.sync_verified,
-            services.update_holders,
+            services.sync_verified,
+            # services.update_holders,
         ]
 
     for module in threads_to_run:

@@ -1,7 +1,10 @@
+from library.RequestManager.CentralProxy import CentralProxy
 from library.BaseSource import BaseSource
 
 class CoinGecko(BaseSource):
     url = "https://api.coingecko.com"
+
+    request_manager = CentralProxy
 
     limit_calls = 1
     limit_period = 5

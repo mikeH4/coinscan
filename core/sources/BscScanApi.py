@@ -1,3 +1,4 @@
+from library.RequestManager.CentralProxy import CentralProxy
 from time import sleep
 from core.types.Address import Address
 from library.BaseSource import BaseSource
@@ -7,6 +8,8 @@ class BscScanApiException(Exception):
 
 class BscScanApi(BaseSource):
     url = "https://api.bscscan.com/"
+
+    request_manager = CentralProxy
 
     limit_calls = 3
     limit_period = 1

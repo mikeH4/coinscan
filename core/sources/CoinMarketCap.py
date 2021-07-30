@@ -1,8 +1,11 @@
+from library.RequestManager.CentralProxy import CentralProxy
 from library.BaseSource import BaseSource
 from bs4 import BeautifulSoup
 
 class CoinMarketCap(BaseSource):
     url = "https://coinmarketcap.com/"
+
+    request_manager = CentralProxy
 
     limit_calls = 1
     limit_period = 5
@@ -16,6 +19,8 @@ class CoinMarketCap(BaseSource):
 
 class CoinMarketCapInternalApi(BaseSource):
     url = "https://api.coinmarketcap.com"
+
+    request_manager = CentralProxy
 
     limit_calls = 1
     limit_period = 5
@@ -34,6 +39,8 @@ class CoinMarketCapInternalApi(BaseSource):
 
 class CoinMarketCapProApi(BaseSource):
     url = "https://pro-api.coinmarketcap.com/"
+
+    request_manager = CentralProxy
 
     limit_calls = 1
     limit_period = 5

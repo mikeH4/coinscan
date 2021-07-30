@@ -1,4 +1,5 @@
 from library.BaseSource import BaseSource
+from library.RequestManager.NoProxy import NoProxy
 
 class ScannerApi(BaseSource):
     url = "https://api2.coinscan.finance/"
@@ -6,7 +7,8 @@ class ScannerApi(BaseSource):
     limit_calls = 1
     limit_period = 1
 
-    # Only use in exceptional cases
+    request_manager = NoProxy
+
     auth_headers = {
         "auth": "bON)Ihn(UB)B$#)TN$)UBOBNF)U$BNT)UB@$IJEHNU934NTU349B",
         "X-Api-Auth": "5ad6c116cda6f75000ee2c943d406516a6332718e90c87833ffecfef2f58f34e"

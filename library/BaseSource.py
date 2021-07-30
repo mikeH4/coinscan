@@ -1,4 +1,4 @@
-from library.RequestManager.RequestPool import RequestPool
+from library.RequestManager.CentralProxy import CentralProxy
 from library.request import get
 from library.Proxies import Proxies
 import json
@@ -24,7 +24,7 @@ class BaseSource(metaclass=BaseSourceMetaClass):
     # Only use in exceptional cases
     limit_bypass = False
 
-    request_manager = RequestPool
+    request_manager = CentralProxy
 
     @staticmethod
     def inherits(_class):
