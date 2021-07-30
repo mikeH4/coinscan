@@ -37,10 +37,7 @@ class Proxies(BaseModel):
     @staticmethod
     def test_proxy(proxy):
         try:
-            get(
-                "https://google.com",
-                proxy=proxy
-            )
+            get("https://google.com")
         except ProxyError as e:
             print(e)
             return False

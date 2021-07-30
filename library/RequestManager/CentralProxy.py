@@ -1,7 +1,6 @@
 from time import sleep, time
 from urllib.parse import urlencode, urlparse, urlunparse
 from requests.models import Response
-from library.Proxies import Proxies
 import requests
 
 class CentralProxy:

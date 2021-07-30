@@ -1,6 +1,4 @@
 from library.RequestManager.CentralProxy import CentralProxy
-from library.request import get
-from library.Proxies import Proxies
 import json
 from urllib.parse import urljoin
 
@@ -46,11 +44,7 @@ class BaseSource(metaclass=BaseSourceMetaClass):
                 cookies=cookies,
                 json=json,
             )
-            if self.limit_bypass:
-                return get(**kwds,proxy=Proxies.get_all()[0])
-            else:
-                return self.request_manager.request(
-                    **kwds,
-                    _class=self.__class__,
-                    param_from_proxy=self.__class__.param_from_proxy,
-                )
+            return self.request_manager.request(
+                **kwds,
+                _class=self.__class__
+            )

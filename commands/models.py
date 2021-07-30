@@ -5,7 +5,6 @@ from core.Token.TokenMeta import TokenMeta
 
 from core.Holders.Holders import Holders
 from core.Holders.AddressLabels import AddressLabels
-from library.Proxies import Proxies
 from core.misc.Listing import Listing
 from core.misc.TokenPrices import TokenPrices
 from core.misc.Pairs import Pairs

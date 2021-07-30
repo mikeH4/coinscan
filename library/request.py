@@ -1,26 +1,14 @@
 import requests
 from urllib.parse import urlencode
 
-def get(url,proxy,params={},headers={},cookies={},json={}):
-    headers["User-Agent"] = proxy.agent
-
-    print("PS",proxy)
-    req_proxy = None
-    # Empty Proxy means self
-    if proxy.ip != "":
-        req_proxy = { 
-            "http"  : f"http://{proxy.ip}:{proxy.port}", 
-            "https" : f"http://{proxy.ip}:{proxy.port}",
-        }
-
-    print(f"Request from {proxy}: {url}?{urlencode(params)}")
+def get(url,params={},headers={},cookies={},json={}):
+    print(f"Request: {url}?{urlencode(params)}")
 
     res = requests.get(
         url,
         params=params,
         headers=headers,
         cookies=cookies,
-        proxies=req_proxy,
         json=None if json == {} else json
     )
     return res
