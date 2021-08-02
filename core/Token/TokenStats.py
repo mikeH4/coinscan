@@ -45,28 +45,13 @@ class TokenStats(BaseModel):
         dont_update: list[str] = [],
         db: DB = None
     ):
-        keys = self.keys
-        self.keys.remove("id")
+        query, values = TokenMeta._prep_query(self,dont_update=dont_update) #type: ignore
 
-        update_cmd = []
-        values = []
-        for key in keys:
-            if key in dont_update: continue
-            update_cmd.append(f"{key} = excluded.{key}")
-            values.append(getattr(self,key))
-
-        query = f"""
-        {TokenMeta.address_upsert_sql()}
-        INSERT INTO token_stats
-        SELECT id,{DB.placeholder(len(keys))} FROM cte
-        ON CONFLICT (id)
-        DO UPDATE SET {', '.join(update_cmd)}
-        RETURNING id
-        """
         with self.with_db(db) as db:
-            ret = db.get(query,[chain, token_address] + values)
+            ret = db.get(query,[chain,token_address] + values)
             assert ret is not None
             self.id = bigint(ret[0])
+        
         return self.id
     
     @classmethod
@@ -74,6 +59,7 @@ class TokenStats(BaseModel):
         chain: ChainEnum,
         data: list[tuple[str, numeric, numeric, numeric]]
     ):
+        if len(data) < 1: return
         with DB(auto_commit=True) as db:
             update_cmd = []
             null_cmd = []
@@ -111,7 +97,7 @@ class TokenStats(BaseModel):
             sql = f"""
             INSERT INTO token_stats (id, price_change, circulating, liquidity)
             VALUES {','.join(values)}
-            ON CONFLICT
-            UPDATE SET {','.join(update_cmd)}
+            ON CONFLICT (id)
+            DO UPDATE SET {','.join(update_cmd)}
             """
             db.query(sql,params)

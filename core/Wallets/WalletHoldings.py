@@ -1,3 +1,5 @@
+from core.Address import Address
+from time import time
 from core.Token.TokenMeta import TokenMeta
 from core.types.AddressHash import AddressHash
 from library.postgres import DB
@@ -27,28 +29,47 @@ class WalletHoldings(BaseModel):
         dont_update: list[str] = [],
         db: Optional[DB] = None
     ):
+        query, values = TokenMeta._prep_query(self, # type: ignore
+            dont_update=dont_update,
+            remove_key="wallet_id"
+        )
+
         with self.with_db(db) as db:
-            keys = self.keys
-            self.keys.remove("wallet_id")
+            ret = db.get(query,[chain,wallet_address] + values)
+            assert ret is not None
+            self.id = bigint(ret[0])
+        
+        return self.id
 
-            update_cmd = []
-            values = []
-            for key in keys:
-                if key in dont_update: continue
-                update_cmd.append(f"{key} = excluded.{key}")
-                values.append(getattr(self,key))
-
+    @classmethod
+    def not_updated(cls, *,
+        before_hours: int = 24,
+        db: Optional[DB] = None
+    ):
+        before_time = int(time() - before_hours*60*60)
+        with cls.with_db(db) as db:
             query = f"""
-            {TokenMeta.address_upsert_sql()}
-            INSERT INTO token_meta
-            SELECT id,{DB.placeholder(len(keys))} FROM cte
-            ON CONFLICT (id)
-            DO UPDATE SET {', '.join(update_cmd)}
-            RETURNING id
+            SELECT
+                address.id,
+                address.chain,
+                address.address,
+                pair_address.address
+            FROM address
+            JOIN token_meta ON token_meta.id = address.id
+            LEFT JOIN token_pair ON token_pair.token_id = address.id
+            LEFT JOIN address AS pair_address ON token_pair.pair_id = pair_address.id
+            LEFT JOIN state_time
+                ON token_meta.id = state_time.id
+                AND state_time.key = 'wallet_supply'
+                AND state_time.update IS TRUE
+            WHERE state_time.key IS NULL OR (
+                state_time.time < {before_time}
+            )
             """
-            with self.with_db(db) as db:
-                ret = db.get(query,[chain, wallet_address] + values)
-                assert ret is not None
-                self.id = bigint(ret[0])
-            return self.id
-    
+            rows = db.get_all(query)
+
+            return [
+                (Address._from_row(row),None if row[3] is None else AddressHash(row[3]))
+                for row
+                in rows
+            ]

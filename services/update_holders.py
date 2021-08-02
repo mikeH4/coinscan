@@ -1,9 +1,9 @@
-from core.Wallets.ViewableWalletHoldings import ViewableWalletHoldings
+from concurrent.futures.thread import ThreadPoolExecutor
 from core.Wallets.WalletHoldings import WalletHoldings
+from core.Wallets._inter_pull_and_update import pull_and_update
 from library.Repeater import Repeater
 from library.postgres import DB
 from library.timer import timer
-from concurrent.futures import ThreadPoolExecutor
 
 def main():
     with DB(auto_commit=False) as db:
@@ -11,19 +11,25 @@ def main():
         
         while repeater.loop():
             with timer("Update Holders") as increment:
-                while True:
-                    addresses = ViewableWalletHoldings.not_updated(db=db)
-                    if len(addresses) < 1:
-                        print("Breaking")
-                        break
+                address_objects = WalletHoldings.not_updated(db=db)
+                if len(address_objects) < 1:
+                    print("Breaking")
+                    break
+                print(len(address_objects))
 
-                    with ThreadPoolExecutor(max_workers=4) as exec:
-                        for address in addresses:
+                with ThreadPoolExecutor(max_workers=4) as exec:
+                    for address, pair_address in address_objects:
+                        pair_types: tuple = (None,) if pair_address is None else (None, pair_address)
+
+                        for pair in pair_types:
+                            # pull_and_update(chain=address.chain,token_address=address.address,pair_address=pair,db=db)
                             exec.submit(
-                                WalletHoldings.pull_and_update,
-                                token_address=address,
+                                pull_and_update,
+                                chain=address.chain,
+                                token_address=address.address,
+                                pair_address=pair,
                                 db=db
                             )
 
-                    db.conn.commit()
-                    increment(len(addresses))
+                db.conn.commit()
+                increment(len(address_objects))

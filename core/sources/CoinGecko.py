@@ -21,7 +21,6 @@ class CoinGecko(BaseSource):
             return res.json()
         except ValueError:
             print("CoinGecko JSON error")
-            print(res.text)
             return []
     
     def update_token_listings(self):

@@ -17,10 +17,11 @@ class BscScanApi(BaseSource):
             module=module,
             action=action
         )
-        data = self.request(
+        res = self.request(
             f"/api",
             params=parameters
-        ).json()
+        )
+        data = res.json()
         if data["status"] == "0":
             raise BscScanApiException(data["result"])
         return data
@@ -43,7 +44,7 @@ class BscScanApi(BaseSource):
         return float(data["result"])
 
 class EtherScanApi(BscScanApi):
-    url = "https://api.etherscan.com"
+    url = "https://api.etherscan.io"
 
 
 class ChainScanApi():

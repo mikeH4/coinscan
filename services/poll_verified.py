@@ -21,6 +21,6 @@ def main():
                         db=db,
                         source_verified=True
                     )
-                    db.conn.commit()
-
-                    print(f"{i+1}/{addresses_len} has been verifed")
+                    print(f"{i+1}/{addresses_len} {address} has been verifed")
+                
+                db.conn.commit()

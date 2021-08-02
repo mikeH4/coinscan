@@ -7,7 +7,7 @@ from library.BaseModel import BaseModel
 class StateTime(BaseModel):
     table = "state_time"
     
-    primary = ["key","id"]
+    primary = ["key","id","update"]
 
     def __init__(self,
         key: str,
@@ -31,8 +31,9 @@ class StateTime(BaseModel):
         
         INSERT INTO state_time (key,id,time,update)
         VALUES ({DB.placeholder(3)}, TRUE)
-        ON CONFLICT
-        UPDATE SET update = excluded.update;
+        ON CONFLICT (key, id, update)
+        DO UPDATE SET time = excluded.time
+        ;
         """
 
         param = [key, id, int(time())]

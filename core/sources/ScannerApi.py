@@ -5,7 +5,7 @@ from library.BaseSource import BaseSource
 from library.RequestManager.NoProxy import NoProxy
 
 class ScannerApi(BaseSource):
-    url = "https://api2.coinscan.finance/"
+    url = "http://localhost:90/"
 
     request_manager = NoProxy
 
@@ -17,28 +17,28 @@ class ScannerApi(BaseSource):
     def req(self, chain: ChainEnum, path: str, *args, **kwargs):
         path = path.lstrip("/")
         chain = ChainEnum(chain)
-        return self.request(urljoin(f"/v1/{chain}/",path),*args,**kwargs)
+        return self.request(urljoin(f"/v2/private/{chain}/",path),*args,**kwargs)
 
     def new(self, chain: ChainEnum):
-        res = self.req(chain,"/v1/private/new",headers=self.auth_headers)
+        res = self.req(chain,"/new",headers=self.auth_headers)
         return res.json()
     
     def get_addresses(self, chain: ChainEnum, * , addresses: list[AddressHash]):
-        res = self.req(chain,f"/v1/private/get",headers=self.auth_headers,json=dict(
+        res = self.req(chain,f"/get",headers=self.auth_headers,json=dict(
             addresses=addresses
         ))
         return res.json()
     
     def prices(self, chain: ChainEnum) -> list[tuple[str, numeric, numeric, numeric]]:
-        res = self.req(chain,"/v1/private/liquidity",headers=self.auth_headers)
+        res = self.req(chain,"/liquidity",headers=self.auth_headers)
         return res.json()
 
     def busd(self, chain: ChainEnum):
-        res = self.req(chain,f"/v1/private/busd",headers=self.auth_headers)
+        res = self.req(chain,f"/busd",headers=self.auth_headers)
         return res.json()
 
     def token_pairs_count(self, chain: ChainEnum):
-        res = self.req(chain,f"/v1/private/token-pairs-count",headers=self.auth_headers)
+        res = self.req(chain,f"/token-pairs-count",headers=self.auth_headers)
         return res.json()["count"]
 
     def token_pairs(self,
@@ -47,5 +47,5 @@ class ScannerApi(BaseSource):
         limit: int = 100,
         offset: int = 0
     ):
-        res = self.req(chain,f"/v1/private/token-pairs?limit={limit}&offset={offset}",headers=self.auth_headers)
+        res = self.req(chain,f"/token-pairs?limit={limit}&offset={offset}",headers=self.auth_headers)
         return res.json()

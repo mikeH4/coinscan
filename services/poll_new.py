@@ -9,7 +9,7 @@ from core.types.db_types import ChainEnum, bigint
 from library.Repeater import Repeater
 
 def main():
-    with DB() as db:
+    with DB(auto_commit=False) as db:
         repeater = Repeater(min=10,max=60*2.5)
         scanner_api = ScannerApi()
 
@@ -64,3 +64,5 @@ def main():
 
                     if repeater.should_repeat():
                         break
+
+                db.conn.commit()

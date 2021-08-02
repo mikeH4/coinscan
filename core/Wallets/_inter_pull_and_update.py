@@ -42,12 +42,14 @@ def pull_and_update(*,
             wallet_holding.supply = numeric(0)
             dont_update = ["wallet_id","token_id","liquidity"]
         
+        print(f"Inserted wallet {wallet_address} for {token_address}")
         wallet_id = wallet_holding.insert_with_wallet_upsert(
             chain=chain,
             wallet_address=wallet_address,
             dont_update=dont_update,
             db=db
         )
+        print("wallet_id",wallet_id)
 
         wallet_meta.id = wallet_id
         wallet_meta._upsert_by_id(db=db)

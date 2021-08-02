@@ -74,5 +74,5 @@ class ViewableTokenListings(BaseModel):
             WHERE token_meta.id IS NULL
             {chain_cond}
             {cls.limit_cond(limit)}
-            """,chain_params)
-            return [cls._from_row(row) for row in db.get_all(query)]
+            """)
+            return [cls._from_row(row) for row in db.get_all(query,chain_params)]

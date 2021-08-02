@@ -9,7 +9,11 @@ class Address(BaseModel):
 
     primary = ["id"]
     indexes = [Index(cols=["chain","address"],unique=True)]
-    
+
+    id: serial
+    chain: ChainEnum
+    address: AddressHash
+
     def __init__(self,
         id: serial,
         chain: ChainEnum,
@@ -19,19 +23,20 @@ class Address(BaseModel):
     @classmethod
     def addresses_from(cls, *, addresses: list[AddressHash], db: DB = None):
         query = f"""
-        SELECT * FROM address WHERE address.address IN (
+        SELECT id, chain, address FROM address WHERE address.address IN (
             {DB.placeholder(len(addresses))}
         )
         """
         with cls.with_db(db) as db:
-            return [AddressHash(row[0]) for row in db.get_all(query,addresses)]
+            return [AddressHash(row[2]) for row in db.get_all(query,addresses)]
     
     @staticmethod
     def _confirm_sql():
         return f"""
         INSERT INTO address (chain, address)
         VALUES ({DB.placeholder(2)})
-        ON CONFLICT (chain, address) DO UPDATE SET address = address.address
+        ON CONFLICT (chain, address)
+        DO UPDATE SET address = address.address
         RETURNING id
         """
 

@@ -27,8 +27,19 @@ class ModelOperator:
         BlockOrTransactionHash: "NULL",
         int: 0,
         numeric: 0,
-        smallint: "SMALLINT",
-        bigint: "BIGINT",
+        smallint: 0,
+        bigint: 0,
+        float: 0,
+        bool: False,
+    }
+    py_defaults = {
+        str: "",
+        AddressHash: None,
+        BlockOrTransactionHash: None,
+        int: 0,
+        numeric: 0,
+        smallint: 0,
+        bigint: 0,
         float: 0,
         bool: False,
     }
@@ -121,16 +132,20 @@ class BaseModelMetaClass(type):
         if str(bases[0]) != "<class 'library.BaseModel.BaseModel'>":
             return None
 
-        cls.keys = list(cls.__init__.__annotations__.keys())
-        if "return" in cls.keys: cls.keys.remove("return") 
+        params = dict(inspect.signature(cls.__init__).parameters)
+        del params["self"]
+        cls.keys = list(params.keys())
 
     def __call__(cls, *args, **kwargs):
         self = super().__call__(**kwargs)
-        for key,_class in cls.__init__.__annotations__.items():
-            if key == "return":
-                continue
-            val = None if kwargs[key] is None else _class(kwargs[key])
-            setattr(self,key,val)
+        for name, param in inspect.signature(cls.__init__).parameters.items():
+            if name == "self": continue
+            _class = param.annotation
+            if name not in kwargs and not isinstance(param.default,inspect._empty): # type: ignore
+                val = param.default
+            else:
+                val = None if kwargs[name] is None else _class(kwargs[name])
+            setattr(self, name, val)
         cls.__init__(self,**kwargs)
         return self
 

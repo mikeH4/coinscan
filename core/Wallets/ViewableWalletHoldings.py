@@ -86,20 +86,3 @@ class ViewableWalletHoldings(ViewableWalletMeta):
 
             return wallets
     
-    @classmethod
-    def not_updated(cls, *,
-        before_hours: int = 24,
-        db: Optional[DB] = None
-    ):
-        before_time = int(time() - before_hours*60*60)
-        with cls.with_db(db) as db:
-            query = cls._build_query(f"""
-            JOIN state_time ON state_time.id = wallet_meta.id
-            WHERE state_time.key IS NULL OR (
-                state_time.id = {db.placeholder(1)}
-                AND state_time.time > {before_time}
-            )
-            ORDER BY state_time.time DESC NULLS FIRST
-            """)
-
-            return [cls._from_row(row) for row in db.get_all(query)]

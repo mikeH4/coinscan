@@ -24,25 +24,14 @@ class TokenListings(BaseModel):
         dont_update: list[str] = ["added"],
         db: DB = None
     ):
-        keys = self.keys
-        self.keys.remove("id")
+        query, values = TokenMeta._prep_query(
+            self, # type: ignore
+            dont_update=dont_update,
+        )
 
-        update_cmd = []
-        values = []
-        for key in keys:
-            if key in dont_update: continue
-            update_cmd.append(f"{key} = excluded.{key}")
-            values.append(getattr(self,key))
-
-        query = f"""
-        {TokenMeta.address_upsert_sql()}
-        INSERT INTO token_listings
-        SELECT id,{DB.placeholder(len(keys))} FROM cte
-        ON CONFLICT (id)
-        DO UPDATE SET {', '.join(update_cmd)}
-        RETURNING id
-        """
         with self.with_db(db) as db:
-            self.id = db.get(query,[chain, token_address] + values)[0]
-        return bigint(self.id)
-    
+            ret = db.get(query,[chain,token_address] + values)
+            assert ret is not None
+            self.id = bigint(ret[0])
+        
+        return self.id
