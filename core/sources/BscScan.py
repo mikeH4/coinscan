@@ -1,8 +1,10 @@
+from typing import Optional
+from core.types.db_types import ChainEnum, bigint, numeric
 from library.RequestManager.CentralProxy import CentralProxy
-from core.Holders.AddressInfo import AddressInfo
-from core.Holders.Holders import Holders
-from time import sleep, time
-from core.types.Address import Address, BlockOrTransactionHash
+from core.Wallets.WalletMeta import WalletMeta
+from core.Wallets.WalletHoldings import WalletHoldings
+from time import sleep
+from core.types.AddressHash import AddressHash
 from library.BaseSource import BaseSource
 from bs4 import BeautifulSoup
 
@@ -11,10 +13,7 @@ class BscScan(BaseSource):
 
     request_manager = CentralProxy
 
-    limit_calls = 1
-    limit_period = 2
-
-    def holders(self,address: Address):
+    def holders(self, address: AddressHash) -> Optional[tuple[int,list[tuple[AddressHash,WalletMeta,WalletHoldings]]]]:
         try:
             res = self.request("/token/generic-tokenholders2",params=dict(
                 a=str(address)
@@ -27,7 +26,7 @@ class BscScan(BaseSource):
             try:
                 total_holders = int((
                     soup.select("#maintable > div:nth-child(2) > p")[0]
-                    .get_text()
+                    .get_text() # type: ignore
                     .lower()
                     .split("a total of ")
                 )[1].split(" ")[0].replace(",",""))
@@ -36,52 +35,52 @@ class BscScan(BaseSource):
                 print(maintain)
                 raise Exception(f"Error parsing total holders: {address}")
 
-            holders = []
+            wallets: list[tuple[AddressHash,WalletMeta,WalletHoldings]] = []
             for row in soup.select("table > tbody > tr"):
-                cols = row.select("td")
+                cols = row.select("td") # type: ignore
                 if len(cols) < 5:
                     print("No Holders")
-                    return [total_holders,[]]
+                    return (total_holders,[])
                 if len(cols) == 5:
                     rank_col,address_col,quantity_col,perc_col,analytics_cols = cols
                 elif len(cols) == 6:
                     rank_col,address_col,quantity_col,perc_col,value_col,analytics_cols = cols
-                
-                holder_args = dict(
-                    contract=address,
-                    holder=None,
-                    holding=None,
+                else:
+                    raise Exception(f"Unknown number of cols {len(cols)}")
+
+                wallet_holdings = WalletHoldings(
+                    wallet_id=bigint(0),
+                    token_id=bigint(0),
+                    supply=numeric(0),
+                    liquidity=numeric(0)
                 )
-                bscscan_tag = ""
+                wallet_meta = WalletMeta(
+                    id=bigint(0),
+                    is_contract=False,
+                    bscscan_tag=""
+                )
+
+                wallet = None
 
                 span = address_col.select("span")[0]
                 if "title" in span.attrs:
-                    bscscan_tag = span.get_text()
+                    wallet_meta.bscscan_tag = span.get_text()
 
-                holder_args["holder"] = span.select("a")[0].attrs["href"].split("?a=")[-1]
-                if holder_args["holder"].lower() == "0x000000000000000000000000000000000000dead":
-                    holder_args["holder"] = "0x0000000000000000000000000000000000000000"
+                wallet = span.select("a")[0].attrs["href"].split("?a=")[-1]
+                if wallet.lower() == "0x000000000000000000000000000000000000dead":
+                    wallet = "0x0000000000000000000000000000000000000000"
 
-                holder_args["holding"] = float(quantity_col.get_text().replace(",",""))
-                if holder_args["holding"] == 0:
+                wallet_holdings.supply = numeric(quantity_col.get_text().replace(",",""))
+                if wallet_holdings.supply == 0:
                     print("Wait, what?")
                     print(row)
                     continue
 
-                is_contract = len(address_col.select("i[title='Contract']")) > 0
-                
-                holder = Holders(**holder_args)
-                address_info = AddressInfo(
-                    address=Address(holder.holder),
-                    is_contract=is_contract,
-                    bscscan_tag=bscscan_tag,
-                    updated=time(),
-                    added=time(),
-                )
+                wallet_meta.is_contract = len(address_col.select("i[title='Contract']")) > 0
 
-                holders.append((holder,address_info))
+                wallets.append((AddressHash(wallet),wallet_meta,wallet_holdings))
 
-            return (total_holders,holders)
+            return (total_holders,wallets)
         except Exception as e:
             print(e)
             print(f"Error parsing holders from BscScan: {address}")
@@ -91,41 +90,24 @@ class BscScan(BaseSource):
         res = self.request("/contractsVerified")
         soup = BeautifulSoup(res.text,"html.parser")
         addresses = [
-            tag.get_text()
+            tag.get_text() # type: ignore
             for tag
             in soup.select("#transfers [title='Verified Code'] + a")
         ]
         return addresses
 
-    def creation(self,address:Address):
-        res = self.request(f"/address/{address}")
-        soup = BeautifulSoup(res.text,"html.parser")
-        try:
-            creator_address, creation_tx = soup.select(
-                "#ContentPlaceHolder1_trContract > div > div:nth-child(2)"
-            )[0].get_text().split(" at txn ")
-            creator = Address(creator_address.strip())
-            creation_tx = BlockOrTransactionHash(creation_tx.strip())
-            return (creator,creation_tx)
-        except Exception as e:
-            print(f"Error parsing creator from BscScan: {address}")
-            print(soup.select(
-                "#ContentPlaceHolder1_cardright"
-            ))
-            return None
-    
-    def address_info(self,address:Address):
+    def address_info(self, address: AddressHash):
         try:
             res = self.request(f"/address/{address}")
             soup = BeautifulSoup(res.text,"html.parser")
             
-            contract_or_address = soup.select("#icon")[0].parent.get_text().strip().split(" ")[0]
+            contract_or_address = soup.select("#icon")[0].parent.get_text().strip().split(" ")[0] # type: ignore
             is_contract = contract_or_address.lower() == "Contract"
 
             spans = soup.select("[title='Public Name Tag (viewable by anyone)']")
             bscscan_tag = ""
             if len(spans) > 0:
-                bscscan_tag = spans[0].get_text()
+                bscscan_tag = spans[0].get_text() # type: ignore
 
             return dict(
                 is_contract=is_contract,
@@ -135,3 +117,14 @@ class BscScan(BaseSource):
             print(e)
             print("Error parsing is_contract from BscScan:")
             sleep(3)
+        
+class EtherScan(BscScan):
+    url = "https://etherscan.io/"
+
+class ChainScan():
+    def __new__(cls, chain: ChainEnum):
+        if chain == "bsc":
+            return BscScan()
+        elif chain == "eth":
+            return EtherScan()
+        raise TypeError(f"{chain} is not a valid chain")

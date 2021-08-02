@@ -1,37 +1,29 @@
-from core.misc.Pairs import Pairs
-
+from core.Wallets.ViewableWalletHoldings import ViewableWalletHoldings
+from core.Wallets.WalletHoldings import WalletHoldings
+from library.Repeater import Repeater
+from library.postgres import DB
+from library.timer import timer
+from concurrent.futures import ThreadPoolExecutor
 
 def main():
-    from library.Repeater import Repeater
-    from core.sources.BscScan import BscScan
-    from core.Holders.Holders import Holders
-    from core.Holders.HoldersPulled import HoldersPulled
-    from library.postgres import DB
-    from library.timer import timer
-    from concurrent.futures import ThreadPoolExecutor
-
     with DB(auto_commit=False) as db:
         repeater = Repeater(min=60*3)
-        bscscan = BscScan()
         
         while repeater.loop():
             with timer("Update Holders") as increment:
                 while True:
-                    addresses = (
-                        HoldersPulled.not_updated_at_all(db=db,limit=100) +
-                        Pairs.unknown_pairs(db=db,limit=100)
-                    )
-                    if len(addresses) < 50:
-                        addresses += HoldersPulled.not_updated_recently(db=db,limit=100)
-
-                    addresses_len = len(addresses)
-                    if addresses_len < 1:
+                    addresses = ViewableWalletHoldings.not_updated(db=db)
+                    if len(addresses) < 1:
                         print("Breaking")
                         break
 
                     with ThreadPoolExecutor(max_workers=4) as exec:
                         for address in addresses:
-                            exec.submit(Holders.update_with_pull,address=address,bscscan=bscscan,db=db)
+                            exec.submit(
+                                WalletHoldings.pull_and_update,
+                                token_address=address,
+                                db=db
+                            )
 
                     db.conn.commit()
-                    increment(addresses_len)
+                    increment(len(addresses))

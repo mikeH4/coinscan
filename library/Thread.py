@@ -1,5 +1,6 @@
 import sys
 from threading import Thread as PythonThread, current_thread
+from typing import Callable, Optional
 
 class Thread:
     def __init__(self,pool,thread:PythonThread,name:str) -> None:
@@ -16,19 +17,20 @@ class Thread:
         self.thread.start()
 
 class ThreadPoolPrintIntercepter():
-    original = None
+    original: Optional[Callable] = None
 
     @staticmethod
     def write(message:str):
         if message != "\n" and message != " ":
             message = f"{current_thread().name} @> {message}"
+        assert ThreadPoolPrintIntercepter.original is not None
         ThreadPoolPrintIntercepter.original(message)
 
 class ThreadPool:
     @staticmethod
     def intercept_prints():
         ThreadPoolPrintIntercepter.original = sys.stdout.write
-        sys.stdout.write = ThreadPoolPrintIntercepter.write
+        sys.stdout.write = ThreadPoolPrintIntercepter.write # type: ignore
 
     def __init__(self) -> None:
         self._active = {}

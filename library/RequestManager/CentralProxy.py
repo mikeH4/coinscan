@@ -35,8 +35,6 @@ class CentralProxy:
         cls.init_slot(_class)
         cls.hold_fire(_class)
 
-        if "param_from_proxy" in kwargs:
-            del kwargs["param_from_proxy"]
         res = forward_get(url,**kwargs)
         return cls.with_trip(_class, res, kwargs)
     

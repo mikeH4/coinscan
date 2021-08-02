@@ -1,14 +1,19 @@
-def main():
-    from core.sources.ScannerApi import ScannerApi
-    from library.Repeater import Repeater
-    from core.misc.TokenPrices import TokenPrices
+from core.types.db_types import ChainEnum
+from core.sources.ScannerApi import ScannerApi
+from library.Repeater import Repeater
+from core.Token.TokenStats import TokenStats
 
+def main():
     repeater = Repeater(min=60*10)
     scanner_api = ScannerApi()
 
     while repeater.loop():
-        data = scanner_api.prices()
-        TokenPrices.completely_absolutely_replace(data)
-
+        for chain in ChainEnum.enum_opts:
+            chain = ChainEnum(chain)
+            data = scanner_api.prices(chain)
+            TokenStats.replace_price_data(
+                chain=chain,
+                data=data
+            )
         
         print("Replaced all data")

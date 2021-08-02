@@ -1,35 +1,36 @@
-import psycopg2
+from typing import Optional
 from psycopg2.pool import ThreadedConnectionPool
 import settings
 from signal import *
 import atexit
 
+class PostgresDBException(Exception): pass
+
 class DB:
-    _pool: ThreadedConnectionPool = None
-    _database = None
-    _connsettings = None
+    _pools:dict[str,ThreadedConnectionPool] = dict( # type: ignore
+        blockchain= None,
+    )
+    _initialized: bool = False
 
     @classmethod
-    def initialize(cls, database: str, usepool:bool = True):
-        if cls._database is not None: raise Exception("Initialize Called")
-        cls._database = database
+    def initialize(cls):
+        if cls._initialized: raise PostgresDBException("Initialize Called")
+        cls._initialized = True
 
-        cls._connsettings = dict(
-            host="localhost",
-            database=database,
-        )
+        for dbname in cls._pools.keys():
+            connsettings = dict()
+            if settings.sandbox != True:
+                connsettings.update(
+                    user="coinscan",
+                    password="root"
+                )
         
-        if settings.sandbox != True:
-            cls._connsettings.update(
-                user="coinscan",
-                password="root"
-            )
-        
-        if usepool:
-            cls._pool = ThreadedConnectionPool(
+            cls._pools[dbname] = ThreadedConnectionPool(
+                host="localhost",
+                database=dbname,
                 minconn=1,
                 maxconn=120,
-                **cls._connsettings
+                **connsettings
             )
         # DB._register_cleanup()
 
@@ -40,20 +41,17 @@ class DB:
     def placeholder(l: int):
         return ",".join(['%s'] * l )
 
-    def __init__(self, auto_commit=True):
+    def __init__(self, dbname = "blockchain", auto_commit: bool = True):
         self.auto_commit = auto_commit
-        self.open()
-    
-    def open(self):
+        
+        if dbname not in self._pools.keys():
+            raise PostgresDBException(f"{dbname} is not one of {','.join(self._pools.keys())}")
         DB.__active.append(self)
 	
-        if self._pool is not None:
-            print("Using Pool",f"Active: {len(DB.__active)}")
-            self.conn = self._pool.getconn()
-        else:
-            print("Using Single Conn",f"Active: {len(DB.__active)}")
-            self.conn = psycopg2.connect(**self._connsettings)
-        
+        print(f"Using Pool {dbname}, Active: {len(DB.__active)}")
+
+        self.pool = self._pools[dbname]
+        self.conn = self.pool.getconn()
         self.cursor = self.conn.cursor()
 
     def close(self):
@@ -62,8 +60,7 @@ class DB:
         if self.auto_commit: self.conn.commit()
         self.cursor.close()
         self.conn.close()
-        if self._pool is not None:
-            self._pool.putconn(self.conn)
+        self.pool.putconn(self.conn)
 
     def __enter__(self):
         return self
@@ -73,10 +70,10 @@ class DB:
 
     def insert(self,
         table,
-        data,
-        commit: bool = True,
-        ignore_insert=False,
-        replace_insert_on:list = False,
+        data: dict[str,str],
+        commit: bool = False,
+        ignore_insert: bool = False,
+        replace_insert_on: list[str] = None,
         dont_update = []
     ):
         cols = list(data.keys())
@@ -85,10 +82,10 @@ class DB:
         
         sql = f"INSERT INTO {table} ({cols_str}) VALUES ({placeholder})"
                 
-        if replace_insert_on:
+        if replace_insert_on is not None:
             for replace_col in replace_insert_on:
                 if replace_col not in cols:
-                    raise Exception("replace_insert_on must be of columns inserted")
+                    raise PostgresDBException("replace_insert_on must be of columns inserted")
             update_str = ", ".join([
                 (f"{key} = excluded.{key}")
                 for key in cols
@@ -102,26 +99,26 @@ class DB:
         elif ignore_insert:
             sql += "ON CONFLICT DO NOTHING"
     
-        self.query(sql,data.values())
+        self.query(sql,list(data.values()))
         
         if commit:
             self.conn.commit()
 
             return self.cursor.lastrowid
 
-    def get(self,sql: str,queries:list = []):
+    def get(self, sql: str, queries: list = []) -> Optional[tuple]:
         self.query(sql, queries)
         return self.cursor.fetchone()
 
-    def get_all(self,sql: str,queries:list = []):
+    def get_all(self, sql: str, queries:list = []) -> list[tuple]:
         self.query(sql, queries)
         return self.cursor.fetchall()
 
-    def query(self,sql: str,queries:list = []):
+    def query(self,sql: str,queries:list = []) -> Optional[tuple]:
         try:
             a = self.cursor.execute(sql, list( queries ) )
         except Exception as error:
-            raise Exception("\n" + sql + "\n" + str(error))
+            raise PostgresDBException("\n" + sql + "\n" + str(error))
 
     def rollback(self):
         self.query("ROLLBACK;")
@@ -131,12 +128,12 @@ class DB:
         def clean(*args):
             for db in DB.__active:
                 db.close()
-            if DB._pool is not None:
-                DB._pool.closeall()
+            for dbname in DB._pools.keys():
+                DB._pools[dbname].closeall()
             raise SystemExit(0)
 
         atexit.register(clean)
         for sig in (SIGABRT, SIGILL, SIGINT, SIGTERM):
             signal(sig, clean)
 
-DB.initialize("tokens")
+DB.initialize()

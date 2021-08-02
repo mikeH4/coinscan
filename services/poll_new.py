@@ -1,53 +1,66 @@
-def main():
-    from core.sources.ScannerApi import ScannerApi
-    from library.Repeater import Repeater
-    from core.sources.BscScanApi import BscScanApi
-    from core.Token.Token import Token
-    from core.types.Address import Address
-    from library.postgres import DB
+from core.Address import Address
+from core.Token.TokenStats import TokenStats
+from library.postgres import DB
+from core.sources.ScannerApi import ScannerApi
+from core.sources.BscScanApi import ChainScanApi
+from core.types.AddressHash import AddressHash
+from core.Token.TokenMeta import TokenMeta
+from core.types.db_types import ChainEnum, bigint
+from library.Repeater import Repeater
 
-    
+def main():
     with DB() as db:
         repeater = Repeater(min=10,max=60*2.5)
-        bscscan_api = BscScanApi()
         scanner_api = ScannerApi()
 
         existing_addrs = []
 
         while repeater.loop():
-            data = scanner_api.new()
-            data_len = len(data)
+            for chain in ChainEnum.enum_opts:
+                chain = ChainEnum(chain)
+                data = scanner_api.new(chain)
+                data_len = len(data)
 
-            addresses = [row["address"] for row in data]
-            
-            if len(existing_addrs) == 0:
-                print("Fetched Existing From")
-                existing_addrs = Token.existing_from(addresses,db)
-            elif len(existing_addrs) > 5000:
-                # Just so memory doesn't escape
-                existing_addrs = existing_addrs[5000:]
+                addresses = [AddressHash(row["address"]) for row in data]
+                
+                if len(existing_addrs) == 0:
+                    print("Fetched Existing is 0")
+                    existing_addrs = Address.addresses_from(addresses=addresses, db=db)
+                elif len(existing_addrs) > 5000:
+                    # Just so memory doesn't escape
+                    existing_addrs = existing_addrs[5000:]
 
-            for i,token_data in enumerate(data):
-                if token_data["address"] in existing_addrs:
-                    continue
-                existing_addrs.append(token_data["address"])
+                for i,token_data in enumerate(data):
+                    address = AddressHash(token_data["address"])
 
-                address = Address(token_data["address"])
+                    if address in existing_addrs: continue
+                    existing_addrs.append(address)
 
-                decimals = token_data["decimals"]
-                total_supply = token_data["total_supply"]/(10**decimals)
-                Token.insert_with_source(
-                    bscscan_api=bscscan_api,
-                    address=address,
-                    name=token_data["name"],
-                    symbol=token_data["symbol"],
-                    decimals=decimals,
-                    total_supply=total_supply,
-                    block_time=token_data["block_time"],
-                    db=db
-                )
+                    decimals = token_data["decimals"]
+                    total_supply = token_data["total_supply"]/(10**decimals)
+                    
+                    id = TokenMeta(
+                        id=bigint(0),
+                        name=token_data["name"],
+                        symbol=token_data["symbol"],
+                        decimals=decimals,
+                        created_time=token_data["block_time"],
+                        source_verified=ChainScanApi(chain).source_code(address=address) is not None
+                    ).insert_or_update(
+                        chain=chain,
+                        token_address=address,
+                        db=db
+                    )
 
-                print(f"{i+1}/{data_len} Token Inserted")
+                    TokenStats(
+                        id=id,
+                        total_supply=total_supply
+                    )._upsert_by_id(
+                        dont_update=["circulating","price_change","holders","liquidity"],
+                        db=db
+                    )
 
-                if repeater.should_repeat():
-                    break
+                    print(f"{i+1}/{data_len} Token Inserted")
+
+                    if repeater.should_repeat():
+                        break

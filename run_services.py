@@ -7,7 +7,6 @@ import settings
 # From Api2
 import services.poll_new
 import services.copy_token_prices
-import services.poll_pairs
 import services.sync_listing_tokens
 
 # From Listing Sites
@@ -40,7 +39,6 @@ if __name__ == "__main__":
         services.copy_token_prices,
         services.poll_listings,
         services.poll_new,
-        services.poll_pairs,
         services.poll_verified,
         services.sync_listing_tokens,
         services.sync_verified,
@@ -50,11 +48,11 @@ if __name__ == "__main__":
         threads_to_run = [
             # services.copy_token_prices,
             # services.poll_listings,
-            # services.poll_new,
+            services.poll_new,
             # services.poll_pairs,
             # services.poll_verified,
             # services.sync_listing_tokens,
-            services.sync_verified,
+            # services.sync_verified,
             # services.update_holders,
         ]
 

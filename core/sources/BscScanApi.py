@@ -1,6 +1,7 @@
+from core.types.db_types import ChainEnum
 from library.RequestManager.CentralProxy import CentralProxy
 from time import sleep
-from core.types.Address import Address
+from core.types.AddressHash import AddressHash
 from library.BaseSource import BaseSource
 
 class BscScanApiException(Exception):
@@ -10,13 +11,6 @@ class BscScanApi(BaseSource):
     url = "https://api.bscscan.com/"
 
     request_manager = CentralProxy
-
-    limit_calls = 3
-    limit_period = 1
-
-    param_from_proxy = dict(
-        bscscan_apikey="apikey"
-    )
 
     def call(self,module,action,**parameters):
         parameters.update(
@@ -31,7 +25,7 @@ class BscScanApi(BaseSource):
             raise BscScanApiException(data["result"])
         return data
 
-    def source_code(self,address:Address):
+    def source_code(self, address: AddressHash):
         while True:
             try:
                 data = self.call("contract","getsourcecode",
@@ -42,8 +36,20 @@ class BscScanApi(BaseSource):
             except BscScanApiException:
                 sleep(3)
     
-    def total_supply(self,address:Address):
+    def total_supply(self,address: AddressHash):
         data = self.call("stats","tokensupply",
             contractaddress=str(address)
         )
         return float(data["result"])
+
+class EtherScanApi(BscScanApi):
+    url = "https://api.etherscan.com"
+
+
+class ChainScanApi():
+    def __new__(cls, chain: ChainEnum):
+        if chain == "bsc":
+            return BscScanApi()
+        elif chain == "eth":
+            return EtherScanApi()
+        raise TypeError(f"{chain} is not a valid chain")

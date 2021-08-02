@@ -1,20 +1,90 @@
-# coinscan
+# Coin Scan
 
-Main Coin Scan repository that contains code for the api, and main processes of the coinscan backend
+At the core, the database consists of a single table:
 
-## Clone
+```
+AddressInfo:
+    id: serial
+    chain: ChainEnum
+    address: Address
+```
 
-1. Navigate into this dir
+Each Address can be a wallet, token, pair or all 3. Each address can have associated meta for all types:
 
-2. Create a virtual env
-`python3 -m venv env`
+## 1. `token`
 
-3. Activate virtual env
-`source env/bin/activate`
+#### `TokenMeta`
+For generally static meta about the token
+```
+TokenMeta:
+    id: bigint
+    name: str
+    symbol: str
+    decimals: int
+    created_time: int
+    source_verified: bool
+```
 
-4. Install Dependencies
-`pip3 install -r requirements.txt`
+#### `TokenPrices`
+For dynamic, regularly updating data related to the token
+```
+TokenPrices:
+    id: bigint
+    total_supply: numeric
+    circulating: numeric
+    price_change: bigint
+    holders: numeric
+    liquidity: numeric
+```
 
-5. Run `python3 cmd.py` optionally specifiying a script after, for example: `python3 cmd.py service`
+#### `TokenListings`
+For listings from places like CoinGecko and CoinMarketCap
+```
+TokenListings:
+    id: bigint
+    platform: PlatformsEnum
+    local_id: str
+    local_slug: str
+    added: int
+```
 
-6. Run API using `uvicorn api:app --reload`
+## 2. `wallet`
+
+#### `WalletMeta`
+For meta related to the wallet:
+```
+WalletMeta:
+    id: bigint
+    is_contract: bool
+    bscscan_tag: str
+    added: int
+```
+
+#### `WalletHoldings`
+For holdings, and liquidity of a particular token:
+```
+WalletHoldings:
+    token_id: bigint
+    holder_id: bigint
+    supply: numeric
+    liquidity: numeric
+```
+
+## 3. `pair`
+Pair lookup for each token:
+#### `TokenPair`
+```
+TokenPair:
+    pair_id: bigint
+    token_id: bigint
+```
+
+## Additional
+#### `StateTime`
+Keeps track of added/updated time for particular objects
+```
+StateTime:
+    key: str
+    id: bigint
+    update: bool
+```

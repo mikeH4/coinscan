@@ -3,7 +3,7 @@ from time import time
 
 
 @contextmanager
-def timer(description: str) -> None:
+def timer(description: str):
     start = time()
     items = 0
     def increment(by: int):

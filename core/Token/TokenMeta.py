@@ -1,99 +1,101 @@
-from typing import KeysView
-from core.types.db_types import numeric
-from library.BaseModel import BaseModel
+from core.Address import Address
+from typing import Optional
 from library.postgres import DB
-from core.types.Address import Address, BlockOrTransactionHash
+from core.types.AddressHash import AddressHash
+from library.BaseModel import BaseModel
+from core.types.db_types import ChainEnum, bigint
 
 class TokenMeta(BaseModel):
     table = "token_meta"
-    primary = ["address"]
+    primary = ["id"]
 
-    null_cols = [
-        "decimals",
-        "total_supply",
-        "source_verified",
-        "holders",
-        "liquidity",
-        "creation_tx",
-        "creator",
-        "block_time"
-    ]
+    id: bigint
+    name: str
+    symbol: str
+    decimals: int
+    created_time: int
+    source_verified: bool
 
     def __init__(self,
-        address:Address,
-        decimals:int = None,
-        total_supply:numeric = None,
-        source_verified:bool = None,
-        holders:int = None,
-        liquidity:numeric = None,
-        creation_tx:BlockOrTransactionHash = None,
-        creator:Address = None,
-        block_time:int = None
-    ) -> None: pass
+        *,
+        id: bigint,
+        name: str,
+        symbol: str,
+        decimals: int,
+        created_time: int,
+        source_verified: bool = None
+    ): pass
+
+    @staticmethod
+    def address_upsert_sql():
+        return f"""WITH cte AS ( {Address._confirm_sql()} )"""
+
+    def insert_or_update(self,
+        *,
+        chain: ChainEnum,
+        token_address: AddressHash,
+        dont_update: list[str] = ["created_time"],
+        db: DB = None
+    ):
+        keys = self.keys
+        self.keys.remove("id")
+
+        update_cmd = []
+        values = []
+        for key in keys:
+            if key in dont_update: continue
+            update_cmd.append(f"{key} = excluded.{key}")
+            values.append(getattr(self,key))
+
+        query = f"""
+        {self.address_upsert_sql()}
+        INSERT INTO token_meta
+        SELECT id,{DB.placeholder(len(keys))} FROM cte
+        ON CONFLICT (id)
+        DO UPDATE SET {', '.join(update_cmd)}
+        RETURNING id
+        """
+        with self.with_db(db) as db:
+            ret = db.get(query,[chain, token_address] + values)
+            assert ret is not None
+            self.id = bigint(ret[0])
+        return self.id
     
     @classmethod
-    def get(cls,address):
-        with DB() as db:
-            return cls._from_row(db.get(
-                f"SELECT * FROM token_meta WHERE address = {db.placeholder(1)}",
-                [address]
-            ))
-
-    @classmethod
-    def where_is_none(cls,key,limit=1000):
-        limit_cond = cls.limit_cond(limit)
-        if key not in cls.keys:
-            raise KeyError(f"TokenMeta doesn't have the attribute {key}")
-        with DB() as db:
-            return [cls._from_row(row) for row in db.get_all(
-                f"""
-                SELECT * FROM token_meta
-                WHERE {key} IS NULL
-                ORDER BY block_time DESC NULLS LAST
-                {limit_cond}
-                """,
-                [key]
-            )]
-
-    @classmethod
-    def get_addresses(cls,limit=1000,where_cond=""):
-        limit_cond = cls.limit_cond(limit)
-        with DB() as db:
-            return [row[0] for row in db.get_all(
-                f"""
-                SELECT tokens.address FROM tokens
-                LEFT JOIN token_meta ON tokens.address = token_meta.address
-                {where_cond}
-                ORDER BY block_time DESC NULLS LAST
-                {limit_cond}
-                """
-            )]
-
-    @classmethod
-    def update(
-        cls,
-        address:Address,
-        db = None,
-        dont_update=[],
+    def update(cls, *,
+        chain: ChainEnum,
+        token_address: AddressHash,
+        db: DB = None,
         **kwds
     ):
-        address = str(Address(address))
+        full_kwds = {}
+        dont_update = []
+        for key in cls.keys:
+            if key in kwds:
+                full_kwds[key] = kwds[key]
+            else:
+                full_kwds[key] = None
+                dont_update.append(key)
+        TokenMeta(**full_kwds).insert_or_update(
+            chain=chain,
+            token_address=token_address,
+            dont_update=dont_update,
+            db=db
+        )
+    
+    @classmethod
+    def get_addresses(cls, *,
+        where_cond: str = "",
+        limit: Optional[int] = None,
+        db: Optional[DB] = None
+    ):
+        cls.limit_cond(limit)
         with cls.with_db(db) as db:
-            cols = kwds.keys()
-            col_string = ','.join(cols)
-            placeholder = db.placeholder(len(kwds)+1)
-
-            keyed_str = ", ".join([
-                f"{key} = excluded.{key}"
-                for key in cols
-                if key not in dont_update
-            ])
-            insert_sql = f"INSERT INTO token_meta (address,{col_string}) VALUES ({placeholder})"
-
-            update_sql = f"UPDATE SET {keyed_str}"
-            sql = f"""
-            {insert_sql}
-            ON CONFLICT (address)
-            DO {update_sql}
-            """
-            db.query(sql,[address] + list(kwds.values()))
+            rows = db.get_all(f"""
+            SELECT
+                address.address
+            FROM token_meta
+            JOIN address ON address.id = token_meta.id
+            {where_cond}
+            """)
+            return [AddressHash(row[0]) for row in rows]

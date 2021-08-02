@@ -9,18 +9,12 @@ class BaseSourceMetaClass(type):
         if str(bases[0]) != "<class 'library.BaseSource.BaseSource'>":
             return None
 
-        if cls.url is None:
+        if cls.url is None: # type: ignore
             raise NotImplementedError("Class is invalid, url must be present")
 
 # Abstract Class
 class BaseSource(metaclass=BaseSourceMetaClass):
-    url = None
-    limit_calls = 1
-    limit_period = 1
-    param_from_proxy={}
-
-    # Only use in exceptional cases
-    limit_bypass = False
+    url: str = None # type: ignore
 
     request_manager = CentralProxy
 
