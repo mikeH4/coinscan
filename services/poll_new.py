@@ -25,7 +25,7 @@ def main():
                 
                 if len(existing_addrs) == 0:
                     print("Fetched Existing is 0")
-                    existing_addrs = Address.addresses_from(addresses=addresses, db=db)
+                    existing_addrs = Address.addresses_from(chain=chain,addresses=addresses, db=db)
                 elif len(existing_addrs) > 5000:
                     # Just so memory doesn't escape
                     existing_addrs = existing_addrs[5000:]

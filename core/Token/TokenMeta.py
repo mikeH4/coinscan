@@ -97,18 +97,17 @@ class TokenMeta(BaseModel):
         )
     
     @classmethod
-    def get_addresses(cls, *,
+    def get_only_addresses(cls, *,
         where_cond: str = "",
         limit: Optional[int] = None,
         db: Optional[DB] = None
     ):
-        cls.limit_cond(limit)
         with cls.with_db(db) as db:
             rows = db.get_all(f"""
-            SELECT
-                address.address
+            SELECT address.address
             FROM token_meta
             JOIN address ON address.id = token_meta.id
             {where_cond}
+            {cls.limit_cond(limit)}
             """)
             return [AddressHash(row[0]) for row in rows]

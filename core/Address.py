@@ -21,15 +21,37 @@ class Address(BaseModel):
     ): pass
 
     @classmethod
-    def addresses_from(cls, *, addresses: list[AddressHash], db: DB = None):
-        query = f"""
-        SELECT id, chain, address FROM address WHERE address.address IN (
-            {DB.placeholder(len(addresses))}
+    def addresses_from(cls, *,
+        chain: ChainEnum,
+        addresses: list[AddressHash],
+        limit: Optional[int] = None,
+        db: Optional[DB] = None
+    ):
+        objs = cls.filter(
+            where_cond=f"WHERE address IN ({DB.placeholder(len(addresses))}) AND chain = {chain}",
+            limit=limit,
+            db=db
         )
-        """
-        with cls.with_db(db) as db:
-            return [AddressHash(row[2]) for row in db.get_all(query,addresses)]
+        return [obj.address for obj in objs]
     
+    @classmethod
+    def filter(cls, *,
+        where_cond: str = "",
+        limit: Optional[int] = None,
+        db: Optional[DB] = None
+    ):
+        with cls.with_db(db) as db:
+            rows = db.get_all(f"""
+            SELECT
+                address.id,
+                address.chain,
+                address.address
+            FROM address
+            {where_cond}
+            {cls.limit_cond(limit)}
+            """)
+            return [cls._from_row(row) for row in rows]
+
     @staticmethod
     def _confirm_sql():
         return f"""

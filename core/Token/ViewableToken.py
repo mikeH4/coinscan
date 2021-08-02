@@ -1,10 +1,22 @@
-from core.types.db_types import ChainEnum, numeric
+from typing import Optional
+from core.types.db_types import ChainEnum, bigint, numeric
 from library.postgres import DB
 from core.types.AddressHash import AddressHash, Validate
 from library.BaseModel import BaseModel
 
 class ViewableToken(BaseModel):
+    id: bigint
+    chain: ChainEnum
+    address: AddressHash
+    name: str
+    symbol: str
+    source_verified: bool
+    created: int
+    holders: numeric
+    listing: str
+
     def __init__(self,
+        id: bigint,
         chain: ChainEnum,
         address: AddressHash,
         name: str,
@@ -26,10 +38,23 @@ class ViewableToken(BaseModel):
             if row is None: return None
             return cls._from_row(row)
 
+    @classmethod
+    def keyed_by_ids(cls, ids: list[bigint], db: Optional[DB] = None):
+        query = cls._build_query(f"""
+        WHERE address.id IN ({DB.placeholder(len(ids))})
+        """)
+        with cls.with_db(db) as db:
+            keyed: dict[bigint,ViewableToken] = dict()
+            for row in db.get_all(query,ids):
+                token = cls._from_row(row)
+                keyed[token.id] = token
+            return keyed
+
     @staticmethod
     def _build_query(where: str = ""):
         query = f"""
         SELECT
+            address.id AS id,
             address.chain AS chain,
             address.address AS address,
             token_meta.name AS name,
@@ -51,6 +76,19 @@ class ViewableToken(BaseModel):
         {where}
         """
         return query
+        
+    @classmethod
+    def rising(cls, *,
+        limit: Optional[int] = 100,
+        db: Optional[DB] = None
+    ):
+        query = cls._build_query(f"""
+        WHERE token_stats.liquidity >= 7
+        ORDER BY token_stats.price_change DESC
+        LIMIT {cls.limit_cond(limit)}
+        """)
+        with cls.with_db(db) as db:
+            return [cls._from_row(row) for row in db.get_all(query)]
 
     @classmethod
     def search(cls, keyword: str):

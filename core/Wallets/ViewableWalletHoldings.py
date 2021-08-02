@@ -1,7 +1,5 @@
-from time import time
-from typing import Optional
 from core.Wallets.ViewableWalletMeta import ViewableWalletMeta
-from core.types.db_types import ChainEnum, enum, numeric
+from core.types.db_types import ChainEnum, bigint, enum, numeric
 from core.types.AddressHash import AddressHash, Validate
 from library.postgres import DB
 
@@ -9,6 +7,7 @@ TokenOrWallet = enum("wallet","token")
 
 class ViewableWalletHoldings(ViewableWalletMeta):
     def __init__(self,
+        id: bigint,
         chain: ChainEnum,
         address: AddressHash,
         is_contract: bool,
@@ -22,6 +21,7 @@ class ViewableWalletHoldings(ViewableWalletMeta):
     def _build_query(where: str = ""):
         return f"""
         SELECT
+            wallet_address.id AS id,
             wallet_address.chain AS chain,
             wallet_address.address AS wallet_address,
             wallet_meta.is_contract AS is_contract,

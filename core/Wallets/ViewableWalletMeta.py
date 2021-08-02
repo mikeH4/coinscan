@@ -1,10 +1,11 @@
-from core.types.db_types import ChainEnum
+from core.types.db_types import ChainEnum, bigint
 from library.postgres import DB
 from library.BaseModel import BaseModel
 from core.types.AddressHash import AddressHash, Validate
 
 class ViewableWalletMeta(BaseModel):
     def __init__(self,
+        id: bigint,
         chain: ChainEnum,
         address: AddressHash,
         is_contract: bool,
@@ -17,6 +18,7 @@ class ViewableWalletMeta(BaseModel):
         with DB() as db:
             row = db.get("""
             SELECT
+                address.id AS id,
                 address.chain AS chain,
                 address.address AS address,
                 wallet_meta.is_contract AS is_contract,

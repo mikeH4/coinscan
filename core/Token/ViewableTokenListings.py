@@ -1,10 +1,11 @@
 from typing import Optional
 from library.postgres import DB
 from core.types.AddressHash import AddressHash, Validate
-from core.types.db_types import ChainEnum, PlatformsEnum
+from core.types.db_types import ChainEnum, PlatformsEnum, bigint
 from library.BaseModel import BaseModel
 
 class ViewableTokenListings(BaseModel):
+    id: bigint
     chain: ChainEnum
     token_address: AddressHash
     platform: PlatformsEnum
@@ -12,6 +13,7 @@ class ViewableTokenListings(BaseModel):
     added: int
 
     def __init__(self,
+        id: bigint,
         chain: ChainEnum,
         token_address: AddressHash,
         platform: PlatformsEnum,
@@ -23,6 +25,7 @@ class ViewableTokenListings(BaseModel):
     def _build_query(where: str = ""):
         query = f"""
         SELECT
+            address.id AS id,
             address.chain AS chain,
             address.address AS address,
             token_listings.platform AS platform,

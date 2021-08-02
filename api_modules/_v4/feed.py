@@ -1,3 +1,4 @@
+from core.types.db_types import bigint, numeric
 from fastapi import APIRouter
 from library.postgres import DB
 
@@ -19,45 +20,42 @@ def latest(
         min_liquidity_500=min_liquidity_500
     ),limit=100)
 
-# @router.get("/listings")
-# def listings():
-#     with DB() as db:
-#         listings = ViewableTokenListings.new_listings()
-#         listing_keys = list(listings)
-#         tokens = ViewableToken.get_addresses(
-#             listing_keys,
-#             db=db
-#         )
-#         sorted_tokens = []
-#         for address in listing_keys:
-#             if address not in tokens:
-#                 del listings[address]
-#                 continue
-#             sorted_tokens.append(tokens[address])
-#         return dict(
-#             listings=listings,
-#             tokens=sorted_tokens
-#         )
+@router.get("/listings")
+def listings():
+    with DB() as db:
+        listings = ViewableTokenListings.new_listings()
+        
+        keyed_listings: dict[bigint,ViewableTokenListings] = dict()
+        for listing in listings: keyed_listings[listing.id] = listing
 
-# @router.get("/rising")
-# def rising():
-#     with DB() as db:
-#         rising = TokenPrices.rising(db=db)
-#         rising_keys = list(rising.keys())
-#         tokens = ViewableToken.get_addresses(
-#             rising_keys,
-#             db=db
-#         )
-#         sorted_tokens = []
-#         for address in rising_keys:
-#             if address not in tokens:
-#                 del rising[address]
-#                 continue
-#             sorted_tokens.append(tokens[address])
-#         return dict(
-#             change=rising,
-#             tokens=sorted_tokens
-#         )
+        tokens = ViewableToken.keyed_by_ids(ids=list(keyed_listings.keys()), db=db)
+
+        return dict(
+            listings=keyed_listings,
+            tokens=tokens
+        )
+
+@router.get("/rising")
+def rising():
+    with DB() as db:
+        rows = db.get_all("""
+        SELECT id, price_change FROM token_stats
+        WHERE liquidity > 7
+        ORDER BY price_change DESC
+        """)
+
+        keyed_rising = {
+            bigint(row[0]): numeric(row[1])
+            for row
+            in rows
+        }
+
+        tokens = ViewableToken.keyed_by_ids(ids=list(keyed_rising.keys()), db=db)
+
+        return dict(
+            change=rising,
+            tokens=tokens
+        )
     
 @router.get("/search/{search}")
 def search(search: str):

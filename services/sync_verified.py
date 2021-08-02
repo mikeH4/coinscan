@@ -7,15 +7,16 @@ def main():
     with DB() as db:
         for chain in ChainEnum.enum_opts:
             chain = ChainEnum(chain)
-            api = ChainScanApi(chain)
-            addresses = TokenMeta.get_addresses(
+            addresses = TokenMeta.get_only_addresses(
                 limit=None,
-                where_cond="WHERE token_meta.source_verified IS NOT TRUE"
+                where_cond=f"""
+                WHERE token_meta.source_verified IS NOT TRUE
+                AND address.chain = {chain}
+                """
             )
-            addresses_len = len(addresses)
 
             for i,address in enumerate(addresses):
-                source_verified = (api.source_code(
+                source_verified = (ChainScanApi(chain).source_code(
                     address=address
                 ) is not None)
                 TokenMeta.update(
@@ -26,4 +27,4 @@ def main():
                 )
                 db.conn.commit()
 
-                print(f"{i+1}/{addresses_len} Source Updated: {address} => {str(source_verified)}")
+                print(f"{i+1}/{len(addresses)} Source Updated: {address} => {str(source_verified)}")
