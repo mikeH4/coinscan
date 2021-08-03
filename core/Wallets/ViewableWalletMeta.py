@@ -5,9 +5,8 @@ from core.types.AddressHash import AddressHash, Validate
 
 class ViewableWalletMeta(BaseModel):
     def __init__(self,
-        id: bigint,
         chain: ChainEnum,
-        address: AddressHash,
+        wallet_address: AddressHash,
         is_contract: bool,
         holder_tag: str,
     ) -> None: pass
@@ -18,7 +17,6 @@ class ViewableWalletMeta(BaseModel):
         with DB() as db:
             row = db.get("""
             SELECT
-                address.id AS id,
                 address.chain AS chain,
                 address.address AS address,
                 wallet_meta.is_contract AS is_contract,

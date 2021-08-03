@@ -9,6 +9,7 @@ class PostgresDBException(Exception): pass
 class DB:
     _pools:dict[str,ThreadedConnectionPool] = dict( # type: ignore
         blockchain= None,
+        bsc= None,
     )
     _initialized: bool = False
 
@@ -41,7 +42,7 @@ class DB:
     def placeholder(l: int):
         return ",".join(['%s'] * l )
 
-    def __init__(self, dbname = "blockchain", auto_commit: bool = True):
+    def __init__(self, dbname: str = "blockchain", auto_commit: bool = True):
         self.auto_commit = auto_commit
         
         if dbname not in self._pools.keys():

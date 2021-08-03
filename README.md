@@ -6,7 +6,7 @@ At the core, the database consists of a single table:
 AddressInfo:
     id: serial
     chain: ChainEnum
-    address: Address
+    address:    
 ```
 
 Each Address can be a wallet, token, pair or all 3. Each address can have associated meta for all types:
@@ -25,10 +25,10 @@ TokenMeta:
     source_verified: bool
 ```
 
-#### `TokenPrices`
+#### `TokenStats`
 For dynamic, regularly updating data related to the token
 ```
-TokenPrices:
+TokenStats:
     id: bigint
     total_supply: numeric
     circulating: numeric
@@ -57,7 +57,6 @@ WalletMeta:
     id: bigint
     is_contract: bool
     bscscan_tag: str
-    added: int
 ```
 
 #### `WalletHoldings`
@@ -86,5 +85,6 @@ Keeps track of added/updated time for particular objects
 StateTime:
     key: str
     id: bigint
+    time: int
     update: bool
 ```

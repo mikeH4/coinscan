@@ -25,10 +25,15 @@ def listings():
     with DB() as db:
         listings = ViewableTokenListings.new_listings()
         
-        keyed_listings: dict[bigint,ViewableTokenListings] = dict()
-        for listing in listings: keyed_listings[listing.id] = listing
+        keyed_listings: dict[bigint,list[ViewableTokenListings]] = dict()
+        for listing in listings:
+            if listing.id not in keyed_listings: keyed_listings[listing.id] = []
+            keyed_listings[listing.id].append(listing)
 
         tokens = ViewableToken.keyed_by_ids(ids=list(keyed_listings.keys()), db=db)
+
+        for id in list(keyed_listings.keys()):
+            if id not in tokens: del keyed_listings[id]
 
         return dict(
             listings=keyed_listings,
@@ -51,6 +56,9 @@ def rising():
         }
 
         tokens = ViewableToken.keyed_by_ids(ids=list(keyed_rising.keys()), db=db)
+
+        for id in list(keyed_rising.keys()):
+            if id not in tokens: del keyed_rising[id]
 
         return dict(
             change=rising,

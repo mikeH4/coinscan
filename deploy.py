@@ -1,22 +1,16 @@
 import subprocess
 
 subcmd = [
-    "sudo nginx -t",
-    "cd /home/coinscan/",
+    "cd /home/blockchain/",
     "unzip -o archive.zip",
     "rm archive.zip",
-    "systemctl restart coinscan_services",
-    "systemctl status coinscan_services",
-    "systemctl restart coinscan_api",
-    "systemctl status coinscan_api",
     "systemctl restart nginx",
     "systemctl status nginx",
 ]
 subcmd_str =  "&& ".join(subcmd)
 cmds = [
     "git archive --format zip --output archive.zip master",
-    "scp archive.zip coinscan:/home/coinscan",
-    "scp helpful_blobs/nginx.conf coinscan:/etc/nginx/nginx.conf",
+    "scp archive.zip coinscan:/home/blockchain",
     f"ssh coinscan '{subcmd_str}'",
 ]
 

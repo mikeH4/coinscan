@@ -2,7 +2,7 @@
 echo "" > /etc/nginx/nginx.conf && nano /etc/nginx/nginx.conf && sudo nginx -t && sudo systemctl restart nginx
 
 # Open DB
-sudo -u postgres psql -d tokens
+sudo -u postgres psql -d blockchain
 
 # Monitor Status
 journalctl -f -u coinscan_api

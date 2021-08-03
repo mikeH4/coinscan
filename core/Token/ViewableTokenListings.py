@@ -10,7 +10,7 @@ class ViewableTokenListings(BaseModel):
     chain: ChainEnum
     token_address: AddressHash
     platform: PlatformsEnum
-    platform_id: str
+    link: str
     added: int
 
     def __init__(self,
@@ -18,9 +18,14 @@ class ViewableTokenListings(BaseModel):
         chain: ChainEnum,
         token_address: AddressHash,
         platform: PlatformsEnum,
-        platform_id: str,
+        link: str,
         added: int,
-    ): pass
+    ):
+        if platform == "coingecko":
+            self.link = f"https://coingecko.com/en/coins/{link}/"
+        elif platform == "coinmarketcap":
+            self.link = f"https://coinmarketcap.com/currencies/{link}/"
+
 
     @staticmethod
     def _build_query(where: str = ""):
@@ -30,7 +35,7 @@ class ViewableTokenListings(BaseModel):
             address.chain AS chain,
             address.address AS address,
             token_listings.platform AS platform,
-            token_listings.local_slug AS platform_id,
+            token_listings.local_slug AS platform_slug,
             token_listings.added AS added
         FROM token_listings
         JOIN address ON address.id = token_listings.id

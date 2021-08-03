@@ -1,18 +1,19 @@
-from core.Wallets.ViewableWalletMeta import ViewableWalletMeta
-from core.types.db_types import ChainEnum, bigint, enum, numeric
+from library.BaseModel import BaseModel
+from core.types.db_types import ChainEnum, enum, numeric
 from core.types.AddressHash import AddressHash, Validate
 from library.postgres import DB
 
 TokenOrWallet = enum("wallet","token")
 
-class ViewableWalletHoldings(ViewableWalletMeta):
+class ViewableWalletHoldings(BaseModel):
     def __init__(self,
-        id: bigint,
         chain: ChainEnum,
-        address: AddressHash,
+        wallet_address: AddressHash,
         is_contract: bool,
         holder_tag: str,
-        token: AddressHash,
+        token_address: AddressHash,
+        token_name: str,
+        token_symbol: str,
         supply: numeric,
         liquidity: numeric
     ) -> None: pass
@@ -21,18 +22,20 @@ class ViewableWalletHoldings(ViewableWalletMeta):
     def _build_query(where: str = ""):
         return f"""
         SELECT
-            wallet_address.id AS id,
             wallet_address.chain AS chain,
             wallet_address.address AS wallet_address,
             wallet_meta.is_contract AS is_contract,
             wallet_meta.bscscan_tag AS holder_tag,
             token_address.address AS token_address,
+            token_meta.name AS token_name,
+            token_meta.symbol AS token_symbol,
             wallet_holdings.supply AS supply,
             wallet_holdings.liquidity AS liquidity
         FROM wallet_holdings
         JOIN address AS wallet_address ON wallet_holdings.wallet_id = wallet_address.id
-        JOIN address AS token_address ON wallet_holdings.token_id = wallet_address.id
+        JOIN address AS token_address ON wallet_holdings.token_id = token_address.id
         JOIN wallet_meta ON wallet_holdings.wallet_id = wallet_meta.id
+        JOIN token_meta ON wallet_holdings.token_id = token_meta.id
         {where}
         """
     
@@ -66,8 +69,8 @@ class ViewableWalletHoldings(ViewableWalletMeta):
 
             for row in rows:
                 supply, liquidity = [
-                    row[5] or 0,
-                    row[6] or 0,
+                    row[-2] or 0,
+                    row[-1] or 0,
                 ]
                 max_liquidity = max(liquidity, max_liquidity)
                 max_supply = max(supply, max_supply)
@@ -80,7 +83,7 @@ class ViewableWalletHoldings(ViewableWalletMeta):
                 # == would work the same
                 if limit is not None and len(wallets) >= limit:
                     break
-                if (row[1] or 0) < max_keep_supply and (row[2] or 0) < max_keep_liquidity:
+                if (row[-2] or 0) < max_keep_supply and (row[-1] or 0) < max_keep_liquidity:
                     continue
                 wallets.append(cls._from_row(row))
 
