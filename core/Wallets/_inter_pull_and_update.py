@@ -49,7 +49,6 @@ def pull_and_update(*,
             dont_update=dont_update,
             db=db
         )
-        print("wallet_id",wallet_id)
 
         wallet_meta.id = wallet_id
         wallet_meta._upsert_by_id(db=db)

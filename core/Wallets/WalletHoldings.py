@@ -125,6 +125,7 @@ class WalletHoldings(BaseModel):
             WHERE state_time.key IS NULL OR (
                 state_time.time < {before_time}
             )
+            ORDER BY state_time.time ASC NULLS FIRST
             """
             rows = db.get_all(query)
 

@@ -38,7 +38,7 @@ class CentralProxy:
         res = forward_get(url,**kwargs)
         return cls.with_trip(_class, res, kwargs)
     
-def forward_get(url,params={},headers={},cookies={},json={}):
+def forward_get(url,params={},headers={},json={}):
     encoded_params = urlencode(params)
     encoded_params = ("" if encoded_params == "" else "?") + encoded_params
     
@@ -50,7 +50,6 @@ def forward_get(url,params={},headers={},cookies={},json={}):
     res = requests.get(
         "https://connect.flek.cloud",
         headers=headers,
-        cookies=cookies,
         json=None if json == {} else json
     )
     return res

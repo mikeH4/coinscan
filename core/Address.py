@@ -28,7 +28,8 @@ class Address(BaseModel):
         db: Optional[DB] = None
     ):
         objs = cls.filter(
-            where_cond=f"WHERE address IN ({DB.placeholder(len(addresses))}) AND chain = {chain}",
+            where_cond=f"WHERE address IN ({DB.placeholder(len(addresses))}) AND chain = '{chain}'",
+            params=addresses,
             limit=limit,
             db=db
         )
@@ -38,6 +39,7 @@ class Address(BaseModel):
     def filter(cls, *,
         where_cond: str = "",
         limit: Optional[int] = None,
+        params: list = [],
         db: Optional[DB] = None
     ):
         with cls.with_db(db) as db:
@@ -49,7 +51,7 @@ class Address(BaseModel):
             FROM address
             {where_cond}
             {cls.limit_cond(limit)}
-            """)
+            """,params)
             return [cls._from_row(row) for row in rows]
 
     @staticmethod

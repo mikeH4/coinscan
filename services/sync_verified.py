@@ -11,7 +11,7 @@ def main():
                 limit=None,
                 where_cond=f"""
                 WHERE token_meta.source_verified IS NOT TRUE
-                AND address.chain = {chain}
+                AND address.chain = '{chain}'
                 """
             )
 

@@ -28,14 +28,13 @@ class BaseSource(metaclass=BaseSourceMetaClass):
         script_content = soup.select(selector)[0].string
         return json.loads(script_content)
 
-    def request(self,path,params={},headers={},cookies={},json={}):
+    def request(self,path,params={},headers={},json={}):
         # Sleep and retry
         while True:
             kwds = dict(
                 url=urljoin(self.url,path),
                 params=params,
                 headers=headers,
-                cookies=cookies,
                 json=json,
             )
             return self.request_manager.request(
