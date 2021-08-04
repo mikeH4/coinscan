@@ -40,6 +40,7 @@ class ViewableToken(BaseModel):
 
     @classmethod
     def keyed_by_ids(cls, ids: list[bigint], db: Optional[DB] = None):
+        if len(ids) < 1: return []
         query = cls._build_query(f"""
         WHERE address.id IN ({DB.placeholder(len(ids))})
         """)
@@ -91,13 +92,14 @@ class ViewableToken(BaseModel):
             return [cls._from_row(row) for row in db.get_all(query)]
 
     @classmethod
-    def search(cls, keyword: str):
+    def search(cls, *, keyword: str, limit: Optional[int] = 10):
         keyword = keyword.lower()
         query = cls._build_query(f"""
         WHERE address.address = {DB.placeholder(1)}
         OR LOWER(token_meta.name) LIKE {DB.placeholder(1)}
         OR LOWER(token_meta.symbol) LIKE {DB.placeholder(1)}
         ORDER BY token_stats.liquidity DESC NULLS LAST
+        {cls.limit_cond(limit)}
         """)
         with DB() as db:
             rows = db.get_all(query,[keyword,*[f"%{keyword}%"] * 2])

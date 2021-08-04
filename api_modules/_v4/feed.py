@@ -30,14 +30,16 @@ def listings():
             if listing.id not in keyed_listings: keyed_listings[listing.id] = []
             keyed_listings[listing.id].append(listing)
 
-        tokens = ViewableToken.keyed_by_ids(ids=list(keyed_listings.keys()), db=db)
+        keyed_tokens = ViewableToken.keyed_by_ids(ids=list(keyed_listings.keys()), db=db)
+        sorted_tokens = []
 
         for id in list(keyed_listings.keys()):
-            if id not in tokens: del keyed_listings[id]
+            if id not in keyed_tokens: continue
+            sorted_tokens.append(keyed_tokens[id])
 
         return dict(
             listings=keyed_listings,
-            tokens=tokens
+            tokens=sorted_tokens
         )
 
 @router.get("/rising")
@@ -47,6 +49,7 @@ def rising():
         SELECT id, price_change FROM token_stats
         WHERE liquidity > 7
         ORDER BY price_change DESC
+        LIMIT 100
         """)
 
         keyed_rising = {
@@ -55,17 +58,19 @@ def rising():
             in rows
         }
 
-        tokens = ViewableToken.keyed_by_ids(ids=list(keyed_rising.keys()), db=db)
+        keyed_tokens = ViewableToken.keyed_by_ids(ids=list(keyed_rising.keys()), db=db)
+        sorted_tokens = []
 
         for id in list(keyed_rising.keys()):
-            if id not in tokens: del keyed_rising[id]
+            if id not in keyed_tokens: continue
+            sorted_tokens.append(keyed_tokens[id])
 
         return dict(
-            change=rising,
-            tokens=tokens
+            change=keyed_rising,
+            tokens=sorted_tokens
         )
     
 @router.get("/search/{search}")
 def search(search: str):
-    tokens = ViewableToken.search(search)
+    tokens = ViewableToken.search(keyword=search)
     return tokens

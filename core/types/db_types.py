@@ -35,4 +35,5 @@ def enum(*opts: str):
 
 PlatformsEnum = enum("coinmarketcap","coingecko")
 ChainEnum = enum("bsc","eth")
+ChainEnum.enum_opts = ("bsc",)
 AddressTypeEnum = enum("token","pair","wa")

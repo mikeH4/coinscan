@@ -58,12 +58,13 @@ class ViewableTokenListings(BaseModel):
             ]
 
     @classmethod
-    def new_listings(cls, *, db: DB = None, after_hours: int = 24):
+    def new_listings(cls, *, db: DB = None, after_hours: int = 24, limit: Optional[int] = 100):
         after = int(time() - (after_hours*60*60))
         with cls.with_db(db) as db:
             query = cls._build_query(f"""
             WHERE token_listings.added > {after}
             ORDER BY token_listings.added DESC
+            {cls.limit_cond(limit)}
             """)
             return [
                 cls._from_row(row)

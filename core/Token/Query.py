@@ -1,3 +1,4 @@
+from core.types.db_types import ChainEnum
 from core.sources.ScannerApi import ScannerApi
 from core.Token.ViewableToken import ViewableToken
 from library.postgres import DB
@@ -22,7 +23,7 @@ class Query(ViewableToken):
     @staticmethod
     @Cache.wrap(("busd_value",),cache_for=5*60)
     def busd_to_wbnb(busd_value: float):
-        return busd_value*ScannerApi().busd()["wbnb_for_1_busd"]
+        return busd_value*ScannerApi().busd(ChainEnum("bsc"))["wbnb_for_1_busd"]
 
     @classmethod
     def _build(
