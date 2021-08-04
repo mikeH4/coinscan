@@ -8,7 +8,7 @@ def main():
     scanner_api = ScannerApi()
 
     while repeater.loop():
-        for chain in ChainEnum.enum_opts:
+        for chain in ["bsc"]:
             chain = ChainEnum(chain)
             data = scanner_api.prices(chain)
             TokenStats.replace_price_data(
