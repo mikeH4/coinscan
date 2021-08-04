@@ -13,7 +13,7 @@ class ViewableToken(BaseModel):
     source_verified: bool
     created: int
     holders: numeric
-    listing: str
+    listings: str
 
     def __init__(self,
         id: bigint,
@@ -24,7 +24,7 @@ class ViewableToken(BaseModel):
         source_verified: bool,
         created: int,
         holders: numeric,
-        listing: str
+        listings: str
     ): pass
 
     @classmethod
