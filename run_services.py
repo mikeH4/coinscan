@@ -48,12 +48,12 @@ if __name__ == "__main__":
     ]
     if settings.sandbox == True:
         threads_to_run = [
-            services.copy_token_prices,
+            # services.copy_token_prices,
             services.poll_listings,
-            services.poll_new,
-            services.poll_verified,
-            services.sync_listing_tokens,
-            services.sync_verified,
+            # services.poll_new,
+            # services.poll_verified,
+            # services.sync_listing_tokens,
+            # services.sync_verified,
             # services.update_holders,
         ]
 

@@ -5,7 +5,7 @@ from library.BaseSource import BaseSource
 from library.RequestManager.NoProxy import NoProxy
 
 class ScannerApi(BaseSource):
-    url = "http://localhost:90/"
+    url = "https://api2.coinscan.finance/"
 
     request_manager = NoProxy
 
