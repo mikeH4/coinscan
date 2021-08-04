@@ -1,7 +1,14 @@
+import subprocess
+
+def create_pm2(name: str, script: str, args: str = ""):
+    cmd = f"""pm2 restart {name} || pm2 start {script} --interpreter ./env/bin/python --name {name} -- {args}"""
+    return cmd
+
 subcmd = [
     "cd /home/blockchain/",
     "unzip -o archive.zip",
     "rm archive.zip",
+    create_pm2("api","api.py")
 ]
 
 services = [
@@ -15,8 +22,11 @@ services = [
     "update_holders",
 ]
 
-# for script in services:
-#     subcmd += [f"""pm2 restart service-{script} || pm2 start run_service.py --interpreter ./env/bin/python --name service-{script} -- {script}"""]
+subcmd += [
+    create_pm2(service,"run_service.py",service)
+    for service
+    in services
+]
 
 subcmd += [
     "systemctl restart nginx",
@@ -30,5 +40,4 @@ cmds = [
     f"ssh coinscan '{subcmd_str}'",
 ]
 
-print(subcmd)
-# subprocess.call(" && ".join(cmds),shell=True)
+subprocess.call(" && ".join(cmds),shell=True)
