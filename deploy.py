@@ -1,7 +1,14 @@
 import subprocess
 
-def create_pm2(name: str, script: str, args: str = ""):
-    cmd = f"""pm2 restart {name} || pm2 start {script} --interpreter ./env/bin/python --name {name} -- {args}"""
+def create_pm2(
+    name: str,
+    script: str,
+    args: str = "", *,
+    restart: bool = True
+):
+    args = f"" if args.strip() == "" else f"-- {args}"
+    restart_str = "" if restart else "--no-autorestart"
+    cmd = f"""pm2 restart {name} || pm2 start {script} {restart_str} --interpreter ./env/bin/python --name {name} {args}"""
     return cmd
 
 subcmd = [
@@ -17,13 +24,18 @@ services = [
     "poll_new",
     "poll_pairs",
     "poll_verified",
-    "synv_listing_tokens",
+    "sync_listing_tokens",
     "sync_verified",
     "update_holders",
 ]
 
 subcmd += [
-    create_pm2(service,"run_service.py",service)
+    create_pm2(
+        service,
+        "run_service.py",
+        service,
+        restart = service[:5] != "sync_"
+    )
     for service
     in services
 ]
@@ -33,7 +45,8 @@ subcmd += [
     "systemctl status nginx",
 ]
 
-subcmd_str =  "&& ".join(subcmd)
+subcmd_str =  " ; ".join(subcmd)
+
 cmds = [
     "git archive --format zip --output archive.zip master",
     "scp archive.zip coinscan:/home/blockchain",

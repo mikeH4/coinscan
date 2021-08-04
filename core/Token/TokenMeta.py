@@ -4,7 +4,7 @@ from typing import Optional
 from library.postgres import DB
 from core.types.AddressHash import AddressHash
 from library.BaseModel import BaseModel, ModelOperator
-from core.types.db_types import ChainEnum, bigint
+from core.types.db_types import bigint, ChainEnum
 
 class TokenMeta(BaseModel):
     table = "token_meta"
