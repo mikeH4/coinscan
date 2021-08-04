@@ -200,8 +200,13 @@ def import_pairs(*, old_db: DB, new_db: DB):
 
 with DB(auto_commit=False) as blockchain:
     with DB("tokens") as tokens_db:
-        # import_tokens(old_db=tokens_db,new_db=blockchain)
-        # import_listings(old_db=tokens_db,new_db=blockchain)
-        # import_wallet_meta(old_db=tokens_db,new_db=blockchain)
-        # import_wallet_holdings(old_db=tokens_db,new_db=blockchain)
+        print("import_tokens")
+        import_tokens(old_db=tokens_db,new_db=blockchain)
+        print("import_listings")
+        import_listings(old_db=tokens_db,new_db=blockchain)
+        print("import_wallet_meta")
+        import_wallet_meta(old_db=tokens_db,new_db=blockchain)
+        print("import_wallet_holdings")
+        import_wallet_holdings(old_db=tokens_db,new_db=blockchain)
+        print("import_pairs")
         import_pairs(old_db=tokens_db,new_db=blockchain)
