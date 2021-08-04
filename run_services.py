@@ -20,6 +20,7 @@ import services.update_holders
 # From BscscanApi
 import services.sync_verified
 
+
 def catching_wrapper(func):
     def wrapper(*args,**kwargs):
         while True:

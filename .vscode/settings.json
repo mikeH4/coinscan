@@ -1,6 +1,7 @@
 {
-    "python.pythonPath": "/Library/Frameworks/Python.framework/Versions/3.9/bin/python3",
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": false,
-    "python.linting.banditEnabled": false
+    "python.pythonPath": "env/bin/python",
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.banditEnabled": false,
+    "python.workspaceSymbols.enabled": true
 }

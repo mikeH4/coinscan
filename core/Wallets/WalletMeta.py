@@ -1,3 +1,4 @@
+from core.Token.TokenMeta import TokenMeta
 from library.postgres import DB
 from typing import Optional
 from core.types.db_types import ChainEnum, bigint
@@ -30,3 +31,22 @@ class WalletMeta(BaseModel):
                 replace_insert_on=["id"],
                 dont_update=dont_update
             )
+
+    def insert_or_update(self,
+        *,
+        chain: ChainEnum,
+        wallet_address: AddressHash,
+        dont_update: list[str] = [],
+        db: Optional[DB] = None
+    ):
+        query, values = TokenMeta._prep_query(
+            self, # type: ignore
+            dont_update=dont_update,
+        )
+
+        with self.with_db(db) as db:
+            ret = db.get(query,[chain,wallet_address] + values)
+            assert ret is not None
+            self.id = bigint(ret[0])
+        
+        return self.id

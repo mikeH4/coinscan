@@ -1,6 +1,3 @@
-from typing import Literal
-
-
 class numeric(float): pass
 
 class smallint(int): pass

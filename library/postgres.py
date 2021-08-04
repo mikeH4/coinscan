@@ -1,15 +1,18 @@
 from typing import Optional
+import psycopg2
 from psycopg2.pool import ThreadedConnectionPool
 import settings
 from signal import *
 import atexit
 
-class PostgresDBException(Exception): pass
+class PostgresDBException(Exception):
+    pgcode: str
+    pgerror: str
 
 class DB:
     _pools:dict[str,ThreadedConnectionPool] = dict( # type: ignore
         blockchain= None,
-        bsc= None,
+        tokens= None,
     )
     _initialized: bool = False
 
@@ -118,8 +121,11 @@ class DB:
     def query(self,sql: str,queries:list = []) -> Optional[tuple]:
         try:
             a = self.cursor.execute(sql, list( queries ) )
-        except Exception as error:
-            raise PostgresDBException("\n" + sql + "\n" + str(error))
+        except psycopg2.Error as error:
+            e = PostgresDBException("\n" + sql + "\n" + str(error))
+            e.pgcode = error.pgcode
+            e.pgerror = error.pgerror
+            raise e
 
     def rollback(self):
         self.query("ROLLBACK;")
