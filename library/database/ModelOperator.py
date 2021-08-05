@@ -1,6 +1,6 @@
-from library.database.BaseModel import BaseModel
-from typing import Any
 import inspect
+from typing import Union
+from library.database.BaseModel import BaseModel
 from library.database.postgres import DB
 from library.database.Index import Index
 from library.database.mappings import (
@@ -76,24 +76,25 @@ class ModelOperatorSql:
         
         return columns_sql
     
-    def get_primary_key_sql(self) -> str:
-        return f"PRIMARY KEY({','.join(self.cls.primary)})"
+    def get_create_primary_key_sql(self) -> str:
+        primary_str = ','.join(self.cls.primary)
+        sql = f"ALTER TABLE {self.cls.table} ADD PRIMARY KEY ({primary_str});"
+        return sql
 
     def get_create_table_sql(self) -> str:
         column_sql_list = list(self.get_columns_sql().values())
-        sql_directives = column_sql_list + [self.get_primary_key_sql()]
-        directives_str = ', \n   '.join(sql_directives)
+        directives_str = ', \n   '.join(column_sql_list)
         return (f"""CREATE TABLE {self.cls.table} ( \n   {directives_str} \n); """)
 
-    def get_indexes_sql(self) -> str:
-        index_directives = []
+    def get_indexes_sql(self) -> dict[str,str]:
+        index_directives: dict[str,str] = {}
         for index in self.cls.indexes:
             index: Index = index
             index_name = index.gen_name(self.cls.table)
             unique_str = "UNIQUE" if index.unique else ""
             index_directive = f"CREATE {unique_str} INDEX {index_name} ON {self.cls.table} ({index.joined()})"
-            index_directives.append(index_directive)
-        return "\n" + '\n'.join(index_directives)
+            index_directives[index_name] = index_directive
+        return index_directives
 
     def get_column_names_string(self) -> str:
         return ",".join(self.parameters.keys())
@@ -118,22 +119,115 @@ class ModelOperatorSql:
         """
         return syntax
 
-class ModelOperator(ModelOperatorSql):
+class ModelOperatorChecks(ModelOperatorSql):
+    def primary_key_matches(self) -> bool:
+        rows = self.db.get_all(f"""
+        SELECT a.attname, format_type(a.atttypid, a.atttypmod) AS data_type
+        FROM   pg_index i
+        JOIN   pg_attribute a ON a.attrelid = i.indrelid
+                            AND a.attnum = ANY(i.indkey)
+        WHERE  i.indrelid = '{self.cls.table}'::regclass
+        AND    i.indisprimary;
+        """)
+        column_names: list[str] = [row[0] for row in rows]
+        return sorted(column_names) == sorted(self.cls.primary)
+
+    def get_new_indexes(self) -> tuple[set[str],set[str]]:
+        rows = self.db.get_all(f"""
+        SELECT
+            indexname
+        FROM pg_indexes
+        WHERE schemaname = 'public'
+        AND tablename = '{self.cls.table}';
+        """)
+        existing_indexes: set[str] = set([
+            row[0]
+            for row in rows
+            if row[0][-5:] != "_pkey"
+        ])
+        now_indexes = set(self.get_indexes_sql().keys())
+
+        drop_indexes = existing_indexes - now_indexes
+        create_indexes = now_indexes - existing_indexes
+
+        return (create_indexes,drop_indexes)
+
     def exists(self):
         table_names = ModelOperatorUtils.existing_tables(db=self.db)
         return self.cls.table in table_names
-    
-    def needs_migration(self):
-        return len(self.new_cols) > 0
 
-    def create(self):
-        self.db.query(self.get_create_table_sql())
-        self.db.conn.commit()
+
+class ModelTempTableExists(Exception): pass
+
+def print_if_above_0(message: str, check: Union[list,set]) -> bool:
+    if len(check) > 0: print(f"{message}",check)
+    return len(check) > 0
+
+def confirm(*message: str, default = True) -> bool:
+    message_str = ' '.join(message)
+    message_str += " (Y/N) "
+    
+    res = input(message_str).lower()
+    if default == True:
+        return res not in ["n","no","nope"]
+    else:
+        return res in ["y","yes","yep"]
+
+class ModelOperator(ModelOperatorChecks):
+    def run_migration(self):
+        if not self.exists():
+            print("Create Table:",self.cls.table)
+
+        has_new_columns = print_if_above_0("New Columns:",self.new_cols)
+
+        has_update_primary_key = True
+        if self.exists():
+            has_update_primary_key = not self.primary_key_matches()
+            if has_update_primary_key: print(f"Primary Key on ({', '.join(self.cls.primary)})")
+
+        create_indexes, drop_indexes = self.get_new_indexes()
+        has_create_indexes = print_if_above_0("Create Indexes:",create_indexes)
+        has_drop_indexes = print_if_above_0("Drop Indexes:",drop_indexes)
+
+        if not (has_new_columns or has_update_primary_key or has_create_indexes or has_drop_indexes): return
+
+        if not confirm("Create?"): return
+        
+        if not self.exists():
+            self.db.query(self.get_create_table_sql())
+            self.db.conn.commit()
+            has_update_primary_key = True
+        elif len(self.new_cols) > 1:
+            self.db.query(self.get_migrate_table_sql())
+            self.db.conn.commit()
+            create_indexes, drop_indexes = self.get_new_indexes()
+            has_update_primary_key = True
+
+        if has_update_primary_key:
+            # Add Try/Except
+            try: self.db.query(f"ALTER TABLE {self.cls.table} DROP CONSTRAINT {self.cls.table}_pkey")
+            except: pass
+            self.db.conn.commit()
+            self.db.query(self.get_create_primary_key_sql())
+            self.db.conn.commit()
+
+        index_commands: list[str] = []
+        for index_name in drop_indexes:
+            index_commands.append(f"DROP INDEX {index_name}")
+
+        for index_name, index_sql in self.get_indexes_sql().items():
+            if index_name in create_indexes:
+                index_commands.append(index_sql)
+
+        if len(index_commands) > 0:
+            self.db.query(";\n".join(index_commands))
+            self.db.conn.commit()
 
     def migrate(self):
         self.db.query(self.get_migrate_table_sql())
         self.db.conn.commit()
 
-    def drop_temp(self):
+    def drop_temp_table(self):
+        # Add Try/Except
         self.db.query(f"DROP TABLE {self.cls.table}_temp")
         self.db.conn.commit()

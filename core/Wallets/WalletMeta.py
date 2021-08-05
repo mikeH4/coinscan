@@ -2,7 +2,7 @@ from core.Token.TokenMeta import TokenMeta
 from library.database.postgres import DB
 from typing import Optional
 from core.types.db_types import ChainEnum, bigint
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 from core.types.AddressHash import AddressHash
 
 class WalletMeta(BaseModel):

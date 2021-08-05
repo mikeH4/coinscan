@@ -2,7 +2,7 @@ from core.Token.TokenMeta import TokenMeta
 from core.types.AddressHash import AddressHash
 from library.database.postgres import DB
 from core.types.db_types import ChainEnum, bigint, enum, numeric
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 
 class TokenStats(BaseModel):
     table = "token_stats"

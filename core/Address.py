@@ -2,7 +2,7 @@ from typing import Optional
 from library.database.postgres import DB
 from core.types.AddressHash import AddressHash
 from core.types.db_types import ChainEnum, bigint, serial
-from library.BaseModel import BaseModel, Index
+from library.database.BaseModel import BaseModel, Index
 
 class Address(BaseModel):
     table = "address"

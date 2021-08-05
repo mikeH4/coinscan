@@ -1,4 +1,4 @@
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 from core.types.db_types import ChainEnum, enum, numeric
 from core.types.AddressHash import AddressHash, Validate
 from library.database.postgres import DB

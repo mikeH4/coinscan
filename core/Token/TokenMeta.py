@@ -3,7 +3,8 @@ from core.Address import Address
 from typing import Optional
 from library.database.postgres import DB
 from core.types.AddressHash import AddressHash
-from library.BaseModel import BaseModel, ModelOperator
+from library.database.BaseModel import BaseModel
+from library.database.mappings import py_defaults
 from core.types.db_types import bigint, ChainEnum
 
 class TokenMeta(BaseModel):

@@ -1,6 +1,6 @@
 from core.types.db_types import ChainEnum, bigint
 from library.database.postgres import DB
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 from core.types.AddressHash import AddressHash, Validate
 
 class ViewableWalletMeta(BaseModel):

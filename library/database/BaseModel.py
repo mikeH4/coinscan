@@ -8,7 +8,7 @@ class BaseModelMetaClass(type):
     def __init__(cls, name, bases, namespace, **kwargs):
         if len(bases) < 1:
             return None
-        if str(bases[0]) != "<class 'library.BaseModel.BaseModel'>":
+        if str(bases[0]) != "<class 'library.database.BaseModel.BaseModel'>":
             return None
 
         params = dict(inspect.signature(cls.__init__).parameters)

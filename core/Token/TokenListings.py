@@ -1,7 +1,7 @@
 from core.Token.TokenMeta import TokenMeta
 from library.database.postgres import DB
 from core.types.AddressHash import AddressHash
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 from core.types.db_types import ChainEnum, PlatformsEnum, bigint
 
 class TokenListings(BaseModel):

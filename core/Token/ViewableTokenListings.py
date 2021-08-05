@@ -3,7 +3,7 @@ from typing import Optional
 from library.database.postgres import DB
 from core.types.AddressHash import AddressHash, Validate
 from core.types.db_types import ChainEnum, PlatformsEnum, bigint
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 
 class ViewableTokenListings(BaseModel):
     id: bigint

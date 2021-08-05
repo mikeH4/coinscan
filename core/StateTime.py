@@ -2,7 +2,7 @@ from time import time
 from typing import Optional
 from library.database.postgres import DB
 from core.types.db_types import bigint
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 
 class StateTime(BaseModel):
     table = "state_time"

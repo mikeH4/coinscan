@@ -1,4 +1,3 @@
-import core.Address
 import core.StateTime
 import core.Token.TokenMeta
 import core.Token.TokenStats
@@ -8,10 +7,10 @@ import core.Wallets.WalletHoldings
 import core.Wallets.WalletHoldings
 import core.Pair.TokenPair
 
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 
-models = [
-    cls
+models: list[BaseModel] = [ # type: ignore
+    cls 
     for cls in BaseModel.__subclasses__()
-    if cls.table is not None
+    if cls.table is not None and issubclass(cls,BaseModel)
 ]

@@ -1,7 +1,7 @@
 from core.types.AddressHash import AddressHash
 from library.database.postgres import DB
 from typing import Optional
-from library.BaseModel import BaseModel
+from library.database.BaseModel import BaseModel
 from core.types.db_types import ChainEnum, bigint
 
 class TokenPair(BaseModel):
