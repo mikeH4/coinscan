@@ -5,7 +5,7 @@ from core.Token.TokenListings import TokenListings
 from core.Token.TokenStats import TokenStats
 from core.types.AddressHash import AddressHash
 from core.types.db_types import ChainEnum, PlatformsEnum, bigint, numeric
-from library.postgres import DB, PostgresDBException
+from library.database.postgres import DB, PostgresDBException
 from core.Token.TokenMeta import TokenMeta
 
 stops = 10000

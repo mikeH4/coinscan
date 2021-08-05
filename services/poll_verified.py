@@ -2,7 +2,7 @@ from core.types.db_types import ChainEnum
 from library.Repeater import Repeater
 from core.sources.BscScan import ChainScan
 from core.Token.TokenMeta import TokenMeta
-from library.postgres import DB
+from library.database.postgres import DB
 
 def main():
     with DB() as db:

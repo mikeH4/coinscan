@@ -1,5 +1,5 @@
 from core.types.AddressHash import AddressHash
-from library.postgres import DB
+from library.database.postgres import DB
 from typing import Optional
 from library.BaseModel import BaseModel
 from core.types.db_types import ChainEnum, bigint

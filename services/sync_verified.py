@@ -1,7 +1,7 @@
 from core.types.db_types import ChainEnum
 from core.sources.BscScanApi import ChainScanApi
 from core.Token.TokenMeta import TokenMeta
-from library.postgres import DB
+from library.database.postgres import DB
 
 def main():
     with DB() as db:

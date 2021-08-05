@@ -48,7 +48,7 @@ for table,col in table_cols:
 
 # Now RUN
 
-from library.postgres import DB
+from library.database.postgres import DB
 
 class Status:
     OK = '\033[92m'

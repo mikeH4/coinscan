@@ -1,6 +1,6 @@
 from typing import Optional
 from core.types.db_types import ChainEnum, bigint, numeric
-from library.postgres import DB
+from library.database.postgres import DB
 from core.types.AddressHash import AddressHash, Validate
 from library.BaseModel import BaseModel
 

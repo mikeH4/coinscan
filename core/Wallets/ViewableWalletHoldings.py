@@ -1,7 +1,7 @@
 from library.BaseModel import BaseModel
 from core.types.db_types import ChainEnum, enum, numeric
 from core.types.AddressHash import AddressHash, Validate
-from library.postgres import DB
+from library.database.postgres import DB
 
 TokenOrWallet = enum("wallet","token")
 

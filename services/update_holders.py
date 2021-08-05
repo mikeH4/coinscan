@@ -2,7 +2,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from core.Wallets.WalletHoldings import WalletHoldings
 from core.Wallets._inter_pull_and_update import pull_and_update
 from library.Repeater import Repeater
-from library.postgres import DB
+from library.database.postgres import DB
 from library.timer import timer
 
 def main():

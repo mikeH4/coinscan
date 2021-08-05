@@ -1,5 +1,5 @@
 from core.StateTime import StateTime
-from library.postgres import DB
+from library.database.postgres import DB
 from core.Token.TokenListings import TokenListings
 from datetime import datetime
 from core.types.AddressHash import AddressHash

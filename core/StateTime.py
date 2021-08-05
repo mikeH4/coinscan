@@ -1,6 +1,6 @@
 from time import time
 from typing import Optional
-from library.postgres import DB
+from library.database.postgres import DB
 from core.types.db_types import bigint
 from library.BaseModel import BaseModel
 

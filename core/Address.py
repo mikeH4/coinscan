@@ -1,5 +1,5 @@
 from typing import Optional
-from library.postgres import DB
+from library.database.postgres import DB
 from core.types.AddressHash import AddressHash
 from core.types.db_types import ChainEnum, bigint, serial
 from library.BaseModel import BaseModel, Index

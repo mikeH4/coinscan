@@ -1,4 +1,4 @@
-from library.postgres import DB
+from library.database.postgres import DB
 from db.models import models
 
 with DB() as db:

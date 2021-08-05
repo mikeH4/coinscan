@@ -4,7 +4,7 @@ from core.types.AddressHash import AddressHash
 from core.types.db_types import ChainEnum, bigint
 from core.Token.ViewableTokenListings import ViewableTokenListings
 from core.sources.ScannerApi import ScannerApi
-from library.postgres import DB
+from library.database.postgres import DB
 
 def main():
     scanner_api = ScannerApi()

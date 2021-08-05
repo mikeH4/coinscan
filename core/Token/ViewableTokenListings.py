@@ -1,6 +1,6 @@
 from time import time
 from typing import Optional
-from library.postgres import DB
+from library.database.postgres import DB
 from core.types.AddressHash import AddressHash, Validate
 from core.types.db_types import ChainEnum, PlatformsEnum, bigint
 from library.BaseModel import BaseModel

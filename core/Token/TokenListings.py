@@ -1,5 +1,5 @@
 from core.Token.TokenMeta import TokenMeta
-from library.postgres import DB
+from library.database.postgres import DB
 from core.types.AddressHash import AddressHash
 from library.BaseModel import BaseModel
 from core.types.db_types import ChainEnum, PlatformsEnum, bigint

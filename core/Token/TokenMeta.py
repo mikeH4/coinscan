@@ -1,7 +1,7 @@
 import inspect
 from core.Address import Address
 from typing import Optional
-from library.postgres import DB
+from library.database.postgres import DB
 from core.types.AddressHash import AddressHash
 from library.BaseModel import BaseModel, ModelOperator
 from core.types.db_types import bigint, ChainEnum
@@ -87,7 +87,7 @@ class TokenMeta(BaseModel):
                 full_kwds[key] = kwds[key]
             else:
                 _class = parameters[key].annotation
-                full_kwds[key] = ModelOperator.py_defaults[_class]
+                full_kwds[key] = py_defaults[_class]
                 dont_update.append(key)
         TokenMeta(**full_kwds).insert_or_update(
             chain=chain,

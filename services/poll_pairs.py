@@ -1,4 +1,4 @@
-from library.postgres import DB
+from library.database.postgres import DB
 from library.Repeater import Repeater
 from core.sources.ScannerApi import ScannerApi
 from core.Pair.TokenPair import TokenPair

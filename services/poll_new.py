@@ -1,6 +1,6 @@
 from core.Address import Address
 from core.Token.TokenStats import TokenStats
-from library.postgres import DB
+from library.database.postgres import DB
 from core.sources.ScannerApi import ScannerApi
 from core.sources.BscScanApi import ChainScanApi
 from core.types.AddressHash import AddressHash

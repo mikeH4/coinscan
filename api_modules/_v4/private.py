@@ -1,4 +1,4 @@
-from library.postgres import DB
+from library.database.postgres import DB
 from core.Token.ViewableToken import ViewableToken
 from core.types.AddressHash import AddressHash
 import settings

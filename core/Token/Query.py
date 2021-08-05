@@ -1,7 +1,7 @@
 from core.types.db_types import ChainEnum
 from core.sources.ScannerApi import ScannerApi
 from core.Token.ViewableToken import ViewableToken
-from library.postgres import DB
+from library.database.postgres import DB
 from library.Cache import Cache
 from itertools import combinations
 

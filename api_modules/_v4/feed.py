@@ -1,6 +1,6 @@
 from core.types.db_types import bigint, numeric
 from fastapi import APIRouter
-from library.postgres import DB
+from library.database.postgres import DB
 
 from core.Token.ViewableToken import ViewableToken
 from core.Token.ViewableTokenListings import ViewableTokenListings
