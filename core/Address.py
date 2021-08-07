@@ -34,12 +34,10 @@ class Address(BaseModel):
             limit=limit,
             db=db
         )
-        print("enter",[str(addr) for addr in addresses])
-        print("exit",[str(obj.address) for obj in objs])
         return [obj.address for obj in objs]
     
     @classmethod
-    
+
     def filter(cls, *,
         where_cond: str = "",
         limit: Optional[int] = None,
