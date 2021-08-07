@@ -19,7 +19,7 @@ def authenticate(auth):
 
 class ItemsSections(BaseModel):
     listings: List[List[str]]
-    addresses: List[str]
+    addresses: List[AddressHash]
 
 @router.post("/from-items")
 def new_tokens(
@@ -32,9 +32,9 @@ def new_tokens(
     for platform,name in items.listings:
         params.append(platform)
         params.append(name)
-        conds.append(f"(platform = {DB.placeholder(1)} AND local_slug = {DB.placeholder(1)})")
+        conds.append(f"(token_listings.platform = {DB.placeholder(1)} AND token_listings.local_slug = {DB.placeholder(1)})")
 
-    items.addresses = [str(Address(address)) for address in items.addresses]
+    items.addresses = [AddressHash(address) for address in items.addresses]
     params += items.addresses
     if len(items.addresses) > 0:
         conds.append(f"tokens.address IN ({DB.placeholder(len(items.addresses))})")
@@ -42,20 +42,22 @@ def new_tokens(
     if len(conds) < 1:
         return []
 
-    sql = ViewableToken._build_query(f"""
-    LEFT JOIN
-        listings as listings_full
-    ON listings_full.token = tokens.address
-    WHERE
-        ({' OR '.join(conds)})
-    """)
+    cond_str = f"WHERE ({' OR '.join(conds)})"
+    sql = f"""
+    SELECT
+        address.chain AS chain,
+        address.address AS address
+    FROM address
+    LEFT JOIN token_listings ON token_listings.id = address.id
+    {cond_str}
+    """
     with DB() as db:
-        addresses = {}
-        tokens = []
-        for row in db.get_all(sql,params):
-            address = str(Address(row[0]))
-            if address in addresses:
-                continue
-            addresses[address] = True
-            tokens.append(ViewableToken._from_row(row))
+        tokens = [
+            dict(
+                chain=chain,
+                address=AddressHash(address)
+            )
+            for chain, address
+            in set(db.get_all(sql,params))
+        ]
         return tokens
