@@ -39,6 +39,7 @@ class Address(BaseModel):
         return [obj.address for obj in objs]
     
     @classmethod
+    
     def filter(cls, *,
         where_cond: str = "",
         limit: Optional[int] = None,
