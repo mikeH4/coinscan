@@ -13,8 +13,7 @@ class ModelOperatorUtils:
     def get_enum_name (opts: list[str], *, db: DB):
         enum_values = ','.join([f"'{opt}'" for opt in opts])
         enum_name = 'enum_' + '_'.join(opts)
-        try:
-            with DB(auto_commit=True) as db: db.query(f"CREATE TYPE {enum_name} AS ENUM ({enum_values});")
+        try: db.query(f"CREATE TYPE {enum_name} AS ENUM ({enum_values});")
         except Exception: print("Type Exists ",enum_name)
         
         return enum_name

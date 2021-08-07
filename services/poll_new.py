@@ -10,13 +10,13 @@ from library.Repeater import Repeater
 
 def main():
     with DB(auto_commit=False) as db:
-        repeater = Repeater(min=10,max=60*2.5)
+        repeater = Repeater(min=10,max=int(60*2.5))
         scanner_api = ScannerApi()
 
         existing_addrs = []
 
         while repeater.loop():
-            for chain in ["bsc"]:
+            for chain in ["eth"]:
                 chain = ChainEnum(chain)
                 data = scanner_api.new(chain)
                 data_len = len(data)
@@ -61,6 +61,7 @@ def main():
                     )
 
                     print(f"{i+1}/{data_len} Token Inserted")
+                    repeater.commit(db)
 
                     if repeater.should_repeat():
                         break

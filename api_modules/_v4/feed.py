@@ -1,4 +1,5 @@
-from core.types.db_types import bigint, numeric
+from typing import Optional
+from core.types.db_types import ChainEnum, bigint, numeric
 from fastapi import APIRouter
 from library.database.postgres import DB
 
@@ -13,11 +14,14 @@ router = APIRouter(
 @router.get("/latest")
 def latest(
     only_contract_verified: bool = False,
-    min_liquidity_500: bool = False
+    min_liquidity_500: bool = False,
+    chain: str = ChainEnum("bsc")
 ):
+    chain_is: Optional[ChainEnum] = None if chain == "" else ChainEnum(chain)
     return Query.get_filtered(dict(
         only_source_verified=only_contract_verified,
-        min_liquidity_500=min_liquidity_500
+        min_liquidity_500=min_liquidity_500,
+        chain=chain_is
     ),limit=100)
 
 @router.get("/listings")
