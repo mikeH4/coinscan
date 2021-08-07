@@ -37,7 +37,7 @@ def new_tokens(
     items.addresses = [AddressHash(address) for address in items.addresses]
     params += items.addresses
     if len(items.addresses) > 0:
-        conds.append(f"tokens.address IN ({DB.placeholder(len(items.addresses))})")
+        conds.append(f"address.address IN ({DB.placeholder(len(items.addresses))})")
 
     if len(conds) < 1:
         return []
