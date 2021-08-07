@@ -34,11 +34,6 @@ def main():
                     # Just so memory doesn't escape
                     existing_addrs[chain] = existing_addrs[chain][5000:]
 
-                print(
-                    "matches",
-                    len(set(addresses) - set(existing_addrs[chain])) == (len(addresses) - len(existing_addrs[chain])),
-                    len(set(addresses) - set(existing_addrs[chain]))
-                )
 
                 for i,token_data in enumerate(data):
                     address = AddressHash(token_data["address"])
