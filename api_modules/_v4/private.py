@@ -48,6 +48,7 @@ def new_tokens(
         address.chain AS chain,
         address.address AS address
     FROM address
+    JOIN address ON token_meta.id = address.id
     LEFT JOIN token_listings ON token_listings.id = address.id
     {cond_str}
     """
