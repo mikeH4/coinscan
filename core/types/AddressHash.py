@@ -10,7 +10,7 @@ class AddressHash(str):
         return super(AddressHash, cls).__new__(cls, address)
 
     def __repr__(self) -> str:
-        return f"<Address: {self}>"
+        return f"<AddressHash: {self}>"
 
 def Validate(chain: ChainEnum, address: AddressHash):
     return (ChainEnum(chain), AddressHash(address))

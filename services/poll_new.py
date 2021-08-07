@@ -29,6 +29,7 @@ def main():
                 elif len(existing_addrs) > 5000:
                     # Just so memory doesn't escape
                     existing_addrs = existing_addrs[5000:]
+                print("Fetched Existing len",len(existing_addrs))
 
                 for i,token_data in enumerate(data):
                     address = AddressHash(token_data["address"])
