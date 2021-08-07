@@ -1,3 +1,4 @@
+exit()
 from core.Pair.TokenPair import TokenPair
 from core.Wallets.WalletMeta import WalletMeta
 from core.Wallets.WalletHoldings import WalletHoldings
@@ -8,6 +9,7 @@ from core.types.db_types import ChainEnum, PlatformsEnum, bigint, numeric
 from library.database.postgres import DB, PostgresDBException
 from core.Token.TokenMeta import TokenMeta
 
+# migrator
 stops = 10000
 
 def import_tokens(*, old_db: DB, new_db: DB):

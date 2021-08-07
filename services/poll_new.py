@@ -16,7 +16,7 @@ def main():
         existing_addrs = []
 
         while repeater.loop():
-            for chain in ["eth"]:
+            for chain in ["eth","bsc"]:
                 chain = ChainEnum(chain)
                 data = scanner_api.new(chain)
                 data_len = len(data)

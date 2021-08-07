@@ -14,7 +14,7 @@ def main():
 
         # 2.5 min max
         while repeater.loop():
-            for chain in ["bsc"]:
+            for chain in ChainEnum.enum_opts:
                 chain = ChainEnum(chain)
                 existing_pairs = TokenPair.count(chain=chain,db=db)
                 all_pairs = ScannerApi().token_pairs_count(chain)
