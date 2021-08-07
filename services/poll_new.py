@@ -31,8 +31,6 @@ def main():
                     # Just so memory doesn't escape
                     existing_addrs = existing_addrs[5000:]
 
-                print("subtracted",len(set(addresses) - set(existing_addrs)))
-                print("minused",(len(addresses) - len(existing_addrs)))
                 assert len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs))
 
                 for i,token_data in enumerate(data):
