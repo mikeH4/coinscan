@@ -31,9 +31,18 @@ def main():
                     # Just so memory doesn't escape
                     existing_addrs = existing_addrs[5000:]
 
-                # print("walk",[str(a) for a in addresses])
-                # print("run",[str(a) for a in existing_addrs])
-                # assert len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs))
+                addresses_str = [str(a) for a in addresses]
+                existing_addrs_str = [str(a) for a in existing_addrs]
+                print(
+                    "str matches",
+                    len(set(addresses_str) - set(existing_addrs_str)) == (len(addresses_str) - len(existing_addrs_str)),
+                    len(set(addresses_str) - set(existing_addrs_str))
+                )
+                print(
+                    "matches",
+                    len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs)),
+                    len(set(addresses) - set(existing_addrs))
+                )
 
                 for i,token_data in enumerate(data):
                     address = AddressHash(token_data["address"])
