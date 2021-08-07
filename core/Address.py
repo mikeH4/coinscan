@@ -27,6 +27,7 @@ class Address(BaseModel):
         limit: Optional[int] = None,
         db: Optional[DB] = None
     ):
+        chain = ChainEnum(chain)
         objs = cls.filter(
             where_cond=f"WHERE address IN ({DB.placeholder(len(addresses))}) AND chain = '{chain}'",
             params=addresses,

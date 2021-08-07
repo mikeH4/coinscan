@@ -43,7 +43,6 @@ class Repeater:
     
     def commit(self, db: DB):
         self.not_committed_since += 1
-        print(self.not_committed_since)
         if self.not_committed_since < self.commit_every: return
         
         assert self.not_committed_since == self.commit_every

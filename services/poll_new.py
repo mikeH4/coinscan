@@ -35,6 +35,7 @@ def main():
                 for i,token_data in enumerate(data):
                     address = AddressHash(token_data["address"])
 
+                    print(address,existing_addrs[:10])
                     if address in existing_addrs: continue
                     existing_addrs.append(address)
 
