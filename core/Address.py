@@ -44,7 +44,7 @@ class Address(BaseModel):
         db: Optional[DB] = None
     ):
         with cls.with_db(db) as db:
-            rows = db.get_all(f"""
+            query = f"""
             SELECT
                 address.id,
                 address.chain,
@@ -52,7 +52,8 @@ class Address(BaseModel):
             FROM address
             {where_cond}
             {cls.limit_cond(limit)}
-            """,params)
+            """
+            rows = db.get_all(query,params)
             return [cls._from_row(row) for row in rows]
 
     @staticmethod

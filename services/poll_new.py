@@ -26,16 +26,17 @@ def main():
                 if len(existing_addrs) == 0:
                     print("Fetched Existing is 0")
                     print("First 10",addresses[:10])
-                    existing_addrs = Address.addresses_from(chain=chain,addresses=addresses, db=db)
+                    existing_addrs = Address.addresses_from(chain=chain, addresses=addresses, db=db)
                 elif len(existing_addrs) > 5000:
                     # Just so memory doesn't escape
                     existing_addrs = existing_addrs[5000:]
-                print("Fetched Existing len",len(existing_addrs))
+
+                assert len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs))
+                print("subtracted",len(set(addresses) - set(existing_addrs)))
 
                 for i,token_data in enumerate(data):
                     address = AddressHash(token_data["address"])
 
-                    print(address,existing_addrs[:10])
                     if address in existing_addrs: continue
                     existing_addrs.append(address)
 
