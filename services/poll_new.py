@@ -31,8 +31,8 @@ def main():
                     # Just so memory doesn't escape
                     existing_addrs = existing_addrs[5000:]
 
-                print("walk",[str(a) for a in addresses])
-                print("run",[str(a) for a in existing_addrs])
+                # print("walk",[str(a) for a in addresses])
+                # print("run",[str(a) for a in existing_addrs])
                 # assert len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs))
 
                 for i,token_data in enumerate(data):
