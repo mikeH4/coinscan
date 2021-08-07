@@ -25,7 +25,7 @@ def main():
                 
                 if len(existing_addrs) == 0:
                     print("Fetched Existing is 0")
-                    print("First 10",addresses[:10])
+                    print("First 5",addresses[:5])
                     existing_addrs = Address.addresses_from(chain=chain, addresses=addresses, db=db)
                 elif len(existing_addrs) > 5000:
                     # Just so memory doesn't escape
@@ -33,6 +33,8 @@ def main():
 
                 print("subtracted",len(set(addresses) - set(existing_addrs)))
                 print("minused",(len(addresses) - len(existing_addrs)))
+                print(addresses)
+                print(existing_addrs)
                 assert len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs))
 
                 for i,token_data in enumerate(data):
