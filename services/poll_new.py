@@ -31,7 +31,7 @@ def main():
                     # Just so memory doesn't escape
                     existing_addrs = existing_addrs[5000:]
 
-                assert len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs))
+                # assert len(set(addresses) - set(existing_addrs)) == (len(addresses) - len(existing_addrs))
 
                 for i,token_data in enumerate(data):
                     address = AddressHash(token_data["address"])
