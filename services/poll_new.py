@@ -13,7 +13,10 @@ def main():
         repeater = Repeater(min=10,max=int(60*2.5))
         scanner_api = ScannerApi()
 
-        existing_addrs = []
+        existing_addrs: dict[ChainEnum,list[AddressHash]] = {
+            ChainEnum("eth"): [],
+            ChainEnum("bsc"): [],
+        }
 
         while repeater.loop():
             for chain in ["eth","bsc"]:
@@ -23,16 +26,14 @@ def main():
 
                 addresses = [AddressHash(row["address"]) for row in data]
                 
-                if len(existing_addrs) == 0:
+                if len(existing_addrs[chain]) == 0:
                     print("Fetched Existing is 0")
                     print("First 5",addresses[:5])
-                    existing_addrs = Address.addresses_from(chain=chain, addresses=addresses, db=db)
-                elif len(existing_addrs) > 5000:
+                    existing_addrs[chain] = Address.addresses_from(chain=chain, addresses=addresses, db=db)
+                elif len(existing_addrs[chain]) > 5000:
                     # Just so memory doesn't escape
-                    existing_addrs = existing_addrs[5000:]
+                    existing_addrs[chain] = existing_addrs[chain][5000:]
 
-                addresses_str = [str(a) for a in addresses]
-                existing_addrs_str = [str(a) for a in existing_addrs]
                 # print(
                 #     "str matches",
                 #     len(set(addresses_str) - set(existing_addrs_str)) == (len(addresses_str) - len(existing_addrs_str)),
@@ -47,8 +48,8 @@ def main():
                 for i,token_data in enumerate(data):
                     address = AddressHash(token_data["address"])
 
-                    if address in existing_addrs: continue
-                    existing_addrs.append(address)
+                    if address in existing_addrs[chain]: continue
+                    existing_addrs[chain].append(address)
 
                     decimals = token_data["decimals"]
                     total_supply = token_data["total_supply"]/(10**decimals)
