@@ -53,10 +53,10 @@ class Address(BaseModel):
             {where_cond}
             {cls.limit_cond(limit)}
             """
-            print("params",[str(addr) for addr in params])
+            # print("params",[str(addr) for addr in params])
             rows = db.get_all(query,params)
             ret = [cls._from_row(row) for row in rows]
-            print("result",[str(addr.address) for addr in ret])
+            # print("result",[str(addr.address) for addr in ret])
             return ret
 
     @staticmethod
