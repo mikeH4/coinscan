@@ -34,6 +34,10 @@ class Address(BaseModel):
             limit=limit,
             db=db
         )
+        if chain == ChainEnum("bsc"):
+            print("before",[str(a) for a in addresses])
+            print("after",[str(obj.address) for obj in objs])
+            
         return [obj.address for obj in objs]
     
     @classmethod
