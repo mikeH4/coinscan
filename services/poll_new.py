@@ -44,9 +44,9 @@ def main():
                     decimals = token_data["decimals"]
                     total_supply = token_data["total_supply"]/(10**decimals)
                     
-                    if not token_data["block_time"]:
-                        print(chain,address,"block_time is not ->",token_data["block_time"])
-                        continue
+                    # if not token_data["block_time"]:
+                    #     print(chain,address,"block_time is not ->",token_data["block_time"])
+                    #     continue
 
                     id = TokenMeta(
                         id=bigint(0),
