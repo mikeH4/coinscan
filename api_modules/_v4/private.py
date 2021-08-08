@@ -1,3 +1,5 @@
+from core.Address import Address
+from core.types.db_types import ChainEnum
 from library.database.postgres import DB
 from core.Token.ViewableToken import ViewableToken
 from core.types.AddressHash import AddressHash
@@ -62,3 +64,21 @@ def new_tokens(
             in set(db.get_all(sql,params))
         ]
         return tokens
+    
+
+class Body(BaseModel):
+    chain: ChainEnum
+    addresses: List[AddressHash]
+
+
+@router.post("/tokens-status")
+def post_tokens(body: Body):
+    chain = ChainEnum(body.chain)
+    sent = set(map(AddressHash,body.addresses))
+
+    with DB() as db:
+        existing = set([AddressHash(row[0]) for row in db.get_all(f"SELECT address FROM address WHERE chain = '{chain}'")])
+        return dict(
+            missing=len(sent - existing),
+            extra=len(existing - sent)
+        )

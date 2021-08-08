@@ -7,15 +7,13 @@ from core.sources.ScannerApi import ScannerApi
 from library.database.postgres import DB
 
 def main():
-    scanner_api = ScannerApi()
-    
     with DB() as db:
         for chain in ChainEnum.enum_opts:
             chain = ChainEnum(chain)
             addresses = [listing.token_address for listing in ViewableTokenListings.unlisted(chain=chain,db=db)]
             print(f"Search for {len(addresses)} addresses")
 
-            data = scanner_api.get_addresses(chain, addresses=addresses)
+            data = ScannerApi().get_addresses(chain, addresses=addresses)
             data_len = len(data)
 
             print(f"{len(addresses)-data_len} tokens not in response")
