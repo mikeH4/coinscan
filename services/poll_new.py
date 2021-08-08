@@ -53,7 +53,7 @@ def main():
                         name=token_data["name"],
                         symbol=token_data["symbol"],
                         decimals=decimals,
-                        created_time=token_data["block_time"],
+                        created_time=token_data["block_time"] or 0,
                         source_verified=ChainScanApi(chain).source_code(address=address) is not None
                     ).insert_or_update(
                         chain=chain,
