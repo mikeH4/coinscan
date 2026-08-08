@@ -1,6 +1,6 @@
 # coinscan
 
-dex analytics for eth + bsc. built it solo in 2021, i was 16. it ran live at coinscan.finance with a reddit bot people actually summoned.
+dex analytics for eth + bsc. built it solo in 2021, i was 18. it ran live at coinscan.finance with a reddit bot people actually summoned.
 
 it watched every new trading pair the second it hit pancakeswap / uniswap / sushi, priced it per block, tracked who was holding and who was dumping, and checked whether a token was a honeypot before you aped in. ~1200 commits over 6 months, three languages, no LLM because there wasn't one.
 
@@ -60,4 +60,4 @@ you build the throttle + a proxy pool or you get banned in an afternoon.
 - eth + bsc, both, per block
 - 3 languages by necessity, not for fun
 - 1.5gb edge cache, 120-connection postgres pools
-- 2021. i was 16. none of it is generated.
+- 2021. i was 18. none of it is generated.
