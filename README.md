@@ -4,7 +4,7 @@ dex analytics for eth + bsc. built it solo in 2021, i was 18. it ran live at coi
 
 it watched every new trading pair the second it hit pancakeswap / uniswap / sushi, priced it per block, tracked who was holding and who was dumping, and checked whether a token was a honeypot before you aped in. ~1200 commits over 6 months, three languages, no LLM because there wasn't one.
 
-fastest dex scanner running at the time, and not by accident: everything else did a database read on every request. i kept the entire token/pair/wallet graph in RAM and hot-swapped it, so a page load was a map lookup, not a query. dextools and poocoin spun. this didn't.
+fastest dex scanner in the world at the time, and not by accident: everything else did a database read on every request. i kept the entire token/pair/wallet graph in RAM and hot-swapped it, so a page load was a map lookup, not a query. dextools and poocoin spun. this didn't.
 
 this repo is the map. the system is 9 repos, listed at the bottom.
 
