@@ -6,17 +6,17 @@ it watched every new trading pair the second it hit pancakeswap / uniswap / sush
 
 fastest dex scanner in the world at the time, and not by accident: everything else did a database read on every request. i kept the entire token/pair/wallet graph in RAM and hot-swapped it, so a page load was a map lookup, not a query. dextools and poocoin spun. this didn't.
 
-this repo maps the 9 sub-codebases and microservices it's built from — 🐍 python · 🐹 go · 📘 typescript:
+this repo maps the 9 sub-codebases and microservices it's built from:
 
-- [coinscan-indexer](https://github.com/mikeH4/coinscan-indexer) — the on-chain engine, 11 scanners. start here. 📘
-- [api-balancer](https://github.com/mikeH4/api-balancer) — whole graph in memory, gob hot-swap, zero-downtime 🐹
-- [coinscan-frontend](https://github.com/mikeH4/coinscan-frontend) — react, every chart hand-drawn in d3, no lib 📘
-- [coinscan-offchain](https://github.com/mikeH4/coinscan-offchain) — holders, listings, source verification 🐍
-- [coinscan-cacher](https://github.com/mikeH4/coinscan-cacher) — ttl merge layer in front of the apis 📘
-- [coinscan-reddit-bot](https://github.com/mikeH4/coinscan-reddit-bot) — summon it, it reads the token off the comment chain, posts price/mcap/liq/holders/scam flags 📘
-- [balancer](https://github.com/mikeH4/balancer) — rate-limit-aware request gateway, per-host quotas, proxy rotation 🐹
-- [go-http-proxy](https://github.com/mikeH4/go-http-proxy) — the proxy fleet node 🐹
-- [this repo](https://github.com/mikeH4/coinscan) — v1 python core + custom orm, and the map you're reading 🐍
+- [coinscan-indexer](https://github.com/mikeH4/coinscan-indexer) — the on-chain engine, 11 scanners. start here. (typescript)
+- [api-balancer](https://github.com/mikeH4/api-balancer) — whole graph in memory, gob hot-swap, zero-downtime (go)
+- [coinscan-frontend](https://github.com/mikeH4/coinscan-frontend) — react, every chart hand-drawn in d3, no lib (typescript)
+- [coinscan-offchain](https://github.com/mikeH4/coinscan-offchain) — holders, listings, source verification (python)
+- [coinscan-cacher](https://github.com/mikeH4/coinscan-cacher) — ttl merge layer in front of the apis (typescript)
+- [coinscan-reddit-bot](https://github.com/mikeH4/coinscan-reddit-bot) — summon it, it reads the token off the comment chain, posts price/mcap/liq/holders/scam flags (typescript)
+- [balancer](https://github.com/mikeH4/balancer) — rate-limit-aware request gateway, per-host quotas, proxy rotation (go)
+- [go-http-proxy](https://github.com/mikeH4/go-http-proxy) — the proxy fleet node (go)
+- [this repo](https://github.com/mikeH4/coinscan) — v1 python core + custom orm, and the map you're reading (python)
 
 ## what it all did
 
